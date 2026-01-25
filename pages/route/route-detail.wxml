@@ -1,0 +1,86 @@
+<!--pages/route/route-detail.wxml-->
+<view class="route-detail-container">
+  <!-- 顶部概览 -->
+  <view class="detail-header">
+    <view class="header-title-row">
+      <text class="header-title">{{scheme.name}}</text>
+      <view class="header-tag">{{scheme.tag}}</view>
+    </view>
+    <view class="header-stats">
+      <view class="stat-card">
+        <text class="stat-value">{{scheme.totalDistance}}</text>
+        <text class="stat-label">总距离(km)</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{scheme.totalDuration}}</text>
+        <text class="stat-label">步行(分钟)</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{scheme.visitDuration}}</text>
+        <text class="stat-label">游玩(小时)</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 时间轴路线 -->
+  <view class="route-timeline">
+    <text class="section-title">游玩攻略</text>
+    <view class="timeline">
+      <view
+        wx:for="{{scheme.stops}}"
+        wx:key="id"
+        class="timeline-item"
+      >
+        <view class="timeline-marker">{{index + 1}}</view>
+        <view class="timeline-content">
+          <view class="timeline-title">{{item.name}}</view>
+          <view class="timeline-info">
+            <text class="info-label">建议停留:</text>
+            <text class="info-value">{{item.duration || 30}}分钟</text>
+          </view>
+          <view class="timeline-info">
+            <text class="info-label">景点特色:</text>
+            <text class="info-value">{{item.feature || '风景优美，值得一游'}}</text>
+          </view>
+          <view class="timeline-tips">
+            <icon type="info" size="14" color="#ff6b35"></icon>
+            <text>{{item.tips || '建议提前准备相机，记录美好时光'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 温馨提示 -->
+  <view class="tips-section">
+    <text class="section-title">温馨提示</text>
+    <view class="tips-list">
+      <view class="tip-item">
+        <icon type="success" size="16" color="#52c41a"></icon>
+        <text>建议携带防晒用品和充足的水</text>
+      </view>
+      <view class="tip-item">
+        <icon type="success" size="16" color="#52c41a"></icon>
+        <text>穿着舒适的步行鞋</text>
+      </view>
+      <view class="tip-item">
+        <icon type="success" size="16" color="#52c41a"></icon>
+        <text>注意景区开放时间，合理安排行程</text>
+      </view>
+      <view class="tip-item">
+        <icon type="warn" size="16" color="#ff6b35"></icon>
+        <text>雨天路滑，请注意安全</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="bottom-actions">
+    <button class="action-button outline" bindtap="onShare">
+      分享给朋友
+    </button>
+    <button class="action-button primary" bindtap="onBackToMap">
+      返回地图
+    </button>
+  </view>
+</view>

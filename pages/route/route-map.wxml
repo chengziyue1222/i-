@@ -1,0 +1,71 @@
+<!--pages/route/route-map.wxml-->
+<view class="route-map-container">
+  <!-- 地图组件 -->
+  <map
+    id="routeMap"
+    longitude="{{centerLocation.longitude}}"
+    latitude="{{centerLocation.latitude}}"
+    scale="16"
+    markers="{{markers}}"
+    polyline="{{polyline}}"
+    show-location="{{true}}"
+    bindregionchange="onMapRegionChange"
+    style="width: 100%; height: calc(100vh - 400rpx);"
+  >
+    <cover-view class="map-controls">
+      <cover-view class="control-button" bindtap="onZoomIn">
+        <cover-view class="control-icon">+</cover-view>
+      </cover-view>
+      <cover-view class="control-button" bindtap="onZoomOut">
+        <cover-view class="control-icon">-</cover-view>
+      </cover-view>
+    </cover-view>
+  </map>
+
+  <!-- 底部路线信息 -->
+  <view class="route-info-panel">
+    <view class="route-header">
+      <view class="route-title-row">
+        <text class="route-title">{{scheme.name}}</text>
+        <view class="route-tag">{{scheme.tag}}</view>
+      </view>
+      <view class="route-stats">
+        <view class="stat-item">
+          <icon type="waiting" size="14" color="#666"></icon>
+          <text>{{scheme.totalDistance}}km</text>
+        </view>
+        <view class="stat-item">
+          <icon type="waiting" size="14" color="#666"></icon>
+          <text>{{scheme.totalDuration}}分钟</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 站点列表 -->
+    <scroll-view class="stops-scroll" scroll-x="{{true}}">
+      <view
+        wx:for="{{scheme.stops}}"
+        wx:key="id"
+        class="stop-item {{currentStopIndex === index ? 'active' : ''}}"
+        bindtap="onStopTap"
+        data-index="{{index}}"
+      >
+        <view class="stop-index">{{index + 1}}</view>
+        <view class="stop-info">
+          <text class="stop-name">{{item.name}}</text>
+          <text class="stop-distance">{{item.distance || '起点'}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="action-button secondary" bindtap="onViewDetail">
+        查看攻略
+      </button>
+      <button class="action-button primary" bindtap="onStartNavigation">
+        开始导航
+      </button>
+    </view>
+  </view>
+</view>

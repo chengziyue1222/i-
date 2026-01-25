@@ -1,0 +1,214 @@
+/* pages/route/scenic-detail.wxss */
+.scenic-detail-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f6f6f6;
+}
+
+.scenic-header {
+  position: relative;
+  height: 400rpx;
+}
+
+.header-image {
+  width: 100%;
+  height: 100%;
+}
+
+.header-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40rpx 30rpx;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+}
+
+.scenic-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12rpx;
+}
+
+.scenic-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.scenic-info-card {
+  margin: 20rpx 30rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.attractions-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: 0 30rpx 20rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.section-title text:first-child {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.selected-count {
+  font-size: 24rpx;
+  color: #0F62FE;
+}
+
+.attractions-scroll {
+  flex: 1;
+  max-height: 600rpx;
+}
+
+.attraction-item {
+  display: flex;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  background-color: #fff;
+}
+
+.attraction-item.selected {
+  background-color: #f0f7ff;
+}
+
+.attraction-icon {
+  margin-right: 24rpx;
+  padding-top: 6rpx;
+}
+
+.attraction-content {
+  flex: 1;
+}
+
+.attraction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.attraction-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.attraction-duration {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.attraction-desc {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.6;
+}
+
+.bottom-bar {
+  padding: 20rpx 30rpx;
+  background-color: #fff;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.plan-button {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #0F62FE;
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  border: none;
+}
+
+.plan-button[disabled] {
+  background-color: #ccc;
+}
+
+/* 终点选择样式 */
+.end-point-options {
+  padding: 0 30rpx 20rpx;
+}
+
+.end-point-item {
+  display: flex;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.end-point-item:last-child {
+  border-bottom: none;
+}
+
+.end-point-item.selected {
+  background-color: #f0f7ff;
+  margin: 0 -30rpx;
+  padding: 30rpx;
+  border-radius: 8rpx;
+}
+
+.end-point-icon {
+  margin-right: 24rpx;
+  padding-top: 6rpx;
+}
+
+.end-point-content {
+  flex: 1;
+}
+
+.end-point-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.end-point-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.5;
+}

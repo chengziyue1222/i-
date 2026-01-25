@@ -1,0 +1,238 @@
+/* pages/way/index.wxss */
+/* 容器样式 */
+.container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #f8f9fa;
+  overflow: hidden;
+}
+
+/* 顶部导航栏 */
+.nav-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32rpx;
+  z-index: 1000;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 1rpx;
+}
+
+.location-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.location-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.95);
+}
+
+.location-btn image {
+  width: 36rpx;
+  height: 36rpx;
+  tint-color: #ffffff;
+}
+
+/* 地图区域 */
+map {
+  width: 100%;
+  height: 60vh;
+  margin-top: 88rpx; /* 避免被导航栏遮挡 */
+}
+
+/* 底部搜索区域 */
+.bottom-search {
+  position: relative;
+  background: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 48rpx 32rpx 32rpx;
+  margin-top: -64rpx;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 搜索框样式 */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f1f3f4;
+  border-radius: 50rpx;
+  padding: 20rpx 32rpx;
+  margin-bottom: 48rpx;
+  transition: all 0.3s ease;
+  border: 2rpx solid transparent;
+}
+
+.search-box:focus-within {
+  background: #ffffff;
+  border-color: #4285f4;
+  box-shadow: 0 4rpx 16rpx rgba(66, 133, 244, 0.15);
+}
+
+.search-box icon {
+  color: #9aa0a6;
+  margin-right: 16rpx;
+  font-size: 32rpx;
+}
+
+.search-box input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #202124;
+  background: transparent;
+}
+
+/* 微信小程序 input placeholder 样式 */
+.search-box input::-webkit-input-placeholder {
+  color: #9aa0a6;
+}
+
+/* 分类导航区域 */
+.categories {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16rpx;
+}
+
+.category-item {
+  width: 96rpx;
+  height: 96rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 24rpx;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.category-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #4285f4, #34a853);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 24rpx;
+}
+
+.category-item image {
+  width: 56rpx;
+  height: 56rpx;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+/* 选中状态 */
+.category-item.selected {
+  background: linear-gradient(135deg, #4285f4, #34a853);
+  transform: translateY(-8rpx);
+  box-shadow: 0 12rpx 24rpx rgba(66, 133, 244, 0.25);
+}
+
+.category-item.selected image {
+  filter: brightness(0) invert(1);
+}
+
+.category-item.selected::before {
+  opacity: 1;
+}
+
+/* 悬停效果（仅支持部分设备） */
+.category-item:active {
+  transform: translateY(-4rpx) scale(0.95);
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 375px) {
+  .nav-bar {
+    padding: 0 24rpx;
+  }
+
+  .title {
+    font-size: 30rpx;
+  }
+
+  .bottom-search {
+    padding: 32rpx 24rpx 24rpx;
+  }
+
+  .categories {
+    padding: 0 8rpx;
+  }
+
+  .category-item {
+    width: 80rpx;
+    height: 80rpx;
+  }
+
+  .category-item image {
+    width: 48rpx;
+    height: 48rpx;
+  }
+}
+
+/* 动画效果 */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.bottom-search {
+  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 深色模式适配（如果需要） */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background-color: #121212;
+  }
+  
+  .bottom-search {
+    background: #1e1e1e;
+  }
+  
+  .search-box {
+    background: #2d2d2d;
+  }
+  
+  .search-box input {
+    color: #ffffff;
+  }
+  
+  .category-item {
+    background: #2d2d2d;
+  }
+}

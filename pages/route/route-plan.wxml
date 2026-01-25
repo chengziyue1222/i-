@@ -1,0 +1,76 @@
+<!--pages/route/route-plan.wxml-->
+<view class="route-plan-container">
+  <!-- 路线类型选择 -->
+  <view class="route-type-section">
+    <text class="section-title">路线类型</text>
+    <view class="type-tabs">
+      <view
+        wx:for="{{routeTypes}}"
+        wx:key="type"
+        class="type-tab {{currentType === item.type ? 'active' : ''}}"
+        bindtap="onTypeChange"
+        data-type="{{item.type}}"
+      >
+        <icon type="{{item.icon}}" size="18"></icon>
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 路线方案列表 -->
+  <view class="route-schemes">
+    <text class="section-title">推荐路线方案</text>
+    <scroll-view
+      class="schemes-scroll"
+      scroll-y="{{true}}"
+    >
+      <view
+        wx:for="{{routeSchemes}}"
+        wx:key="id"
+        class="scheme-card"
+        bindtap="onSchemeSelect"
+        data-scheme-id="{{item.id}}"
+      >
+        <view class="scheme-header">
+          <text class="scheme-title">{{item.name}}</text>
+          <view class="scheme-tag">{{item.tag}}</view>
+        </view>
+
+        <!-- 路线概览 -->
+        <view class="route-overview">
+          <view
+            wx:for="{{item.stops}}"
+            wx:for-item="stop"
+            wx:key="id"
+            class="stop-item"
+          >
+            <view class="stop-icon"></view>
+            <text class="stop-name">{{stop.name}}</text>
+            <view wx:if="{{index < item.stops.length - 1}}" class="stop-line"></view>
+          </view>
+        </view>
+
+        <!-- 路线信息 -->
+        <view class="scheme-info">
+          <view class="info-item">
+            <icon type="waiting" size="14" color="#666"></icon>
+            <text>全程 {{item.totalDistance}}km</text>
+          </view>
+          <view class="info-item">
+            <icon type="waiting" size="14" color="#666"></icon>
+            <text>预计 {{item.totalDuration}}分钟</text>
+          </view>
+          <view class="info-item">
+            <icon type="waiting" size="14" color="#666"></icon>
+            <text>游玩 {{item.visitDuration}}小时</text>
+          </view>
+        </view>
+
+        <view class="scheme-action">
+          <text class="action-text">查看详情</text>
+          <icon type="waiting" size="16" color="#0F62FE"></icon>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

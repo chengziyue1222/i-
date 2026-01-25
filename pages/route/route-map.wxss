@@ -1,0 +1,157 @@
+/* pages/route/route-map.wxss */
+.route-map-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f6f6f6;
+}
+
+.map-controls {
+  position: absolute;
+  right: 30rpx;
+  top: 30rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.control-button {
+  width: 80rpx;
+  height: 80rpx;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.control-icon {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.route-info-panel {
+  background-color: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 30rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.route-header {
+  margin-bottom: 24rpx;
+}
+
+.route-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.route-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.route-tag {
+  padding: 6rpx 16rpx;
+  background-color: #fff4e5;
+  color: #ff6b35;
+  font-size: 20rpx;
+  border-radius: 8rpx;
+}
+
+.route-stats {
+  display: flex;
+  gap: 40rpx;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.stops-scroll {
+  white-space: nowrap;
+  margin-bottom: 30rpx;
+}
+
+.stop-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background-color: #f9f9f9;
+  border-radius: 12rpx;
+  margin-right: 16rpx;
+  min-width: 200rpx;
+}
+
+.stop-item.active {
+  background-color: #e6f0ff;
+}
+
+.stop-index {
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #0F62FE;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.stop-item.active .stop-index {
+  background-color: #0052cc;
+}
+
+.stop-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stop-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.stop-distance {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-button {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.action-button.primary {
+  background-color: #0F62FE;
+  color: #fff;
+}
+
+.action-button.secondary {
+  background-color: #f5f5f5;
+  color: #333;
+}

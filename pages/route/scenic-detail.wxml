@@ -1,0 +1,115 @@
+<!--pages/route/scenic-detail.wxml-->
+<view class="scenic-detail-container">
+  <!-- 景区头部信息 -->
+  <view class="scenic-header">
+    <image class="header-image" src="{{scenicInfo.images[0]}}" mode="aspectFill"></image>
+    <view class="header-overlay">
+      <text class="scenic-title">{{scenicInfo.scenicName}}</text>
+      <text class="scenic-desc">{{scenicInfo.description}}</text>
+    </view>
+  </view>
+
+  <!-- 景区信息 -->
+  <view class="scenic-info-card">
+    <view class="info-row">
+      <text class="info-label">开放时间</text>
+      <text class="info-value">{{scenicInfo.openingHours}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">推荐游玩时长</text>
+      <text class="info-value">{{scenicInfo.suggestedDuration}}小时</text>
+    </view>
+  </view>
+
+  <!-- 景点选择 -->
+  <view class="attractions-section">
+    <view class="section-title">
+      <text>选择景点</text>
+      <text class="selected-count">已选 {{selectedAttractions.length}} 个</text>
+    </view>
+
+    <scroll-view
+      class="attractions-scroll"
+      scroll-y="{{true}}"
+    >
+      <view
+        wx:for="{{attractions}}"
+        wx:key="id"
+        class="attraction-item {{item.selected ? 'selected' : ''}}"
+        bindtap="onAttractionTap"
+        data-id="{{item.id}}"
+      >
+        <view class="attraction-icon">
+          <icon
+            type="{{item.selected ? 'success' : 'circle'}}"
+            size="20"
+            color="{{item.selected ? '#0F62FE' : '#ccc'}}"
+          ></icon>
+        </view>
+        <view class="attraction-content">
+          <view class="attraction-header">
+            <text class="attraction-name">{{item.name}}</text>
+            <text class="attraction-duration">{{item.duration}}分钟</text>
+          </view>
+          <text class="attraction-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 选择终点 -->
+  <view class="attractions-section">
+    <view class="section-title">
+      <text>选择终点</text>
+    </view>
+    
+    <view class="end-point-options">
+      <view
+        class="end-point-item {{selectedEndPoint === 'current' ? 'selected' : ''}}"
+        bindtap="onEndPointSelect"
+        data-type="current"
+      >
+        <view class="end-point-icon">
+          <icon
+            type="{{selectedEndPoint === 'current' ? 'success' : 'circle'}}"
+            size="20"
+            color="{{selectedEndPoint === 'current' ? '#0F62FE' : '#ccc'}}"
+          ></icon>
+        </view>
+        <view class="end-point-content">
+          <text class="end-point-name">当前位置</text>
+          <text class="end-point-desc">使用您的当前位置作为终点</text>
+        </view>
+      </view>
+      
+      <view
+        class="end-point-item {{selectedEndPoint === 'exit' ? 'selected' : ''}}"
+        bindtap="onEndPointSelect"
+        data-type="exit"
+      >
+        <view class="end-point-icon">
+          <icon
+            type="{{selectedEndPoint === 'exit' ? 'success' : 'circle'}}"
+            size="20"
+            color="{{selectedEndPoint === 'exit' ? '#0F62FE' : '#ccc'}}"
+          ></icon>
+        </view>
+        <view class="end-point-content">
+          <text class="end-point-name">景区出口</text>
+          <text class="end-point-desc">返回景区出口作为终点</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <button
+      class="plan-button"
+      disabled="{{selectedAttractions.length === 0}}"
+      bindtap="onPlanRoute"
+    >
+      生成路线方案
+    </button>
+  </view>
+</view>

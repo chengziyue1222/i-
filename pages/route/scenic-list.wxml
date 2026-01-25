@@ -1,0 +1,55 @@
+<!--pages/route/scenic-list.wxml-->
+<view class="scenic-list-container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <icon type="search" size="16" color="#999"></icon>
+      <input
+        class="search-input"
+        placeholder="搜索景区名称"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+  </view>
+
+  <!-- 景区列表 -->
+  <scroll-view
+    class="scenic-scroll"
+    scroll-y="{{true}}"
+    enable-back-to-top="{{true}}"
+  >
+    <view
+      wx:for="{{filteredScenicList}}"
+      wx:key="scenicId"
+      class="scenic-card"
+      bindtap="onScenicTap"
+      data-scenic="{{item}}"
+    >
+      <image class="scenic-image" src="{{item.images[0]}}" mode="aspectFill"></image>
+      <view class="scenic-info">
+        <view class="scenic-header">
+          <text class="scenic-name">{{item.scenicName}}</text>
+          <view class="scenic-tag">{{item.level || 'AAAAA'}}</view>
+        </view>
+        <text class="scenic-desc">{{item.description}}</text>
+        <view class="scenic-meta">
+          <view class="meta-item">
+            <icon type="waiting" size="12" color="#666"></icon>
+            <text>{{item.suggestedDuration}}小时</text>
+          </view>
+          <view class="meta-item">
+            <icon type="waiting" size="12" color="#666"></icon>
+            <text>{{item.openingHours}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{filteredScenicList.length === 0}}" class="empty-state">
+      <icon type="info" size="48" color="#ccc"></icon>
+      <text class="empty-text">暂无景区数据</text>
+    </view>
+  </scroll-view>
+</view>
