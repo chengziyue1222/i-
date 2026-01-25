@@ -2,14 +2,16 @@
 Page({
   data: {
     scheme: {},
-    scenicId: ''
+    scenicId: '',
+    routePoints: []
   },
 
   onLoad(options) {
     const data = JSON.parse(decodeURIComponent(options.data));
     this.setData({
       scheme: data.scheme,
-      scenicId: data.scenicId
+      scenicId: data.scenicId,
+      routePoints: data.routePoints || []
     });
   },
 

@@ -1,0 +1,19 @@
+<!--pages/route/route-nav-page.wxml-->
+<view class="nav-page-container">
+  <!-- 地图组件 -->
+  <map
+    id="navMap"
+    longitude="{{centerLocation.longitude}}"
+    latitude="{{centerLocation.latitude}}"
+    scale="15"
+    markers="{{markers}}"
+    polyline="{{polyline}}"
+    show-location="{{true}}"
+    style="width: 100%; height: 100vh;"
+  ></map>
+
+  <!-- 返回按钮 -->
+  <view class="back-button" bindtap="onBack">
+    <icon type="back" size="20" color="#333"></icon>
+  </view>
+</view>

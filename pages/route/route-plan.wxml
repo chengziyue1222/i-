@@ -67,8 +67,16 @@
         </view>
 
         <view class="scheme-action">
-          <text class="action-text">查看详情</text>
-          <icon type="waiting" size="16" color="#0F62FE"></icon>
+          <view class="action-group">
+            <view class="action-item" bindtap="onNavigate" data-scheme-id="{{item.id}}">
+              <text class="action-text">查看详情</text>
+              <icon type="waiting" size="16" color="#0F62FE"></icon>
+            </view>
+            <view class="action-item" bindtap="onSchemeSelect" data-scheme-id="{{item.id}}">
+              <text class="action-text">查看地图</text>
+              <icon type="waiting" size="16" color="#0F62FE"></icon>
+            </view>
+          </view>
         </view>
       </view>
     </scroll-view>

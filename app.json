@@ -5,6 +5,7 @@
     "pages/route/scenic-detail",
     "pages/route/route-plan",
     "pages/route/route-map",
+    "pages/route/route-nav-page",
     "pages/route/route-detail",
     "pages/solution/index",
     "pages/aboutUs/index",

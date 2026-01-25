@@ -9,6 +9,7 @@ Page({
     },
     markers: [],
     polyline: [],
+    pathPoints: [], // 完整的路径点数据
     currentStopIndex: 0,
     sortedAttractions: []
   },
@@ -50,12 +51,14 @@ Page({
     let sortedAttractions = wx.getStorageSync('sortedAttractions') || [];
     let cachedPathData = wx.getStorageSync('routePathData');
 
-    console.log('从存储获取的路线数据:', sortedAttractions);
-    console.log('从存储获取的路径数据:', cachedPathData);
+    console.log('[route-map] 从存储获取的路线数据:', sortedAttractions);
+    console.log('[route-map] 从存储获取的路径数据:', cachedPathData);
+    console.log('[route-map] scheme.pathData:', this.data.scheme?.pathData);
 
     // 如果传递的 scheme 中有 pathData，优先使用传递的数据
     if (this.data.scheme && this.data.scheme.pathData) {
-      console.log('使用传递的路径数据（优先）:', this.data.scheme.pathData);
+      console.log('[route-map] 使用传递的路径数据（优先）:', this.data.scheme.pathData);
+      console.log('[route-map] 路径点数:', this.data.scheme.pathData.points?.length || 0);
       cachedPathData = this.data.scheme.pathData;
     }
 
@@ -112,78 +115,51 @@ Page({
       // 生成标记点 - 使用自定义颜色区分起点终点
       const markers = this.generateMarkers(mergedAttractions);
 
-      // 生成步行导航路线 - 优先使用传递的路径数据中的polyline，解析失败则回退到直线
+      // 生成步行导航路线
       let polyline;
-      const schemePathData = this.data.scheme?.pathData;
+      let pathPoints = [];
       
-      console.log('[路线显示] scheme.pathData:', schemePathData);
-      console.log('[路线显示] scheme.pathData?.polyline:', schemePathData?.polyline);
-      console.log('[路线显示] scheme.pathData?.points:', schemePathData?.points);
+      // 检查是否有完整的路径数据
+      console.log('[路线显示] scheme:', this.data.scheme);
+      console.log('[路线显示] scheme.pathData:', this.data.scheme?.pathData);
       
-      if (schemePathData?.polyline && Array.isArray(schemePathData.polyline) && schemePathData.polyline.length > 0) {
-        console.log('[路线显示] 使用传递的路径数据中的polyline');
-        try {
-          polyline = this.buildPolylineFromCache(schemePathData);
-          if (!polyline || polyline.length === 0) {
-            console.warn('[路线显示] 传递的polyline解析失败，回退到直线显示');
-            polyline = this.generatePolyline(mergedAttractions);
-          }
-        } catch (error) {
-          console.error('[路线显示] 解析传递的polyline出错，回退到直线显示:', error);
-          polyline = this.generatePolyline(mergedAttractions);
-        }
-      } else if (schemePathData?.points && Array.isArray(schemePathData.points) && schemePathData.points.length > 0) {
-        console.log('[路线显示] 使用传递的路径数据中的points');
-        try {
-          polyline = this.buildPolylineFromCache(schemePathData);
-          if (!polyline || polyline.length === 0) {
-            console.warn('[路线显示] 传递的points解析失败，回退到直线显示');
-            polyline = this.generatePolyline(mergedAttractions);
-          }
-        } catch (error) {
-          console.error('[路线显示] 解析传递的points出错，回退到直线显示:', error);
-          polyline = this.generatePolyline(mergedAttractions);
-        }
-      } else if (cachedPathData?.polyline && Array.isArray(cachedPathData.polyline) && cachedPathData.polyline.length > 0) {
-        console.log('[路线显示] 使用缓存的polyline');
-        try {
-          polyline = this.buildPolylineFromCache(cachedPathData);
-          if (!polyline || polyline.length === 0) {
-            console.warn('[路线显示] 缓存的polyline解析失败，回退到直线显示');
-            polyline = this.generatePolyline(mergedAttractions);
-          }
-        } catch (error) {
-          console.error('[路线显示] 解析缓存的polyline出错，回退到直线显示:', error);
-          polyline = this.generatePolyline(mergedAttractions);
-        }
-      } else if (cachedPathData?.points && Array.isArray(cachedPathData.points) && cachedPathData.points.length > 0) {
-        console.log('[路线显示] 使用缓存的points');
-        try {
-          polyline = this.buildPolylineFromCache(cachedPathData);
-          if (!polyline || polyline.length === 0) {
-            console.warn('[路线显示] 缓存的points解析失败，回退到直线显示');
-            polyline = this.generatePolyline(mergedAttractions);
-          }
-        } catch (error) {
-          console.error('[路线显示] 解析缓存的points出错，回退到直线显示:', error);
-          polyline = this.generatePolyline(mergedAttractions);
-        }
+      if (this.data.scheme && this.data.scheme.pathData && this.data.scheme.pathData.points && this.data.scheme.pathData.points.length > 0) {
+        console.log('[路线显示] ✅ 使用完整的路径数据');
+        pathPoints = this.data.scheme.pathData.points;
+        console.log('[路线显示] 路径点数:', pathPoints.length);
+        polyline = [{
+          points: pathPoints,
+          color: '#0F62FE',
+          width: 5,
+          dottedLine: false,
+          arrowLine: true
+        }];
       } else {
-        console.log('[路线显示] 无路径数据，调用API获取');
-        polyline = await this.generateWalkingPolyline(sortedAttractions);
+        console.log('[路线显示] ❌ 使用直线连接景点（无路径数据）');
+        try {
+          polyline = this.generatePolyline(mergedAttractions);
+          // 从polyline中提取路径点
+          if (polyline && polyline[0] && polyline[0].points) {
+            pathPoints = polyline[0].points;
+          }
+        } catch (error) {
+          console.error('[路线显示] 生成直线失败:', error);
+          polyline = [];
+        }
       }
 
       // 计算中心点
       const centerLocation = this.calculateCenter(mergedAttractions);
       // 输出中心点
-      console.log('中心点坐标:', centerLocation);
-      console.log('标记点数量:', markers.length);
-      console.log('路线数据结构:', polyline);
-      console.log('路线点数量:', polyline && polyline[0] && polyline[0].points ? polyline[0].points.length : 'N/A');
+      console.log('[route-map] 中心点坐标:', centerLocation);
+      console.log('[route-map] 标记点数量:', markers.length);
+      console.log('[route-map] 路线数据结构:', polyline);
+      console.log('[route-map] 路径点数量:', pathPoints.length);
 
       this.setData({
         markers,
         polyline: polyline || [],
+        pathPoints: pathPoints,
         centerLocation,
         sortedAttractions: mergedAttractions
       });
@@ -269,362 +245,6 @@ Page({
       dottedLine: false,
       arrowLine: true
     }];
-  },
-
-  // 从缓存数据构建polyline
-  buildPolylineFromCache(pathData) {
-    console.log('[路线解析] 输入的 pathData:', pathData);
-
-    if (!pathData) {
-      console.warn('[路线解析] 缓存路径数据为空或无效');
-      return [];
-    }
-
-    // 优先使用原始的 polyline 字符串数组重新解码（最准确的步行路径）
-    if (pathData.polylineStrings && Array.isArray(pathData.polylineStrings) && pathData.polylineStrings.length > 0) {
-      console.log('[路线解析] 发现原始 polylineStrings，数量:', pathData.polylineStrings.length);
-      
-      let allPoints = [];
-      
-      for (const segment of pathData.polylineStrings) {
-        if (segment.polyline && typeof segment.polyline === 'string') {
-          const decodedPoints = this.decodePolyline(segment.polyline);
-          if (decodedPoints && Array.isArray(decodedPoints) && decodedPoints.length > 0) {
-            // 如果是第一段，完整添加；如果是后续段，跳过第一个点（避免重复）
-            if (allPoints.length === 0) {
-              allPoints = allPoints.concat(decodedPoints);
-            } else {
-              allPoints = allPoints.concat(decodedPoints.slice(1));
-            }
-          }
-        }
-      }
-      
-      if (allPoints.length > 0) {
-        console.log('[路线解析] 从 polylineStrings 解码到', allPoints.length, '个坐标点');
-        return [{
-          points: allPoints,
-          color: '#0F62FE',
-          width: 5,
-          dottedLine: false,
-          arrowLine: true
-        }];
-      }
-    }
-
-    // 如果没有 polylineStrings，尝试直接提取 polyline（如果存在且有效）
-    if (pathData.polyline && Array.isArray(pathData.polyline) && pathData.polyline.length > 0) {
-      console.log('[路线解析] 发现直接 polyline 数组，数量:', pathData.polyline.length);
-      
-      // 提取所有 polyline 的 points
-      const allPoints = [];
-      for (const pl of pathData.polyline) {
-        if (pl.points && Array.isArray(pl.points)) {
-          allPoints.push(...pl.points);
-        }
-      }
-      
-      if (allPoints.length > 0) {
-        console.log('[路线解析] 从 polyline 中提取到', allPoints.length, '个坐标点');
-        return [{
-          points: allPoints,
-          color: '#0F62FE',
-          width: 5,
-          dottedLine: false,
-          arrowLine: true
-        }];
-      }
-    }
-
-    // 如果没有直接的 polyline，尝试提取 points
-    const { points } = pathData;
-
-    console.log('[路线解析] 提取的 points:', points);
-    console.log('[路线解析] points 类型:', typeof points);
-    console.log('[路线解析] points 是否为数组:', Array.isArray(points));
-    console.log('[路线解析] points 长度:', points ? points.length : 'N/A');
-
-    if (!points || !Array.isArray(points) || points.length === 0) {
-      console.warn('[路线解析] 路径点为空或无效，使用直线连接');
-      const sortedAttractions = wx.getStorageSync('sortedAttractions') || [];
-      return this.generatePolyline(sortedAttractions);
-    }
-
-    // 验证并过滤有效的坐标点
-    const validPoints = points.filter(point => {
-      const isValid = point && 
-                      typeof point.latitude === 'number' && 
-                      typeof point.longitude === 'number' &&
-                      !isNaN(point.latitude) && 
-                      !isNaN(point.longitude) &&
-                      point.latitude >= -90 && 
-                      point.latitude <= 90 &&
-                      point.longitude >= -180 && 
-                      point.longitude <= 180;
-      
-      if (!isValid) {
-        console.warn('[路线解析] 过滤无效的坐标点:', point);
-      }
-      return isValid;
-    });
-
-    console.log('[路线解析] 原始路径点数量:', points.length);
-    console.log('[路线解析] 过滤后有效路径点数量:', validPoints.length);
-
-    if (validPoints.length === 0) {
-      console.warn('[路线解析] 没有有效的路径点，使用直线连接');
-      const sortedAttractions = wx.getStorageSync('sortedAttractions') || [];
-      return this.generatePolyline(sortedAttractions);
-    }
-
-    console.log('[路线解析] 成功构建路线，有效坐标点数量:', validPoints.length);
-    return [{
-      points: validPoints,
-      color: '#0F62FE',
-      width: 5,
-      dottedLine: false,
-      arrowLine: true
-    }];
-  },
-
-  // 生成步行导航路线（使用腾讯地图API）
-  async generateWalkingPolyline(attractions) {
-    try {
-      // 获取腾讯地图API Key
-      const key = wx.getStorageSync('tencentMapKey') || '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE';
-      
-      // 构建所有路线段
-      let allPathPoints = [];
-      
-      // 逐段获取步行路径
-      for (let i = 0; i < attractions.length - 1; i++) {
-        const from = attractions[i];
-        const to = attractions[i + 1];
-        
-        try {
-          const pathPoints = await this.getWalkingPath(
-            from.location,
-            to.location,
-            key
-          );
-          
-          if (pathPoints && pathPoints.length > 0) {
-            // 确保所有坐标点都是有效的
-            const validPoints = pathPoints.filter(point => 
-              point && 
-              typeof point.latitude === 'number' && 
-              typeof point.longitude === 'number' &&
-              !isNaN(point.latitude) && 
-              !isNaN(point.longitude)
-            );
-            
-            if (validPoints.length > 0) {
-              // 如果是第一段，直接添加；如果是后续段，跳过第一个点（避免重复）
-              if (i === 0) {
-                allPathPoints = allPathPoints.concat(validPoints);
-              } else {
-                allPathPoints = allPathPoints.concat(validPoints.slice(1));
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(`获取步行路径失败 (${from.name} -> ${to.name}):`, error);
-        }
-      }
-
-      // 如果没有获取到任何有效路径点，回退到直线
-      if (allPathPoints.length === 0) {
-        console.warn('未获取到任何有效的步行路径点，使用直线连接');
-        return this.generatePolyline(attractions);
-      }
-
-      console.log('步行导航路线点数量:', allPathPoints.length);
-      console.log('前3个路径点示例:', allPathPoints.slice(0, 3));
-      
-      return [{
-        points: allPathPoints,
-        color: '#0F62FE',
-        width: 5,
-        dottedLine: false,
-        arrowLine: true
-      }];
-    } catch (error) {
-      console.error('生成步行导航路线失败:', error);
-      // 出错时回退到直线连接
-      return this.generatePolyline(attractions);
-    }
-  },
-
-  // 获取两点间的步行路径（使用腾讯地图API）
-  getWalkingPath(fromLocation, toLocation, key) {
-    return new Promise((resolve, reject) => {
-      const from = `${fromLocation.latitude},${fromLocation.longitude}`;
-      const to = `${toLocation.latitude},${toLocation.longitude}`;
-      
-      console.log(`调用腾讯地图步行路径API: ${from} -> ${to}`);
-      
-      wx.request({
-        url: 'https://apis.map.qq.com/ws/direction/v1/walking',
-        method: 'GET',
-        data: {
-          from: from,
-          to: to,
-          key: key
-        },
-        success: (res) => {
-          console.log('腾讯地图API原始响应:', res.data);
-          
-          if (res.data && res.data.status === 0 && res.data.result && res.data.result.routes && res.data.result.routes.length > 0) {
-            // 解析路径坐标点
-            const route = res.data.result.routes[0];
-            console.log('路由数据:', route);
-            
-            const pathPoints = this.parseRoutePolyline(route);
-            
-            // 确保返回的是有效数组
-            if (Array.isArray(pathPoints) && pathPoints.length > 0) {
-              console.log(`成功获取步行路径: ${from} -> ${to}, 路径点数量: ${pathPoints.length}`);
-              resolve(pathPoints);
-            } else {
-              console.warn('parseRoutePolyline返回空数组，使用直线作为备选');
-              // 返回起点和终点作为直线
-              resolve([
-                { latitude: fromLocation.latitude, longitude: fromLocation.longitude },
-                { latitude: toLocation.latitude, longitude: toLocation.longitude }
-              ]);
-            }
-          } else {
-            console.warn('腾讯地图API返回异常:', res.data);
-            // API返回错误时，使用直线作为备选
-            resolve([
-              { latitude: fromLocation.latitude, longitude: fromLocation.longitude },
-              { latitude: toLocation.latitude, longitude: toLocation.longitude }
-            ]);
-          }
-        },
-        fail: (err) => {
-          console.error('腾讯地图API调用失败:', err);
-          // 网络请求失败时，使用直线作为备选
-          resolve([
-            { latitude: fromLocation.latitude, longitude: fromLocation.longitude },
-            { latitude: toLocation.latitude, longitude: toLocation.longitude }
-          ]);
-        }
-      });
-    });
-  },
-
-  // 解码腾讯地图的polyline（坐标压缩格式）
-  decodePolyline(encoded) {
-    // 类型检查：如果不是字符串，直接返回空数组或尝试其他处理方式
-    if (typeof encoded !== 'string') {
-      console.warn('decodePolyline: 输入不是字符串，无法解码:', encoded);
-      return [];
-    }
-    
-    const points = [];
-    let index = 0;
-    let lat = 0;
-    let lng = 0;
-    
-    try {
-      while (index < encoded.length) {
-        let b;
-        let shift = 0;
-        let result = 0;
-        
-        do {
-          b = encoded.charCodeAt(index++) - 63;
-          result |= (b & 0x1f) << shift;
-          shift += 5;
-        } while (b >= 0x20);
-        
-        const dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
-        lat += dlat;
-        
-        shift = 0;
-        result = 0;
-        
-        do {
-          b = encoded.charCodeAt(index++) - 63;
-          result |= (b & 0x1f) << shift;
-          shift += 5;
-        } while (b >= 0x20);
-        
-        const dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
-        lng += dlng;
-        
-        points.push({
-          latitude: lat / 1e5,
-          longitude: lng / 1e5
-        });
-      }
-    } catch (error) {
-      console.error('decodePolyline 解码失败:', error, '输入:', encoded);
-      return [];
-    }
-    
-    return points;
-  },
-
-  // 解析腾讯地图返回的路径数据
-  parseRoutePolyline(route) {
-    let pathPoints = [];
-    
-    try {
-      console.log('开始解析route数据:', route);
-      
-      // 优先使用route.polyline（整体路径）
-      if (route.polyline && typeof route.polyline === 'string') {
-        console.log('发现route.polyline，类型为string，长度:', route.polyline.length);
-        const coords = this.decodePolyline(route.polyline);
-        if (coords && Array.isArray(coords) && coords.length > 0) {
-          pathPoints = pathPoints.concat(coords);
-          console.log('使用route.polyline，解析出坐标数:', coords.length);
-        }
-      }
-      // 如果没有整体路径，尝试使用steps（分段路径）
-      else if (route.steps && Array.isArray(route.steps) && route.steps.length > 0) {
-        console.log('使用route.steps，段数:', route.steps.length);
-        route.steps.forEach((step, index) => {
-          if (step.polyline && typeof step.polyline === 'string') {
-            console.log(`步骤 ${index + 1} 发现polyline，类型为string，长度:`, step.polyline.length);
-            const coords = this.decodePolyline(step.polyline);
-            if (coords && Array.isArray(coords) && coords.length > 0) {
-              // 第一段完整添加，后续段跳过第一个点（避免重复）
-              if (index === 0) {
-                pathPoints = pathPoints.concat(coords);
-              } else {
-                pathPoints = pathPoints.concat(coords.slice(1));
-              }
-              console.log(`步骤 ${index + 1} 解析出坐标数:`, coords.length);
-            }
-          } else if (step.polyline) {
-            console.warn(`步骤 ${index + 1} 的polyline格式未知:`, typeof step.polyline, step.polyline);
-          } else {
-            console.warn(`步骤 ${index + 1} 没有polyline属性`);
-          }
-        });
-      }
-      // 如果以上都没有，可能是其他格式
-      else {
-        console.warn('route中未找到可用的polyline数据，route结构:', Object.keys(route));
-        // 尝试直接返回空数组，让调用方处理
-      }
-    } catch (error) {
-      console.error('解析路径数据失败:', error, 'route数据:', route);
-      // 返回空数组而不是undefined
-      return [];
-    }
-    
-    // 确保返回的是数组
-    if (!Array.isArray(pathPoints)) {
-      console.error('parseRoutePolyline 返回的不是数组，强制转换为空数组');
-      return [];
-    }
-    
-    console.log('parseRoutePolyline 最终返回坐标数:', pathPoints.length);
-    return pathPoints;
   },
 
   // 计算地图中心点
@@ -814,9 +434,25 @@ Page({
 
   // 开始导航
   onStartNavigation() {
-    wx.showToast({
-      title: '导航功能开发中',
-      icon: 'none'
+    const attractions = this.data.sortedAttractions || [];
+
+    if (attractions.length === 0) {
+      wx.showToast({
+        title: '路线数据为空',
+        icon: 'none'
+      });
+      return;
+    }
+
+    console.log('[开始导航] 导航路线站点数:', attractions.length);
+
+    const params = encodeURIComponent(JSON.stringify({
+      scheme: this.data.scheme,
+      attractions: attractions
+    }));
+
+    wx.navigateTo({
+      url: `/pages/route/route-nav-page?data=${params}`
     });
   }
 });
