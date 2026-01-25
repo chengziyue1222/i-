@@ -239,35 +239,78 @@ Page({
     // 保存完整路线数据到存储（包括起点和终点及路径数据）
     const completeRoute = this.buildCompleteRoute(routePoints, sortedAttractions);
     wx.setStorageSync('sortedAttractions', completeRoute);
-    
+
+    console.log('[保存方案] 开始');
+    console.log('[保存方案] schemes[0]:', schemes[0]);
+    console.log('[保存方案] schemes[0].totalDistance (初始值):', schemes[0].totalDistance);
+    console.log('[保存方案] schemes[0].totalDuration (初始值):', schemes[0].totalDuration);
+    console.log('[保存方案] schemes[0].pathData:', schemes[0].pathData);
+
     // 如果有pathData，优先使用pathData中的数据（更精确）
-    if (schemes[0].pathData) {
+    if (schemes[0] && schemes[0].pathData) {
+      const pathData = schemes[0].pathData;
+
+      console.log('[保存方案] pathData.totalDistance:', pathData.totalDistance, '类型:', typeof pathData.totalDistance);
+      console.log('[保存方案] pathData.totalDuration:', pathData.totalDuration, '类型:', typeof pathData.totalDuration);
+      console.log('[保存方案] pathData.distances:', pathData.distances);
+
       // 更新总距离（pathData中的距离更精确）
-      if (schemes[0].pathData.totalDistance > 0) {
+      if (typeof pathData.totalDistance === 'number' && !isNaN(pathData.totalDistance)) {
         const oldDistance = schemes[0].totalDistance;
-        schemes[0].totalDistance = Number(schemes[0].pathData.totalDistance.toFixed(2));
+        schemes[0].totalDistance = Number(pathData.totalDistance.toFixed(2));
         console.log(`[更新总距离] ${oldDistance}km -> ${schemes[0].totalDistance}km`);
+      } else {
+        console.warn('[保存方案] pathData.totalDistance 无效，保持原值:', schemes[0].totalDistance);
       }
-      
+
       // 更新总时间
-      if (schemes[0].pathData.totalDuration > 0) {
+      if (typeof pathData.totalDuration === 'number' && !isNaN(pathData.totalDuration)) {
         // 计算游玩时间（小时）
         const visitDuration = sortedAttractions.reduce((sum, attr) => sum + (attr.duration || 0), 0) / 60;
-        
+
         // 使用pathData中的步行时间（已转换为分钟）
-        const walkDuration = schemes[0].pathData.totalDuration;
-        
+        const walkDuration = pathData.totalDuration;
+
         // 更新scheme的总时间 = 游玩时间 + 步行时间
         schemes[0].totalDuration = Math.round(walkDuration + visitDuration * 60); // visitDuration是小时，转换为分钟
-        
+
         console.log(`[更新总时间] 游玩: ${visitDuration}小时, 步行: ${Math.round(walkDuration)}分钟, 总计: ${schemes[0].totalDuration}分钟`);
+      } else {
+        console.warn('[保存方案] pathData.totalDuration 无效，保持原值:', schemes[0].totalDuration);
       }
+    } else {
+      console.warn('[保存方案] schemes[0].pathData 不存在或为空');
+      console.warn('[保存方案] schemes[0]:', schemes[0]);
     }
+
+    // 构建 polyline 格式供 route-map 使用
+    console.log('[保存方案] 检查是否生成 polyline...');
+    console.log('[保存方案] schemes[0].pathData 存在:', !!schemes[0].pathData);
+    console.log('[保存方案] schemes[0].pathData.points 存在:', !!schemes[0].pathData?.points);
+    console.log('[保存方案] schemes[0].pathData.points 长度:', schemes[0].pathData?.points?.length || 0);
     
+    if (schemes[0].pathData && schemes[0].pathData.points && schemes[0].pathData.points.length > 0) {
+      const points = schemes[0].pathData.points;
+      console.log('[保存方案] 前3个坐标点示例:', points.slice(0, 3));
+      console.log('[保存方案] 坐标点总数:', points.length);
+      
+      schemes[0].pathData.polyline = [{
+        points: points,
+        color: '#0F62FE',
+        width: 5,
+        dottedLine: false,
+        arrowLine: true
+      }];
+      console.log('[保存方案] 已生成 polyline，坐标点数量:', points.length);
+    } else {
+      console.warn('[保存方案] 未生成 polyline - pathData 或 points 为空');
+    }
+
     wx.setStorageSync('routePathData', schemes[0].pathData); // 保存路径数据供地图页使用
 
-    console.log('[保存方案] schemes:', schemes);
-    console.log('[保存方案] pathData:', schemes[0].pathData);
+    console.log('[保存方案] 最终 schemes[0].totalDistance:', schemes[0].totalDistance);
+    console.log('[保存方案] 最终 schemes[0].totalDuration:', schemes[0].totalDuration);
+
     this.setData({ routeSchemes: schemes });
   },
 
@@ -467,19 +510,28 @@ Page({
 
     const startLocation = this.extractLocation(startPoint);
     if (startPoint && startLocation) {
-      allPoints.push(startPoint);
+      allPoints.push({
+        ...startPoint,
+        location: startLocation
+      });
     }
 
     sortedAttractions.forEach(attr => {
       const attrLocation = this.extractLocation(attr);
       if (attr && attrLocation) {
-        allPoints.push(attr);
+        allPoints.push({
+          ...attr,
+          location: attrLocation
+        });
       }
     });
 
     const endLocation = this.extractLocation(endPoint);
     if (endPoint && endLocation) {
-      allPoints.push(endPoint);
+      allPoints.push({
+        ...endPoint,
+        location: endLocation
+      });
     }
 
     // 使用限流器串行计算所有路段的距离（避免超过QPS限制）
@@ -509,19 +561,28 @@ Page({
 
     const startLocation = this.extractLocation(startPoint);
     if (startPoint && startLocation) {
-      allPoints.push(startPoint);
+      allPoints.push({
+        ...startPoint,
+        location: startLocation
+      });
     }
 
     sortedAttractions.forEach(attr => {
       const attrLocation = this.extractLocation(attr);
       if (attr && attrLocation) {
-        allPoints.push(attr);
+        allPoints.push({
+          ...attr,
+          location: attrLocation
+        });
       }
     });
 
     const endLocation = this.extractLocation(endPoint);
     if (endPoint && endLocation) {
-      allPoints.push(endPoint);
+      allPoints.push({
+        ...endPoint,
+        location: endLocation
+      });
     }
 
     // 使用限流器串行计算所有路段的距离（避免超过QPS限制）
@@ -550,23 +611,45 @@ Page({
 
     const startLocation = this.extractLocation(startPoint);
     if (startPoint && startLocation) {
-      allPoints.push(startPoint);
+      allPoints.push({
+        ...startPoint,
+        location: startLocation
+      });
     }
 
     sortedAttractions.forEach(attr => {
       const attrLocation = this.extractLocation(attr);
       if (attr && attrLocation) {
-        allPoints.push(attr);
+        allPoints.push({
+          ...attr,
+          location: attrLocation
+        });
       }
     });
 
     const endLocation = this.extractLocation(endPoint);
     if (endPoint && endLocation) {
-      allPoints.push(endPoint);
+      allPoints.push({
+        ...endPoint,
+        location: endLocation
+      });
     }
 
     console.log(`[路径计算] 共 ${allPoints.length} 个路线点, ${allPoints.length - 1} 个路段`);
+    console.log(`[路径计算] allPoints:`, allPoints);
     console.log(`[限流器] 最大请求数: ${this.rateLimiter.maxRequestsPerSecond}/秒`);
+
+    // 检查 allPoints 是否为空
+    if (allPoints.length === 0) {
+      console.error('[路径计算] allPoints 为空，无法计算路径');
+      return Promise.resolve({
+        points: [],
+        distances: [],
+        durations: [],
+        totalDistance: 0,
+        totalDuration: 0
+      });
+    }
 
     // 使用限流器串行获取所有路段的路径数据（避免超过QPS限制）
     const pathPromises = [];
@@ -575,23 +658,35 @@ Page({
     for (let i = 0; i < allPoints.length - 1; i++) {
       const fromLocation = this.extractLocation(allPoints[i]);
       const toLocation = this.extractLocation(allPoints[i + 1]);
+      console.log(`[路径计算] 路段 ${i + 1}:`, fromLocation, '->', toLocation);
       if (fromLocation && toLocation) {
         pathPromises.push(this.getWalkingPathData(fromLocation, toLocation, key, i === 0));
       }
     }
 
-    return Promise.all(pathPromises).then(pathSegments => {
+    console.log(`[路径计算] 共创建 ${pathPromises.length} 个路径请求`);
+
+      return Promise.all(pathPromises).then(pathSegments => {
       // 合并所有路径段
       let allPathPoints = [];
       const distances = [];
       const durations = [];
+      const polylineStrings = []; // 保存原始 polyline 字符串
 
-      console.log(`[路径计算] 成功获取 ${pathSegments.length} 个路段的数据`);
+      console.log(`[路径计算] Promise.all 返回结果`);
+      console.log(`[路径计算] pathSegments 长度: ${pathSegments.length}`);
+      console.log(`[路径计算] pathPromises 长度: ${pathPromises.length}`);
       console.log(`[路径计算] pathSegments:`, pathSegments); // 调试：查看返回的数据结构
+
+      // 检查 pathSegments 是否为空
+      if (!pathSegments || pathSegments.length === 0) {
+        console.warn('[路径计算] pathSegments 为空，使用降级方案');
+        return this.getFallbackPathData(allPoints);
+      }
 
       pathSegments.forEach((segment, index) => {
         console.log(`[路径计算] 处理路段 ${index + 1}:`, segment); // 调试：查看每个segment
-        
+
         if (segment && segment.points && segment.points.length > 0) {
           // 第一段完整添加，后续段跳过第一个点（避免重复）
           if (index === 0) {
@@ -599,38 +694,62 @@ Page({
           } else {
             allPathPoints = allPathPoints.concat(segment.points.slice(1));
           }
-          
-          // 调试：检查 distance 是否存在
+
+          // 保存原始 polyline 字符串
+          if (segment.polylineStr) {
+            polylineStrings.push({
+              from: allPoints[index],
+              to: allPoints[index + 1],
+              polyline: segment.polylineStr
+            });
+          }
+
+          // 调试：检查 distance 和 duration 是否存在
           console.log(`[路径计算] segment.distance:`, segment.distance, `类型:`, typeof segment.distance);
-          
+          console.log(`[路径计算] segment.duration:`, segment.duration, `类型:`, typeof segment.duration);
+          console.log(`[路径计算] segment.points.length:`, segment.points.length);
+          console.log(`[路径计算] segment.polylineStr 长度:`, segment.polylineStr?.length || 0);
+
           distances.push(segment.distance || 0); // 如果为undefined，用0代替
           durations.push(segment.duration || (segment.distance || 0) * 12); // 如果没有duration，用距离估算
-          
+
           console.log(`[路段 ${index + 1}] 距离: ${(segment.distance || 0).toFixed(2)}km, 时间: ${Math.round(segment.duration || (segment.distance || 0) * 12)}分钟, 坐标点: ${segment.points.length}个`);
         } else {
           console.warn(`[路段 ${index + 1}] 数据无效，跳过`);
           console.warn(`[路段 ${index + 1}] segment:`, segment);
+          console.warn(`[路段 ${index + 1}] segment 存在:`, !!segment);
+          console.warn(`[路段 ${index + 1}] segment.points 存在:`, !!(segment && segment.points));
+          console.warn(`[路段 ${index + 1}] segment.points.length:`, segment?.points?.length);
         }
       });
 
       console.log(`[路径计算] distances 数组:`, distances); // 调试：查看distances数组
       console.log(`[路径计算] durations 数组:`, durations); // 调试：查看durations数组
 
+      // 检查是否有有效的数据
+      if (distances.length === 0) {
+        console.warn('[路径计算] distances 数组为空，使用降级方案');
+        return this.getFallbackPathData(allPoints);
+      }
+
       const totalDistance = distances.reduce((sum, dist) => {
         console.log(`[路径计算] reduce - 当前sum: ${sum}, 当前dist: ${dist}`);
         return sum + dist;
       }, 0);
-      
+
       const totalDuration = durations.reduce((sum, dur) => sum + dur, 0);
 
       console.log(`[路径计算完成] 总距离: ${totalDistance.toFixed(2)}km, 总时间: ${Math.round(totalDuration)}分钟, 总坐标点: ${allPathPoints.length}个`);
+      console.log(`[路径计算完成] 保存的 polylineStrings 数量: ${polylineStrings.length}`);
 
       return {
         points: allPathPoints,
         distances: distances,
         durations: durations,
         totalDistance: totalDistance,
-        totalDuration: totalDuration
+        totalDuration: totalDuration,
+        // 保存原始的 polyline 字符串数组
+        polylineStrings: polylineStrings
       };
     }).catch(err => {
       console.error('[路径计算失败]', err);
@@ -665,11 +784,14 @@ Page({
               const pathPoints = this.parseRoutePolyline(route);
 
               console.log(`[API成功] 距离: ${distance.toFixed(2)}km, 时间: ${Math.round(duration)}分钟, 坐标点: ${pathPoints.length}个`);
+              console.log(`[API成功] route.polyline 长度: ${route.polyline?.length || 0}`);
 
               resolve({
                 points: pathPoints,
                 distance: distance,
-                duration: duration
+                duration: duration,
+                // 保存原始 polyline 字符串（如果有）
+                polylineStr: route.polyline || null
               });
             } else {
               console.warn(`[API失败] 状态: ${res.data?.status}, 消息: ${res.data?.message || '未知错误'}`);
@@ -685,7 +807,8 @@ Page({
                   { latitude: toLocation.latitude, longitude: toLocation.longitude }
                 ],
                 distance: fallbackDistance,
-                duration: fallbackDuration
+                duration: fallbackDuration,
+                polylineStr: null
               });
             }
           },
@@ -784,19 +907,44 @@ Page({
   // 获取备选的直线路径数据（当API失败时使用）
   getFallbackPathData(points) {
     console.log('[降级方案] 使用直线路径');
-    
-    const pathPoints = points.map(point => ({
-      latitude: point.location.latitude,
-      longitude: point.location.longitude
-    }));
+
+    // 过滤有效的点（有 location 或直接有 latitude/longitude）
+    const validPoints = points.filter(point => {
+      const location = this.extractLocation(point);
+      return location !== null;
+    });
+
+    if (validPoints.length === 0) {
+      console.warn('[降级方案] 没有有效的路径点');
+      return {
+        points: [],
+        distances: [],
+        durations: [],
+        totalDistance: 0,
+        totalDuration: 0
+      };
+    }
+
+    const pathPoints = validPoints.map(point => {
+      const location = this.extractLocation(point);
+      return {
+        latitude: location.latitude,
+        longitude: location.longitude
+      };
+    });
 
     const distances = [];
     const durations = [];
-    
-    for (let i = 0; i < points.length - 1; i++) {
-      const dist = this.calculateHaversineDistance(points[i].location, points[i + 1].location);
-      distances.push(dist);
-      durations.push(dist * 12); // 假设步行速度5km/h，每公里12分钟
+
+    for (let i = 0; i < validPoints.length - 1; i++) {
+      const fromLocation = this.extractLocation(validPoints[i]);
+      const toLocation = this.extractLocation(validPoints[i + 1]);
+
+      if (fromLocation && toLocation) {
+        const dist = this.calculateHaversineDistance(fromLocation, toLocation);
+        distances.push(dist);
+        durations.push(dist * 12); // 假设步行速度5km/h，每公里12分钟
+      }
     }
 
     const totalDistance = distances.reduce((sum, dist) => sum + dist, 0);
