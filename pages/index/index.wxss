@@ -112,3 +112,158 @@
   height: 32rpx;
   vertical-align: top;
 }
+
+/* 热门景区样式 */
+.hot-scenic-section {
+  margin: 20rpx;
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 24rpx 20rpx;
+}
+
+.hot-scenic-tip {
+  float: right;
+  font-size: 24rpx;
+  color: #ff6b6b;
+  background-color: #fff5f5;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.hot-scenic-list {
+  padding: 10rpx 0;
+}
+
+.hot-scenic-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.hot-scenic-item:active {
+  background-color: #edf2ff;
+}
+
+.hot-scenic-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 前三名特殊样式 */
+.hot-scenic-item:nth-child(1) {
+  background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%);
+}
+
+.hot-scenic-item:nth-child(2) {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.hot-scenic-item:nth-child(3) {
+  background: linear-gradient(135deg, #fff4e6 0%, #ffe8cc 100%);
+}
+
+.hot-scenic-rank {
+  margin-right: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rank-number {
+  font-size: 32rpx;
+  font-weight: bold;
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  text-align: center;
+  border-radius: 50%;
+  color: #fff;
+}
+
+/* 前三名排名样式 */
+.hot-scenic-item:nth-child(1) .rank-number {
+  background-color: #ffd43b;
+  color: #000;
+}
+
+.hot-scenic-item:nth-child(2) .rank-number {
+  background-color: #adb5bd;
+  color: #fff;
+}
+
+.hot-scenic-item:nth-child(3) .rank-number {
+  background-color: #ffa94d;
+  color: #fff;
+}
+
+.hot-scenic-item:nth-child(n+4) .rank-number {
+  background-color: #e9ecef;
+  color: #495057;
+  font-size: 28rpx;
+}
+
+.hot-scenic-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  margin-right: 20rpx;
+}
+
+.hot-scenic-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hot-scenic-name-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.hot-scenic-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #212529;
+  margin-right: 16rpx;
+}
+
+.hot-scenic-level {
+  font-size: 24rpx;
+  color: #339af0;
+  background-color: #e7f5ff;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+}
+
+.hot-scenic-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hot-scenic-duration {
+  font-size: 24rpx;
+  color: #868e96;
+}
+
+.hot-scenic-heat {
+  display: flex;
+  align-items: center;
+}
+
+.heat-icon {
+  font-size: 28rpx;
+  margin-right: 6rpx;
+}
+
+.heat-score {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ff6b6b;
+}

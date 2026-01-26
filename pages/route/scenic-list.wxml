@@ -26,7 +26,7 @@
       bindtap="onScenicTap"
       data-scenic="{{item}}"
     >
-      <image class="scenic-image" src="{{item.images[0]}}" mode="aspectFill"></image>
+      <image class="scenic-image" src="../../images/qxy.png" mode="aspectFill"></image>
       <view class="scenic-info">
         <view class="scenic-header">
           <text class="scenic-name">{{item.scenicName}}</text>
@@ -41,6 +41,10 @@
           <view class="meta-item">
             <icon type="waiting" size="12" color="#666"></icon>
             <text>{{item.openingHours}}</text>
+          </view>
+          <view class="meta-item" wx:if="{{item.distance}}">
+            <icon type="waiting" size="12" color="#666"></icon>
+            <text>{{item.distance}}m</text>
           </view>
         </view>
       </view>

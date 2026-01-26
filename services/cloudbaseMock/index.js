@@ -14,7 +14,8 @@ export const ScenicSpotData = [
       longitude: 116.405000
     },
     openingHours: '08:00-18:00',
-    suggestedDuration: 4
+    suggestedDuration: 4,
+    heat: 98.5  // 热度分数
   },
   {
     scenicId: 'scenic_002',
@@ -30,7 +31,8 @@ export const ScenicSpotData = [
       longitude: 116.415000
     },
     openingHours: '07:30-18:30',
-    suggestedDuration: 5
+    suggestedDuration: 5,
+    heat: 95.2
   },
   {
     scenicId: 'scenic_003',
@@ -46,7 +48,8 @@ export const ScenicSpotData = [
       longitude: 116.400000
     },
     openingHours: '09:00-17:00',
-    suggestedDuration: 2
+    suggestedDuration: 2,
+    heat: 87.3
   },
   {
     scenicId: 'scenic_004',
@@ -62,7 +65,8 @@ export const ScenicSpotData = [
       longitude: 116.408000
     },
     openingHours: '08:30-17:30',
-    suggestedDuration: 3
+    suggestedDuration: 3,
+    heat: 91.7
   },
   {
     scenicId: 'scenic_005',
@@ -77,7 +81,8 @@ export const ScenicSpotData = [
       longitude: 116.410000
     },
     openingHours: '08:00-18:00',
-    suggestedDuration: 1.5
+    suggestedDuration: 1.5,
+    heat: 82.1
   }
 ];
 
@@ -188,6 +193,104 @@ export const NewsData = [
       "content":'腾讯云微搭低代码 WeDa 是高效、高性能的拖拽式低代码开发平台，向上连接前端的行业业务，向下连接云计算的海量能力，助力企业垂直上云。微搭将繁琐的底层架构和基础设施抽象化为图形界面，通过行业化模板、拖放式组件和可视化配置快速构建多端应用（小程序、H5应用、Web 应用等），免去了代码编写工作，让您能够完全专注于业务场景。微搭以云开发作为底层支撑，云原生能力将应用搭建的全链路打通，提供高度开放的开发环境，且时刻为您的应用保驾护航'
   }
 ];
+
+// 景区景点 mock 数据
+export const AttractionData = {
+  'scenic_001': [
+    {
+      id: 'attr_001',
+      name: '星岩春晖',
+      description: '七星岩最著名的景点之一，春季阳光照射下湖光山色格外美丽',
+      location: {
+        latitude: 23.106994,
+        longitude: 116.405500
+      },
+      duration: 60
+    },
+    {
+      id: 'attr_002',
+      name: '玉屏叠翠',
+      description: '玉屏岩上植被茂密，层层叠叠，绿意盎然',
+      location: {
+        latitude: 23.107994,
+        longitude: 116.406000
+      },
+      duration: 45
+    },
+    {
+      id: 'attr_003',
+      name: '石室藏烟',
+      description: '石室岩洞内云雾缭绕，宛如仙境',
+      location: {
+        latitude: 23.105994,
+        longitude: 116.404500
+      },
+      duration: 40
+    },
+    {
+      id: 'attr_004',
+      name: '天柱摘星',
+      description: '天柱岩高耸入云，登顶可摘星辰',
+      location: {
+        latitude: 23.108994,
+        longitude: 116.406500
+      },
+      duration: 90
+    },
+    {
+      id: 'attr_005',
+      name: '阿坡巨瀑',
+      description: '阿坡岩上瀑布飞流直下，气势磅礴',
+      location: {
+        latitude: 23.104994,
+        longitude: 116.405000
+      },
+      duration: 30
+    }
+  ],
+  'scenic_002': [
+    {
+      id: 'attr_006',
+      name: '飞水潭',
+      description: '鼎湖山最著名的瀑布，潭水清澈见底',
+      location: {
+        latitude: 23.116994,
+        longitude: 116.415500
+      },
+      duration: 60
+    },
+    {
+      id: 'attr_007',
+      name: '庆云寺',
+      description: '岭南四大名刹之一，香火鼎盛',
+      location: {
+        latitude: 23.115994,
+        longitude: 116.416000
+      },
+      duration: 45
+    },
+    {
+      id: 'attr_008',
+      name: '宝鼎园',
+      description: '收藏各式宝鼎，展现中国古代青铜文化',
+      location: {
+        latitude: 23.117994,
+        longitude: 116.414500
+      },
+      duration: 40
+    },
+    {
+      id: 'attr_009',
+      name: '蝴蝶谷',
+      description: '山谷中蝴蝶飞舞，景色优美',
+      location: {
+        latitude: 23.114994,
+        longitude: 116.415000
+      },
+      duration: 50
+    }
+  ]
+};
 
 export const SolutionData = [
   {

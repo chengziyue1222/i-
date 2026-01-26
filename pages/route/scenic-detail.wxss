@@ -1,9 +1,8 @@
 /* pages/route/scenic-detail.wxss */
 .scenic-detail-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  min-height: 100vh;
   background-color: #f6f6f6;
+  padding-bottom: 140rpx;
 }
 
 .scenic-header {
@@ -69,9 +68,6 @@
 }
 
 .attractions-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   margin: 0 30rpx 20rpx;
   background-color: #fff;
   border-radius: 16rpx;
@@ -211,4 +207,96 @@
   font-size: 24rpx;
   color: #999;
   line-height: 1.5;
+}
+
+/* 出入口选择器样式 */
+.exit-selector {
+  margin-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.exit-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.exit-selector-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.exit-selector-cancel {
+  font-size: 28rpx;
+  color: #666;
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+}
+
+.exit-selector-cancel:active {
+  background-color: #f0f0f0;
+}
+
+.exit-list-container {
+  background-color: #fff;
+  max-height: 500rpx;
+}
+
+.exit-list {
+  height: 100%;
+  background-color: #fff;
+}
+
+.exit-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.exit-item:last-child {
+  border-bottom: none;
+}
+
+.exit-item:active {
+  background-color: #f5f5f5;
+}
+
+.exit-icon {
+  margin-right: 24rpx;
+}
+
+.exit-content {
+  flex: 1;
+}
+
+.exit-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.exit-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.5;
+}
+
+.exit-check {
+  margin-left: 20rpx;
+}
+
+.exit-empty {
+  padding: 60rpx 30rpx;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
 }

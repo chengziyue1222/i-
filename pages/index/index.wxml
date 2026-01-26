@@ -6,31 +6,45 @@
   </swiper-item>
 </swiper>
 
-<!-- 产品能力 -->
-<view wx:if="{{productAbilityList.length >0}}"  class="template">
-  <view class="template_list">
-    <view class="template_item" wx:for="{{productAbilityList}}" wx:key="index">
-      <image src="{{item.icon}}"></image>
-      <text>{{item.text}}</text>
+<!-- 热门景区 -->
+<view wx:if="{{hotScenicList.length > 0}}" class="common hot-scenic-section">
+  <view class="common_title">
+    <text>🔥 热门景区</text>
+    <text class="hot-scenic-tip">热度排行</text>
+  </view>
+  <view class="hot-scenic-list">
+    <view 
+      wx:for="{{hotScenicList}}" 
+      wx:key="scenicId" 
+      class="hot-scenic-item"
+      bindtap="goScenicDetail"
+      data-id="{{item.scenicId}}"
+      data-name="{{item.scenicName}}"
+    >
+      <view class="hot-scenic-rank">
+        <text class="rank-number">{{index + 1}}</text>
+      </view>
+      <view class="hot-scenic-info">
+        <view class="hot-scenic-name-container">
+          <text class="hot-scenic-name">{{item.scenicName}}</text>
+          <text class="hot-scenic-level">{{item.level}}</text>
+        </view>
+        <view class="hot-scenic-meta">
+          <text class="hot-scenic-duration">建议游玩 {{item.suggestedDuration}} 小时</text>
+          <view class="hot-scenic-heat">
+            <text class="heat-icon">🔥</text>
+            <text class="heat-score">{{item.heat}}°</text>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </view>
 
-<!-- 应用场景 -->
-<view wx:if="{{applicationScene.length >0}}" class="common" style="padding-right: 40rpx;">
-  <view class="common_title">应用场景</view>
-  <scroll-view class="scene_list" scroll-x="true" enable-flex>
-    <view wx:for="{{applicationScene}}" wx:key="index" class="scene_item" style="background-image: url({{item.backgroud_pic}});" catch:tap="goDetail" data-id="{{item._id}}" data-title="{{item.title}}">
-      <view class="scene_title">{{item.title}}</view> 
-      <view class="scene_cont">{{item.sub_title}}</view> 
-    </view>
-  </scroll-view>
-</view>
-
-<!-- 最新动态 -->
+<!-- 最新攻略 -->
 <view wx:if="{{newsList.length >0}}" class="common">
   <view class="common_title">
-    <text>最新动态</text>
+    <text>最新攻略</text>
     <view class="news_more" bind:tap="onGoNews">
       <text>更多</text>
       <image src="../../images/more.png"></image>

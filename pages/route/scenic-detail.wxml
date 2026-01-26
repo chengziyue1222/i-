@@ -96,8 +96,47 @@
         </view>
         <view class="end-point-content">
           <text class="end-point-name">景区出口</text>
-          <text class="end-point-desc">返回景区出口作为终点</text>
+          <text class="end-point-desc">
+            {{selectedEndPoint === 'exit' && endPoint ? '已选择: ' + endPoint.name : (showExitSelector ? '请选择具体出入口...' : '选择具体出入口作为终点')}}
+          </text>
         </view>
+      </view>
+    </view>
+    
+    <!-- 出入口选择列表 -->
+    <view class="exit-selector" wx:if="{{showExitSelector}}">
+      <view class="exit-selector-header">
+        <text class="exit-selector-title">选择出入口 ({{availableExits.length}}个)</text>
+        <text class="exit-selector-cancel" bindtap="onCancelExitSelector">取消</text>
+      </view>
+      
+      <!-- 空列表提示 -->
+      <view class="exit-empty" wx:if="{{!availableExits || availableExits.length === 0}}">
+        <text>未找到出入口，请稍后再试</text>
+      </view>
+      
+      <!-- 出入口列表 -->
+      <view class="exit-list-container" wx:if="{{availableExits && availableExits.length > 0}}">
+        <scroll-view class="exit-list" scroll-y="{{true}}">
+          <view
+            wx:for="{{availableExits}}"
+            wx:key="id"
+            class="exit-item"
+            bindtap="onSelectSpecificExit"
+            data-index="{{index}}"
+          >
+            <view class="exit-icon">
+              <icon type="location" size="16" color="#666"></icon>
+            </view>
+            <view class="exit-content">
+              <text class="exit-name">{{item.name}}</text>
+              <text class="exit-desc">{{item.description}}</text>
+            </view>
+            <view class="exit-check" wx:if="{{endPoint && endPoint.id === item.id}}">
+              <icon type="success_no_circle" size="16" color="#0F62FE"></icon>
+            </view>
+          </view>
+        </scroll-view>
       </view>
     </view>
   </view>

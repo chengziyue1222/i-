@@ -11,7 +11,9 @@ Page({
     endPoint: null, // 终点
     exitPoints: [], // 出口列表
     currentLocation: null, // 当前位置
-    selectedEndPoint: 'current' // 选择的终点类型：'current' 或 'exit'
+    selectedEndPoint: 'current', // 选择的终点类型：'current' 或 'exit'
+    showExitSelector: false, // 是否显示出入口选择器
+    availableExits: [] // 可用的出入口列表
   },
 
   onLoad(options) {
@@ -117,22 +119,31 @@ Page({
 
       // 尝试从缓存获取景点数据
       const cacheKey = `attractions_${scenicId}`;
-      const cachedAttractions = wx.getStorageSync(cacheKey);
+      const cachedData = wx.getStorageSync(cacheKey);
       let attractions = [];
 
-      if (cachedAttractions && cachedAttractions.length > 0) {
-        console.log('从缓存获取景点数据:', cachedAttractions);
-        attractions = cachedAttractions;
+      // 检查缓存是否有效
+      const isCacheValid = cachedData && 
+                          cachedData.data && 
+                          cachedData.data.length > 0 && 
+                          cachedData.expiry && 
+                          (Date.now() - cachedData.timestamp < cachedData.expiry);
+
+      if (isCacheValid) {
+        console.log('[缓存] 从缓存获取景点数据:', cachedData.data);
+        attractions = cachedData.data;
         wx.showToast({
           title: '已加载缓存的景点数据',
           icon: 'success',
           duration: 1500
         });
       } else {
-        console.log('缓存未命中，从腾讯地图API查询景点');
+        console.log('[搜索] 缓存未命中或已过期，从腾讯地图API查询景点');
         // 从腾讯地图API查询该景区的景点列表
         attractions = await this.searchAttractionsByAPI(scenicInfo);
 
+        console.log(`[结果] API搜索到 ${attractions.length} 个景点`);
+        
         if (attractions && attractions.length > 0) {
           // 缓存到本地（有效期24小时）
           const cacheData = {
@@ -141,11 +152,12 @@ Page({
             expiry: 24 * 60 * 60 * 1000 // 24小时
           };
           wx.setStorageSync(cacheKey, cacheData);
-          console.log('景点数据已缓存到本地:', attractions);
+          console.log('[缓存] 景点数据已缓存到本地');
         } else {
           // 如果API查询失败，使用备用数据源
+          console.log('[备用] API未找到景点，使用备用数据源');
           attractions = await fetchAttractionData(scenicId);
-          console.log('使用备用数据源:', attractions);
+          console.log('[备用] 获取到备用数据:', attractions.length, '个景点');
         }
       }
 
@@ -182,57 +194,76 @@ Page({
 
       // 常见的景区景点关键词
       const keywords = [
-        '景点', '风景区', '公园', '古迹', '寺庙', '塔', '楼', '庙',
+        '景点', '公园', '古迹', '寺庙', '塔', '楼', '庙',
         '山', '湖', '岩', '洞', '寺', '观', '亭', '阁'
       ];
 
       // 构建搜索关键词：景区名称 + 景点关键词
       const searchKeywords = keywords.map(kw => `${scenicInfo.scenicName}${kw}`);
 
-      console.log('搜索景区景点:', searchKeywords);
+      console.log('[搜索参数]');
+      console.log('- 景区名称:', scenicInfo.scenicName);
+      console.log('- 景区位置:', scenicInfo.location);
+      console.log('- 搜索范围: 3公里');
+      console.log('- 搜索关键词:', searchKeywords);
+      console.log('- API Key:', API_KEY.substring(0, 10) + '...');
 
-      // 并发搜索所有关键词
-      const requests = searchKeywords.map(keyword => {
+      // 带间隔搜索所有关键词（每个请求间隔200ms，避免触发API频率限制）
+      const requests = searchKeywords.map((keyword, index) => {
         return new Promise((resolveSearch) => {
-          wx.request({
-            url: 'https://apis.map.qq.com/ws/place/v1/search',
-            data: {
-              keyword: keyword,
-              boundary: `nearby(${scenicInfo.location.latitude},${scenicInfo.location.longitude},3000)`, // 3公里范围内
-              key: API_KEY,
-              page_size: 10,
-              page_index: 1
-            },
-            method: 'GET',
-            success: (res) => {
-              if (res.statusCode === 200 && res.data.status === 0 && res.data.data) {
-                const pois = res.data.data;
-                console.log(`搜索 "${keyword}" 找到 ${pois.length} 个结果`);
-                resolveSearch(pois);
-              } else {
+          // 设置延迟，第一个请求立即发送，后续每个请求延迟200ms
+          const delay = index * 200;
+          setTimeout(() => {
+            wx.request({
+              url: 'https://apis.map.qq.com/ws/place/v1/search',
+              data: {
+                keyword: keyword,
+                boundary: `nearby(${scenicInfo.location.latitude},${scenicInfo.location.longitude},3000)`, // 3公里范围内
+                key: API_KEY,
+                page_size: 10,
+                page_index: 1
+              },
+              method: 'GET',
+              success: (res) => {
+                console.log(`[API响应] 关键词: "${keyword}", 状态码: ${res.statusCode}, API状态: ${res.data?.status}`);
+                if (res.statusCode === 200 && res.data.status === 0 && res.data.data) {
+                  const pois = res.data.data;
+                  console.log(`[成功] 搜索 "${keyword}" 找到 ${pois.length} 个结果 (延迟: ${delay}ms)`);
+                  resolveSearch(pois);
+                } else {
+                  console.warn(`[失败] 搜索 "${keyword}" 未找到结果或API错误:`, res.data);
+                  resolveSearch([]);
+                }
+              },
+              fail: (error) => {
+                console.error(`搜索 "${keyword}" 失败:`, error);
                 resolveSearch([]);
               }
-            },
-            fail: (error) => {
-              console.error(`搜索 "${keyword}" 失败:`, error);
-              resolveSearch([]);
-            }
-          });
+            });
+          }, delay);
         });
       });
 
       // 等待所有搜索完成
       Promise.all(requests).then(results => {
+        console.log('[搜索结果汇总]');
+        console.log('- 关键词数量:', searchKeywords.length);
+        console.log('- 各关键词结果:', results.map((pois, i) => `${searchKeywords[i]}: ${pois.length}个`).join(', '));
+        
         // 合并所有结果
         const allPOIs = results.flat();
         
         // 过滤掉没有location的数据
         const validPOIs = allPOIs.filter(poi => poi && poi.location && poi.location.lat && poi.location.lng);
-        console.log(`[搜索] 原始结果: ${allPOIs.length} 个, 有效结果: ${validPOIs.length} 个`);
+        console.log(`[统计] 原始结果: ${allPOIs.length} 个, 有效结果: ${validPOIs.length} 个`);
 
         // 去重：根据名称和位置去重
         const uniquePOIs = this.deduplicatePOIs(validPOIs);
         console.log(`[去重] 去重后: ${uniquePOIs.length} 个景点`);
+
+        if (uniquePOIs.length === 0) {
+          console.warn('[警告] 未找到任何景点，将使用备用数据源');
+        }
 
         // 转换为景点数据格式
         const attractions = uniquePOIs.map(poi => ({
@@ -248,6 +279,101 @@ Page({
 
         console.log(`[最终] 有效景点数: ${attractions.length}`);
         resolve(attractions);
+      }).catch(error => {
+        console.error('[搜索异常]', error);
+        resolve([]);
+      });
+    });
+  },
+
+  // 通过腾讯地图API查询景区出入口
+  async searchExitsByAPI(scenicInfo) {
+    return new Promise((resolve) => {
+      // 腾讯地图地点搜索API
+      const API_KEY = '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE';
+
+      // 常见的出入口关键词
+      const exitKeywords = [
+        '入口', '出口', '大门', '检票口', '售票处', '游客中心', '停车场'
+      ];
+
+      // 构建搜索关键词：景区名称 + 出入口关键词
+      const searchKeywords = exitKeywords.map(kw => `${scenicInfo.scenicName}${kw}`);
+
+      console.log('[searchExitsByAPI] 搜索参数');
+      console.log('- 景区名称:', scenicInfo.scenicName);
+      console.log('- 景区位置:', scenicInfo.location);
+      console.log('- 搜索范围: 2公里');
+      console.log('- 搜索关键词:', searchKeywords);
+
+      // 带间隔搜索所有关键词（每个请求间隔200ms）
+      const requests = searchKeywords.map((keyword, index) => {
+        return new Promise((resolveSearch) => {
+          const delay = index * 200;
+          setTimeout(() => {
+            wx.request({
+              url: 'https://apis.map.qq.com/ws/place/v1/search',
+              data: {
+                keyword: keyword,
+                boundary: `nearby(${scenicInfo.location.latitude},${scenicInfo.location.longitude},2000)`, // 2公里范围内
+                key: API_KEY,
+                page_size: 10,
+                page_index: 1
+              },
+              method: 'GET',
+              success: (res) => {
+                console.log(`[searchExitsByAPI] API响应: ${keyword}, 状态码: ${res.statusCode}, API状态: ${res.data?.status}`);
+                if (res.statusCode === 200 && res.data.status === 0 && res.data.data) {
+                  const pois = res.data.data;
+                  console.log(`[searchExitsByAPI] 搜索 "${keyword}" 找到 ${pois.length} 个结果`);
+                  resolveSearch(pois);
+                } else {
+                  console.warn(`[searchExitsByAPI] 搜索 "${keyword}" 失败:`, res.data);
+                  resolveSearch([]);
+                }
+              },
+              fail: (error) => {
+                console.error(`[searchExitsByAPI] 搜索 "${keyword}" 请求失败:`, error);
+                resolveSearch([]);
+              }
+            });
+          }, delay);
+        });
+      });
+
+      // 等待所有搜索完成
+      Promise.all(requests).then(results => {
+        console.log('[searchExitsByAPI] 所有搜索完成');
+        console.log('- 关键词数量:', searchKeywords.length);
+        console.log('- 各关键词结果:', results.map((pois, i) => `${searchKeywords[i]}: ${pois.length}个`).join(', '));
+        
+        // 合并所有结果
+        const allPOIs = results.flat();
+        
+        // 过滤掉没有location的数据
+        const validPOIs = allPOIs.filter(poi => poi && poi.location && poi.location.lat && poi.location.lng);
+        console.log(`[searchExitsByAPI] 原始结果: ${allPOIs.length} 个, 有效结果: ${validPOIs.length} 个`);
+
+        // 去重：根据名称和位置去重
+        const uniquePOIs = this.deduplicatePOIs(validPOIs);
+        console.log(`[searchExitsByAPI] 去重后: ${uniquePOIs.length} 个出入口`);
+
+        // 转换为出入口数据格式
+        const exits = uniquePOIs.map((poi, index) => ({
+          id: poi.id || `exit_${index}`,
+          name: poi.title,
+          description: poi.address || poi.category,
+          location: {
+            latitude: poi.location.lat,
+            longitude: poi.location.lng
+          }
+        }));
+
+        console.log(`[searchExitsByAPI] 最终返回: ${exits.length} 个出入口`);
+        resolve(exits);
+      }).catch(error => {
+        console.error('[searchExitsByAPI] 搜索异常:', error);
+        resolve([]);
       });
     });
   },
@@ -354,28 +480,149 @@ Page({
 
   // 选择终点
   onEndPointSelect(e) {
-    const { type, index } = e.currentTarget.dataset;
+    const { type } = e.currentTarget.dataset;
 
     if (type === 'current') {
       // 选择当前位置作为终点
       this.setData({
-        endPoint: this.data.currentLocation
+        endPoint: this.data.currentLocation,
+        selectedEndPoint: 'current',
+        showExitSelector: false
       });
       wx.showToast({
         title: '已选择当前位置作为终点',
         icon: 'none'
       });
     } else if (type === 'exit') {
-      // 选择出口作为终点
-      const endPoint = this.data.exitPoints[index];
+      // 选择景区出口作为终点
+      console.log('[选择终点] 用户选择景区出口');
       this.setData({
-        endPoint: endPoint
+        selectedEndPoint: 'exit',
+        showExitSelector: true,
+        endPoint: null  // 清空之前的终点，让用户重新选择具体出入口
+      }, () => {
+        console.log('[选择终点] showExitSelector 已设置为 true');
+        console.log('[选择终点] 当前 showExitSelector:', this.data.showExitSelector);
       });
+      
+      // 查询并显示出入口列表
+      this.loadAvailableExits();
+    }
+  },
+
+  // 加载可用的出入口列表
+  async loadAvailableExits() {
+    const { scenicId, scenicInfo } = this.data;
+    
+    console.log('[加载出入口] 开始加载');
+    console.log('[加载出入口] scenicId:', scenicId);
+    console.log('[加载出入口] scenicInfo:', scenicInfo);
+    
+    // 检查缓存
+    const cacheKey = `exits_${scenicId}`;
+    const cachedData = wx.getStorageSync(cacheKey);
+    
+    console.log('[加载出入口] 缓存数据:', cachedData);
+    
+    // 检查缓存是否有效
+    const isCacheValid = cachedData && 
+                        cachedData.data && 
+                        cachedData.data.length > 0 && 
+                        cachedData.expiry && 
+                        (Date.now() - cachedData.timestamp < cachedData.expiry);
+    
+    console.log('[加载出入口] 缓存是否有效:', isCacheValid);
+    
+    if (isCacheValid) {
+      console.log('[加载出入口] 从缓存获取数据:', cachedData.data);
+      this.setData({
+        availableExits: cachedData.data,
+        showExitSelector: true
+      }, () => {
+        console.log('[加载出入口] 已设置 showExitSelector:', this.data.showExitSelector);
+        console.log('[加载出入口] 已设置 availableExits:', this.data.availableExits);
+      });
+    } else {
+      // 从腾讯地图API查询出入口
+      console.log('[加载出入口] 缓存无效，从API查询');
+      wx.showLoading({ title: '查询出入口...' });
+      
+      try {
+        const exits = await this.searchExitsByAPI(scenicInfo);
+        
+        console.log('[加载出入口] API查询结果:', exits);
+        
+        if (exits && exits.length > 0) {
+          // 缓存到本地（有效期24小时）
+          const cacheData = {
+            data: exits,
+            timestamp: Date.now(),
+            expiry: 24 * 60 * 60 * 1000 // 24小时
+          };
+          wx.setStorageSync(cacheKey, cacheData);
+          console.log('[加载出入口] 数据已缓存');
+          
+          this.setData({
+            availableExits: exits,
+            showExitSelector: true
+          }, () => {
+            console.log('[加载出入口] API数据设置完成，showExitSelector:', this.data.showExitSelector);
+          });
+        } else {
+          // 如果没有找到出入口，使用默认的
+          console.log('[加载出入口] API未找到数据，使用默认出口');
+          const defaultExits = this.generateExitPoints(scenicInfo, this.data.attractions || []);
+          console.log('[加载出入口] 默认出口:', defaultExits);
+          this.setData({
+            availableExits: defaultExits,
+            showExitSelector: true
+          }, () => {
+            console.log('[加载出入口] 默认数据设置完成，showExitSelector:', this.data.showExitSelector);
+          });
+        }
+      } catch (error) {
+        console.error('[加载出入口] API查询失败:', error);
+        // 使用默认出口
+        const defaultExits = this.generateExitPoints(scenicInfo, this.data.attractions || []);
+        this.setData({
+          availableExits: defaultExits,
+          showExitSelector: true
+        }, () => {
+          console.log('[加载出入口] 错误处理设置完成，showExitSelector:', this.data.showExitSelector);
+        });
+      } finally {
+        wx.hideLoading();
+      }
+    }
+  },
+
+  // 选择具体的出入口作为终点
+  onSelectSpecificExit(e) {
+    const { index } = e.currentTarget.dataset;
+    const selectedExit = this.data.availableExits[index];
+    
+    if (selectedExit) {
+      this.setData({
+        endPoint: {
+          ...selectedExit,
+          type: 'end'
+        },
+        showExitSelector: false
+      });
+      
       wx.showToast({
-        title: `已选择${endPoint.name}作为终点`,
+        title: `已选择${selectedExit.name}`,
         icon: 'none'
       });
     }
+  },
+
+  // 取消出入口选择
+  onCancelExitSelector() {
+    this.setData({
+      showExitSelector: false,
+      selectedEndPoint: 'current'
+    });
   },
 
   // 清除终点选择
@@ -439,63 +686,5 @@ Page({
     wx.navigateTo({
       url: `/pages/route/route-plan?data=${params}`
     });
-  },
-
-  // 选择终点类型
-  onEndPointSelect(e) {
-    const type = e.currentTarget.dataset.type;
-    this.setData({ selectedEndPoint: type });
-    
-    // 根据选择更新终点数据
-    if (type === 'current') {
-      // 使用当前位置作为终点
-      const currentLocation = this.data.currentLocation;
-      if (currentLocation) {
-        this.setData({
-          endPoint: {
-            id: 'current',
-            name: '当前位置',
-            type: 'end',
-            location: currentLocation
-          }
-        });
-        console.log('选择终点: 当前位置');
-      } else {
-        console.warn('当前位置数据为空');
-        wx.showToast({
-          title: '当前位置未获取',
-          icon: 'none'
-        });
-      }
-    } else if (type === 'exit') {
-      // 使用景区出口作为终点
-      const exitPoints = this.data.exitPoints;
-      if (exitPoints && exitPoints.length > 0) {
-        // 选择第一个出口作为终点（或者可以选择最近的出口）
-        const exitPoint = exitPoints[0];
-        if (exitPoint && exitPoint.location) {
-          this.setData({
-            endPoint: {
-              id: exitPoint.id || 'exit',
-              name: exitPoint.name || '景区出口',
-              type: 'end',
-              location: exitPoint.location
-            }
-          });
-          console.log('选择终点: 景区出口', exitPoint.name);
-        } else {
-          console.warn('景区出口数据无效:', exitPoint);
-          wx.showToast({
-            title: '景区出口数据无效',
-            icon: 'none'
-          });
-        }
-      } else {
-        wx.showToast({
-          title: '未找到景区出口',
-          icon: 'none'
-        });
-      }
-    }
   }
 });
