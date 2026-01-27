@@ -1,4 +1,5 @@
 // pages/route/route-plan.js
+import { TENCENT_MAP_API_KEY } from '../../config/map';
 
 // 腾讯地图API请求限流器（每秒最多5次）
 class TencentMapRateLimiter {
@@ -461,7 +462,7 @@ Page({
 
           // 注意：需要先在腾讯地图开放平台申请key，并在小程序后台配置request合法域名
           // 开发环境下可以使用mock数据作为备选
-          const key = wx.getStorageSync('tencentMapKey') || '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE';
+          const key = wx.getStorageSync('tencentMapKey') || TENCENT_MAP_API_KEY;
 
           wx.request({
             url: 'https://apis.map.qq.com/ws/direction/v1/walking',
@@ -652,7 +653,7 @@ Page({
 
     // 使用限流器调用腾讯地图 API 获取各路段的准确距离和时间
     const pathPromises = [];
-    const key = wx.getStorageSync('tencentMapKey') || '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE';
+    const key = wx.getStorageSync('tencentMapKey') || TENCENT_MAP_API_KEY;
 
     for (let i = 0; i < allPoints.length - 1; i++) {
       const fromLocation = this.extractLocation(allPoints[i]);

@@ -3,9 +3,11 @@ export const cloudbaseTemplateConfig = {
   useMock: true,
 };
 
-/** 腾讯地图API配置 */
+// 腾讯地图API配置（从统一配置文件导入）
+export { TENCENT_MAP_API_KEY as apiKey } from './map';
+
+// 为了保持向后兼容，保留tencentMapConfig对象
+import { TENCENT_MAP_API_KEY } from './map';
 export const tencentMapConfig = {
-  // 腾讯地图API Key
-  // 注意：如果Key出现请求量限制，请自行申请替换
-  apiKey: '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE',
+  apiKey: TENCENT_MAP_API_KEY,
 };

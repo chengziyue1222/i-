@@ -1,5 +1,6 @@
 // pages/route/scenic-detail.js
 import { fetchScenicSpotDetail, fetchAttractionData } from '../../services/scene/index';
+import { TENCENT_MAP_API_KEY } from '../../config/map';
 
 Page({
   data: {
@@ -189,8 +190,8 @@ Page({
   // 通过腾讯地图API查询景点列表
   async searchAttractionsByAPI(scenicInfo) {
     return new Promise((resolve) => {
-      // 腾讯地图地点搜索API
-      const API_KEY = '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE';
+      // 使用统一的API Key
+      const API_KEY = TENCENT_MAP_API_KEY;
 
       // 常见的景区景点关键词
       const keywords = [
@@ -289,8 +290,8 @@ Page({
   // 通过腾讯地图API查询景区出入口
   async searchExitsByAPI(scenicInfo) {
     return new Promise((resolve) => {
-      // 腾讯地图地点搜索API
-      const API_KEY = '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE';
+      // 使用统一的API Key
+      const API_KEY = TENCENT_MAP_API_KEY;
 
       // 常见的出入口关键词
       const exitKeywords = [

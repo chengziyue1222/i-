@@ -1,4 +1,6 @@
 // pages/route/route-map.js
+import { TENCENT_MAP_API_KEY } from '../../config/map';
+
 Page({
   data: {
     scheme: {},
@@ -317,8 +319,8 @@ Page({
   // 通过API搜索位置
   searchLocationByAPI(keyword) {
     return new Promise((resolve) => {
-      // 腾讯地图地理编码API
-      const API_KEY = '6X2BZ-U466S-CKFOJ-67NXH-HLOSO-VRFLE';
+      // 使用统一的API Key
+      const API_KEY = TENCENT_MAP_API_KEY;
 
       // 构建请求URL
       const url = `https://apis.map.qq.com/ws/geocoder/v1/`;
