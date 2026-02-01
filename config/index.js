@@ -1,6 +1,6 @@
 /** 云开发使用 */
 export const cloudbaseTemplateConfig = {
-  useMock: true,
+  useMock: false, // 改为 false，使用云数据库
 };
 
 // 腾讯地图API配置（从统一配置文件导入）

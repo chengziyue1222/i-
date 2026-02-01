@@ -22,53 +22,71 @@ Page({
       wx.showLoading({
         title: '加载中',
       })
+      
+      console.log('[首页] ===== 开始加载数据 =====');
+      console.log('[首页] 当前模式:', getApp().cloudbaseTemplateConfig?.useMock ? 'Mock数据' : '云数据库');
+      
+      // 加载首页其他数据
       const res = await fetchIndexData({pageSize:1});
+      console.log('[首页] 首页数据加载完成:', res);
+      
+      // 加载景区数据（热门景区）
+      console.log('[首页] 开始加载景区数据...');
       const res1 = await fetchScenicSpotData();
+      console.log('[首页] 景区数据加载完成:', res1);
+      
+      if (!res1) {
+        console.error('[首页] ❌ 景区数据返回为空！');
+      } else if (res1.length === 0) {
+        console.warn('[首页] ⚠️ 景区数据为空数组！');
+      } else {
+        console.log('[首页] ✅ 成功获取景区数据，共', res1.length, '条');
+      }
+      
       const res2 = await fetchNewsData({pageSize:3});
-      const {index_show,function_show,cooperation} = res?.[0];
+      console.log('[首页] 新闻数据加载完成:', res2);
+      
+      const {index_show,function_show,cooperation} = res?.[0] || {};
+      console.log('[首页] 解析首页数据:', {index_show, function_show, cooperation});
 
       // 处理热门景区列表（按热度排序，取前5个）
       let hotScenicList = [];
       console.log('[首页] 原始景区数据 res1:', res1);
       
-      // 如果数据没有heat字段，手动添加（备用方案）
-      let processedScenicData = res1 || [];
-      if (processedScenicData.length > 0 && !processedScenicData[0].heat) {
-        console.log('[首页] 数据缺少heat字段，使用备用热度数据');
-        const heatMap = {
-          'scenic_001': 98.5,
-          'scenic_002': 95.2,
-          'scenic_003': 87.3,
-          'scenic_004': 91.7,
-          'scenic_005': 82.1
-        };
-        processedScenicData = processedScenicData.map(item => ({
-          ...item,
-          heat: heatMap[item.scenicId] || 80.0
-        }));
-        console.log('[首页] 添加热度后的数据:', processedScenicData);
-      }
-      
-      if (processedScenicData && processedScenicData.length > 0) {
-        // 按热度从高到低排序
-        const sorted = processedScenicData.sort((a, b) => (b.heat || 0) - (a.heat || 0));
-        console.log('[首页] 排序后数据:', sorted.map(item => ({name: item.scenicName, heat: item.heat})));
-        hotScenicList = sorted.slice(0, 5);
-        console.log('[首页] 最终热门景区列表:', hotScenicList.length, '个', hotScenicList.map(item => item.scenicName));
+      // 云数据库已按热度降序排序，直接取前5个
+      if (res1 && res1.length > 0) {
+        hotScenicList = res1.slice(0, 5);
+        console.log('[首页] ✅ 热门景区列表:', hotScenicList.length, '个');
+        console.log('[首页] 热门景区详情:', hotScenicList.map(item => ({
+          name: item.scenicName,
+          heat: item.heat,
+          id: item.scenicId
+        })));
+      } else {
+        console.warn('[首页] ⚠️ 没有获取到景区数据，hotScenicList 为空');
+        // 不添加测试数据，保持为空
       }
 
       this.setData({
         showUploadTip: true,
-        bannerList:index_show,
-        productAbilityList:function_show,
-        partnersList: cooperation,
-        applicationScene:res1,
-        newsList: res2,
+        bannerList: index_show || [],
+        productAbilityList: function_show || [],
+        partnersList: cooperation || [],
+        applicationScene: res1 || [],
+        newsList: res2 || [],
         hotScenicList: hotScenicList
       }, () => {
-        console.log('[首页] setData完成，hotScenicList:', this.data.hotScenicList);
+        console.log('[首页] ✅ setData完成');
+        console.log('[首页] 最终 hotScenicList:', this.data.hotScenicList);
+        console.log('[首页] applicationScene:', this.data.applicationScene);
+        
+        // 如果热门景区为空，给出明确提示
+        if (this.data.hotScenicList.length === 0) {
+          console.warn('[首页] ⚠️ 警告: hotScenicList 为空数组，请检查云数据库 scene 集合是否有数据');
+        }
       });
     } catch (error) {
+      console.error('[首页] ❌ 数据加载失败:', error);
       wx.showToast({
         title: error?.message || '页面请求失败，请刷新页面',
         icon: 'error',

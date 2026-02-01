@@ -2,7 +2,7 @@ import { init } from '@cloudbase/wx-cloud-client-sdk';
 import updateManager from './common/updateManager';
 
 wx.cloud.init({
-  env: 'your-env-id', // 指定云开发环境 ID
+  env: 'cloudbase-1g71i8nk689cee71', // 指定云开发环境 ID
 });
 const client = init(wx.cloud);
 const models = client.models;

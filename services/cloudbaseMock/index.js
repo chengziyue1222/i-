@@ -1,90 +1,90 @@
 // 景区 mock 数据
-export const ScenicSpotData = [
-  {
-    scenicId: 'scenic_001',
-    scenicName: '七星岩风景区',
-    level: 'AAAAA',
-    description: '国家AAAAA级旅游景区，被誉为"岭南第一奇观"，以喀斯特地貌为主，湖光山色相映成趣。',
-    images: [
-      'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
-      'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png'
-    ],
-    location: {
-      latitude: 23.105994,
-      longitude: 116.405000
-    },
-    openingHours: '08:00-18:00',
-    suggestedDuration: 4,
-    heat: 98.5  // 热度分数
-  },
-  {
-    scenicId: 'scenic_002',
-    scenicName: '鼎湖山景区',
-    level: 'AAAAA',
-    description: '北回归线上的绿宝石，空气负离子含量高，是天然的氧吧和避暑胜地。',
-    images: [
-      'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
-      'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png'
-    ],
-    location: {
-      latitude: 23.115994,
-      longitude: 116.415000
-    },
-    openingHours: '07:30-18:30',
-    suggestedDuration: 5,
-    heat: 95.2
-  },
-  {
-    scenicId: 'scenic_003',
-    scenicName: '端州古城',
-    level: 'AAAA',
-    description: '拥有2000多年历史的古城，城墙保存完好，文化底蕴深厚。',
-    images: [
-      'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
-      'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'
-    ],
-    location: {
-      latitude: 23.099994,
-      longitude: 116.400000
-    },
-    openingHours: '09:00-17:00',
-    suggestedDuration: 2,
-    heat: 87.3
-  },
-  {
-    scenicId: 'scenic_004',
-    scenicName: '星湖风景区',
-    level: 'AAAAA',
-    description: '以湖泊风光为主题的风景名胜区，湖水清澈，岛屿星罗棋布。',
-    images: [
-      'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
-      'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png'
-    ],
-    location: {
-      latitude: 23.108994,
-      longitude: 116.408000
-    },
-    openingHours: '08:30-17:30',
-    suggestedDuration: 3,
-    heat: 91.7
-  },
-  {
-    scenicId: 'scenic_005',
-    scenicName: '龙母祖庙',
-    level: 'AAAA',
-    description: '岭南著名的道教圣地，建筑精美，香火鼎盛。',
-    images: [
-      'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png'
-    ],
-    location: {
-      latitude: 23.120994,
-      longitude: 116.410000
-    },
-    openingHours: '08:00-18:00',
-    suggestedDuration: 1.5,
-    heat: 82.1
-  }
-];
+// export const ScenicSpotData = [
+//   {
+//     scenicId: 'scenic_001',
+//     scenicName: '七星岩风景区',
+//     level: 'AAAAA',
+//     description: '国家AAAAA级旅游景区，被誉为"岭南第一奇观"，以喀斯特地貌为主，湖光山色相映成趣。',
+//     images: [
+//       'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
+//       'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png'
+//     ],
+//     location: {
+//       latitude: 23.105994,
+//       longitude: 116.405000
+//     },
+//     openingHours: '08:00-18:00',
+//     suggestedDuration: 4,
+//     heat: 98.5  // 热度分数
+//   },
+//   {
+//     scenicId: 'scenic_002',
+//     scenicName: '鼎湖山景区',
+//     level: 'AAAAA',
+//     description: '北回归线上的绿宝石，空气负离子含量高，是天然的氧吧和避暑胜地。',
+//     images: [
+//       'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
+//       'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png'
+//     ],
+//     location: {
+//       latitude: 23.115994,
+//       longitude: 116.415000
+//     },
+//     openingHours: '07:30-18:30',
+//     suggestedDuration: 5,
+//     heat: 95.2
+//   },
+//   {
+//     scenicId: 'scenic_003',
+//     scenicName: '端州古城',
+//     level: 'AAAA',
+//     description: '拥有2000多年历史的古城，城墙保存完好，文化底蕴深厚。',
+//     images: [
+//       'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
+//       'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'
+//     ],
+//     location: {
+//       latitude: 23.099994,
+//       longitude: 116.400000
+//     },
+//     openingHours: '09:00-17:00',
+//     suggestedDuration: 2,
+//     heat: 87.3
+//   },
+//   {
+//     scenicId: 'scenic_004',
+//     scenicName: '星湖风景区',
+//     level: 'AAAAA',
+//     description: '以湖泊风光为主题的风景名胜区，湖水清澈，岛屿星罗棋布。',
+//     images: [
+//       'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
+//       'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png'
+//     ],
+//     location: {
+//       latitude: 23.108994,
+//       longitude: 116.408000
+//     },
+//     openingHours: '08:30-17:30',
+//     suggestedDuration: 3,
+//     heat: 91.7
+//   },
+//   {
+//     scenicId: 'scenic_005',
+//     scenicName: '龙母祖庙',
+//     level: 'AAAA',
+//     description: '岭南著名的道教圣地，建筑精美，香火鼎盛。',
+//     images: [
+//       'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png'
+//     ],
+//     location: {
+//       latitude: 23.120994,
+//       longitude: 116.410000
+//     },
+//     openingHours: '08:00-18:00',
+//     suggestedDuration: 1.5,
+//     heat: 82.1
+//   }
+// ];
 
 // 应用场景 mock 数据
 export const SceneData = [
