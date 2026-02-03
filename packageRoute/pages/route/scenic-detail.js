@@ -1,6 +1,6 @@
 // pages/route/scenic-detail.js
-import { fetchScenicSpotDetail, fetchAttractionData } from '../../services/scene/index';
-import { TENCENT_MAP_API_KEY } from '../../config/map';
+import { fetchScenicSpotDetail, fetchAttractionData } from '../../../services/scene/index';
+import { TENCENT_MAP_API_KEY } from '../../../config/map';
 
 Page({
   data: {
@@ -18,7 +18,19 @@ Page({
   },
 
   onLoad(options) {
+    console.log('[scenic-detail] 页面接收到参数:', options);
     const { scenicId } = options;
+    console.log('[scenic-detail] 解析出的 scenicId:', scenicId);
+    
+    if (!scenicId) {
+      console.error('[scenic-detail] scenicId 为空，无法加载详情');
+      wx.showToast({
+        title: '参数错误',
+        icon: 'none'
+      });
+      return;
+    }
+    
     this.setData({ 
       scenicId,
       selectedEndPoint: 'current' // 默认选择当前位置作为终点
@@ -114,9 +126,21 @@ Page({
 
   // 加载景区详情
   async loadScenicDetail(scenicId) {
+    console.log('[scenic-detail] 开始加载景区详情, scenicId:', scenicId);
     wx.showLoading({ title: '加载中...' });
     try {
       const scenicInfo = await fetchScenicSpotDetail(scenicId);
+      console.log('[scenic-detail] 获取到景区详情:', scenicInfo);
+
+      if (!scenicInfo) {
+        console.error('[scenic-detail] 未找到景区数据');
+        wx.hideLoading();
+        wx.showToast({
+          title: '未找到景区信息',
+          icon: 'none'
+        });
+        return;
+      }
 
       // 尝试从缓存获取景点数据
       const cacheKey = `attractions_${scenicId}`;
@@ -685,7 +709,7 @@ Page({
     }));
 
     wx.navigateTo({
-      url: `/pages/route/route-plan?data=${params}`
+      url: `/packageRoute/pages/route/route-plan?data=${params}`
     });
   }
 });

@@ -23,7 +23,7 @@ export async function fetchSceneDetail(id,type) {
 export async function fetchScenicSpotData() {
   console.log('[服务层] fetchScenicSpotData() 被调用');
   
-  // 从云数据库scene集合直接获取数据，不使用云函数
+  // 从云数据库scene集合直接获取数据
   console.log('[服务层] 使用云数据库直接查询，集合名: scene');
   
   try {
@@ -36,35 +36,49 @@ export async function fetchScenicSpotData() {
     console.log('[服务层] 返回数据类型:', Array.isArray(result.data) ? '数组' : typeof result.data);
     console.log('[服务层] 返回数据长度:', result.data ? result.data.length : 'null');
     
+    // 打印第一条数据的字段，方便调试
+    if (result.data && result.data.length > 0) {
+      console.log('[服务层] 第一条数据的字段:', Object.keys(result.data[0]));
+      console.log('[服务层] 第一条数据内容:', result.data[0]);
+    }
+    
     // 返回数据数组
     return result.data || [];
   } catch (error) {
-    console.error('[服务层] ❌ 从云数据库获取数据失败，降级使用Mock数据:', error.message);
-    console.log('[服务层] 使用 Mock 数据，返回 ScenicSpotData:', ScenicSpotData);
-    return ScenicSpotData;
+    console.error('[服务层] ❌ 从云数据库获取数据失败:', error.message);
+    return [];
   }
 }
 
 /** 获取景区详情数据 */
 export async function fetchScenicSpotDetail(scenicId) {
   console.log('[服务层] fetchScenicSpotDetail() 被调用, scenicId:', scenicId);
-  
-  // 使用云数据库直接查询，使用where条件查询scenicId字段
+
+  // 使用云数据库直接查询，兼容多种ID字段
   try {
     const db = wx.cloud.database();
-    const result = await db.collection('scene')
+    // 先尝试按 scenicId 查询
+    let result = await db.collection('scene')
       .where({
         scenicId: scenicId
       })
       .get();
-    
+
+    // 如果 scenicId 查询无结果，尝试按 _id 查询
+    if (!result.data || result.data.length === 0) {
+      console.log('[服务层] scenicId 查询无结果，尝试按 _id 查询');
+      result = await db.collection('scene')
+        .where({
+          _id: scenicId
+        })
+        .get();
+    }
+
     console.log('[服务层] ✅ 景区详情查询成功:', result);
-    // 返回第一条匹配的数据
     return result.data && result.data.length > 0 ? result.data[0] : null;
   } catch (error) {
-    console.error('[服务层] ❌ 从云数据库获取景区详情失败，降级使用Mock数据:', error.message);
-    /** 返回景区详情 mock数据 */
-    return ScenicSpotData.find((item)=> item?.scenicId === scenicId);
+    console.error('[服务层] ❌ 从云数据库获取景区详情失败:', error.message);
+    return null;
   }
 }
 

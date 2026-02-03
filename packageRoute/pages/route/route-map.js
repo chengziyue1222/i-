@@ -1,5 +1,5 @@
 // pages/route/route-map.js
-import { TENCENT_MAP_API_KEY } from '../../config/map';
+import { TENCENT_MAP_API_KEY } from '../../../config/map';
 
 Page({
   data: {
@@ -430,7 +430,7 @@ Page({
       scenicId: this.data.scenicId
     }));
     wx.navigateTo({
-      url: `/pages/route/route-detail?data=${params}`
+      url: `/packageRoute/pages/route/route-detail?data=${params}`
     });
   },
 
@@ -454,7 +454,7 @@ Page({
     }));
 
     wx.navigateTo({
-      url: `/pages/route/route-nav-page?data=${params}`
+      url: `/packageRoute/pages/route/route-nav-page?data=${params}`
     });
   }
 });

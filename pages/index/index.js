@@ -105,7 +105,7 @@ Page({
   // 跳转景区详情页
   goScenicDetail(event) {
     const scenicId = event.currentTarget.dataset.id;
-    
+
     if (!scenicId) {
       wx.showToast({
         title: '景区信息获取失败',
@@ -114,9 +114,9 @@ Page({
       });
       return;
     }
-    
+
     wx.navigateTo({
-      url: `/pages/route/scenic-detail?scenicId=${scenicId}`
+      url: `/packageRoute/pages/route/scenic-detail?scenicId=${scenicId}`
     });
   },
 

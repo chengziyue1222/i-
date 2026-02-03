@@ -1,5 +1,5 @@
 // pages/route/route-plan.js
-import { TENCENT_MAP_API_KEY } from '../../config/map';
+import { TENCENT_MAP_API_KEY } from '../../../config/map';
 
 // 腾讯地图API请求限流器（每秒最多5次）
 class TencentMapRateLimiter {
@@ -924,7 +924,7 @@ Page({
     console.log('传递给 route-map 的参数长度:', params.length);
 
     wx.navigateTo({
-      url: `/pages/route/route-map?data=${params}`
+      url: `/packageRoute/pages/route/route-map?data=${params}`
     });
   },
 
@@ -956,7 +956,7 @@ Page({
     console.log('传递给 route-detail 的参数长度:', params.length);
 
     wx.navigateTo({
-      url: `/pages/route/route-detail?data=${params}`
+      url: `/packageRoute/pages/route/route-detail?data=${params}`
     });
   }
 });

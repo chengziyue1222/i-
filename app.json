@@ -2,15 +2,23 @@
   "pages": [
     "pages/index/index",
     "pages/route/scenic-list",
-    "pages/route/scenic-detail",
-    "pages/route/route-plan",
-    "pages/route/route-map",
-    "pages/route/route-nav-page",
-    "pages/route/route-detail",
     "pages/solution/index",
     "pages/aboutUs/index",
     "pages/news/index",
     "pages/detail/index"
+  ],
+  "subPackages": [
+    {
+      "root": "packageRoute/pages/route",
+      "name": "route",
+      "pages": [
+        "scenic-detail",
+        "route-plan",
+        "route-map",
+        "route-nav-page",
+        "route-detail"
+      ]
+    }
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
@@ -22,6 +30,16 @@
   "sitemapLocation": "sitemap.json",
   "style": "v2",
   "lazyCodeLoading": "requiredComponents",
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": ["route"]
+    },
+    "pages/route/scenic-list": {
+      "network": "all",
+      "packages": ["route"]
+    }
+  },
   "permission": {
     "scope.userLocation": {
       "desc": "你的位置信息将用于小程序位置定位"

@@ -107,11 +107,14 @@ Page({
 
     return list
       .map(item => {
+        // 兼容多种经纬度字段名：location.latitude/longitude, lat/lng, latitude/longitude
+        const lat = item.latitude || item.lat || (item.location && item.location.latitude);
+        const lng = item.longitude || item.lng || (item.location && item.location.longitude);
         const distance = this.calculateDistance(
           currentLatitude,
           currentLongitude,
-          item.latitude || item.lat,
-          item.longitude || item.lng
+          lat,
+          lng
         );
         return { ...item, distance };
       })
@@ -153,8 +156,38 @@ Page({
   // 点击景区卡片
   onScenicTap(e) {
     const scenic = e.currentTarget.dataset.scenic;
+    console.log('点击景区:', scenic);
+    console.log('景区所有字段:', Object.keys(scenic));
+
+    // 兼容多种ID字段名：scenicId, _id
+    const scenicId = scenic.scenicId || scenic._id;
+    console.log('跳转到景区详情, scenicId:', scenicId);
+
+    if (!scenicId) {
+      console.error('景区ID不存在，无法跳转');
+      wx.showToast({
+        title: '景区ID不存在',
+        icon: 'none'
+      });
+      return;
+    }
+
+    // 使用分包的物理路径进行跳转
+    const url = `/packageRoute/pages/route/scenic-detail?scenicId=${scenicId}`;
+    console.log('跳转路径:', url);
+
     wx.navigateTo({
-      url: `/pages/route/scenic-detail?scenicId=${scenic.scenicId}`
+      url: url,
+      success: () => {
+        console.log('跳转成功');
+      },
+      fail: (err) => {
+        console.error('跳转失败:', err);
+        wx.showToast({
+          title: '跳转失败',
+          icon: 'none'
+        });
+      }
     });
   },
 
