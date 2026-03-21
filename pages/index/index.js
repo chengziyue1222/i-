@@ -1,16 +1,20 @@
 import { fetchIndexData } from '../../services/index/index';
 import { fetchScenicSpotData } from '../../services/scene/index';
 import { fetchNewsData } from '../../services/news/index';
+import { fetchPostList } from '../../services/post/index';
 
 Page({
   data: {
-    showUploadTip:false,
-    bannerList:[],
-    productAbilityList:[],
-    applicationScene:[],
-    newsList:[],
-    partnersList:[],
-    hotScenicList:[] // 热门景区列表
+    showUploadTip: false,
+    bannerList: [],
+    productAbilityList: [],
+    applicationScene: [],
+    newsList: [],
+    partnersList: [],
+    hotScenicList: [],
+    postList: [],
+    activeShortcut: 'walk',
+    routeFilter: 'time'
   },
   async onLoad() {
     await this.getRequestList();
@@ -45,7 +49,10 @@ Page({
       
       const res2 = await fetchNewsData({pageSize:3});
       console.log('[首页] 新闻数据加载完成:', res2);
-      
+
+      const res3 = await fetchPostList({ pageSize: 20 });
+      console.log('[首页] 搭子帖子加载完成:', res3?.length ?? 0);
+
       const {index_show,function_show,cooperation} = res?.[0] || {};
       console.log('[首页] 解析首页数据:', {index_show, function_show, cooperation});
 
@@ -74,7 +81,8 @@ Page({
         partnersList: cooperation || [],
         applicationScene: res1 || [],
         newsList: res2 || [],
-        hotScenicList: hotScenicList
+        hotScenicList: hotScenicList,
+        postList: res3 || []
       }, () => {
         console.log('[首页] ✅ setData完成');
         console.log('[首页] 最终 hotScenicList:', this.data.hotScenicList);
@@ -96,7 +104,26 @@ Page({
       wx.hideLoading();  
     }   
   },
-  // 跳转最新动态列表页面
+  onShortcutTap(e) {
+    const id = e.currentTarget.dataset.id;
+    this.setData({ activeShortcut: id });
+    if (id === 'attraction') {
+      wx.switchTab({ url: '/pages/route/scenic-list' });
+    }
+  },
+  onRouteFilterTap(e) {
+    const filter = e.currentTarget.dataset.filter;
+    this.setData({ routeFilter: filter });
+  },
+  onPostTap(e) {
+    const postId = e.currentTarget.dataset.postId;
+    if (postId) {
+      wx.navigateTo({ url: `/pages/post-detail/index?postId=${postId}` });
+    }
+  },
+  onGoScenicList() {
+    wx.switchTab({ url: '/pages/route/scenic-list' });
+  },
   onGoNews(){
     wx.navigateTo({
       url: '/pages/news/index'

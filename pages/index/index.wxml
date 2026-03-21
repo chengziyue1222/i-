@@ -1,69 +1,138 @@
 <cloud-template-guide />
-<!-- banner -->
-<swiper wx:if="{{bannerList.length >0}}" class="poster" indicator-dots autoplay>
-  <swiper-item wx:for="{{bannerList}}" wx:key="index">
-    <image src="{{item}}"></image>
-  </swiper-item>
-</swiper>
-
-<!-- 热门景区 -->
-<view wx:if="{{hotScenicList.length > 0}}" class="common hot-scenic-section">
-  <view class="common_title">
-    <text>🔥 热门景区</text>
-    <text class="hot-scenic-tip">热度排行</text>
+<scroll-view class="home-scroll" scroll-y="{{true}}" enable-back-to-top="{{true}}">
+  <!-- 顶部品牌区 -->
+  <view class="home-header">
+    <view class="brand">
+      <text class="brand-title">i旅图</text>
+      <text class="brand-subtitle">中国 · 肇庆轻旅行</text>
+    </view>
+    <view class="search-bar">
+      <icon type="search" size="16" color="#999"></icon>
+      <input placeholder="搜索景点/路线" disabled />
+    </view>
   </view>
-  <view class="hot-scenic-list">
-    <view 
-      wx:for="{{hotScenicList}}" 
-      wx:key="scenicId" 
-      class="hot-scenic-item"
-      bindtap="goScenicDetail"
-      data-id="{{item.scenicId}}"
-      data-name="{{item.scenicName}}"
-    >
-      <view class="hot-scenic-rank">
-        <text class="rank-number">{{index + 1}}</text>
+
+  <!-- 快捷入口胶囊 -->
+  <view class="shortcuts-scroll">
+    <view class="shortcuts">
+      <view class="shortcut-item {{activeShortcut === 'attraction' ? 'active' : ''}}" data-id="attraction" bindtap="onShortcutTap">
+        <view class="shortcut-icon" style="background: linear-gradient(135deg, #339af0 0%, #228be6 100%);">🏞</view>
+        <text>景点</text>
       </view>
-      <view class="hot-scenic-info">
-        <view class="hot-scenic-name-container">
-          <text class="hot-scenic-name">{{item.scenicName}}</text>
-          <text class="hot-scenic-level">{{item.level}}</text>
+      <view class="shortcut-item {{activeShortcut === 'food' ? 'active' : ''}}" data-id="food" bindtap="onShortcutTap">
+        <view class="shortcut-icon" style="background: linear-gradient(135deg, #fd7e14 0%, #f59f00 100%);">🍜</view>
+        <text>美食</text>
+      </view>
+      <view class="shortcut-item {{activeShortcut === 'hotel' ? 'active' : ''}}" data-id="hotel" bindtap="onShortcutTap">
+        <view class="shortcut-icon" style="background: linear-gradient(135deg, #20c997 0%, #12b886 100%);">🏨</view>
+        <text>住宿</text>
+      </view>
+      <view class="shortcut-item {{activeShortcut === 'transport' ? 'active' : ''}}" data-id="transport" bindtap="onShortcutTap">
+        <view class="shortcut-icon" style="background: linear-gradient(135deg, #868e96 0%, #495057 100%);">🚌</view>
+        <text>交通</text>
+      </view>
+      <view class="shortcut-item {{activeShortcut === 'walk' ? 'active' : ''}}" data-id="walk" bindtap="onShortcutTap">
+        <view class="shortcut-icon" style="background: linear-gradient(135deg, #0f62fe 0%, #0c4fc4 100%);">🚶</view>
+        <text>步行</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 热门景点推荐 -->
+  <view wx:if="{{hotScenicList.length > 0}}" class="section hot-attraction-section">
+    <view class="section-header">
+      <text class="section-title">热门景点推荐</text>
+      <text class="section-more" bindtap="onGoScenicList">更多</text>
+    </view>
+    <view class="featured-card" bindtap="goScenicDetail" data-id="{{hotScenicList[0].scenicId}}" data-name="{{hotScenicList[0].scenicName}}">
+      <image class="featured-bg" src="{{(hotScenicList[0].images && hotScenicList[0].images[0]) || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
+      <view class="featured-overlay">
+        <text class="featured-name">{{hotScenicList[0].scenicName}}</text>
+        <text class="featured-desc">{{hotScenicList[0].description || '肇庆知名景区'}}</text>
+        <view class="featured-tags">
+          <text class="tag-pill">建议 {{hotScenicList[0].suggestedDuration || 4}} 小时</text>
+          <text class="tag-pill">热度 {{hotScenicList[0].heat || 98.5}}°</text>
         </view>
-        <view class="hot-scenic-meta">
-          <text class="hot-scenic-duration">建议游玩 {{item.suggestedDuration}} 小时</text>
-          <view class="hot-scenic-heat">
-            <text class="heat-icon">🔥</text>
-            <text class="heat-score">{{item.heat}}°</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 当季必去（路线广场） -->
+  <view wx:if="{{hotScenicList.length > 0}}" class="section route-square-section">
+    <view class="section-header">
+      <text class="section-title">当季必去</text>
+      <view class="filter-pills">
+        <view class="filter-pill {{routeFilter === 'time' ? 'active' : ''}}" data-filter="time" bindtap="onRouteFilterTap">时间</view>
+        <view class="filter-pill {{routeFilter === 'checkin' ? 'active' : ''}}" data-filter="checkin" bindtap="onRouteFilterTap">打卡</view>
+        <view class="filter-pill {{routeFilter === 'route' ? 'active' : ''}}" data-filter="route" bindtap="onRouteFilterTap">路线</view>
+      </view>
+    </view>
+    <view class="route-cards">
+      <view
+        wx:for="{{hotScenicList}}"
+        wx:key="scenicId"
+        wx:for-item="item"
+        class="route-card"
+        bindtap="goScenicDetail"
+        data-id="{{item.scenicId}}"
+        data-name="{{item.scenicName}}"
+      >
+        <image class="route-card-img" src="{{(item.images && item.images[0]) || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
+        <view class="route-card-info">
+          <text class="route-card-name">{{item.scenicName}}</text>
+          <text class="route-card-meta">建议 {{item.suggestedDuration || 4}} 小时 · 热度 {{item.heat || 0}}°</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搭子帖子广场 -->
+  <view class="section post-square-section">
+    <view class="section-header">
+      <text class="section-title">搭子帖子广场</text>
+    </view>
+    <view class="post-cards">
+      <view
+        wx:for="{{postList}}"
+        wx:key="postId"
+        class="post-card"
+        bindtap="onPostTap"
+        data-post-id="{{item.postId}}"
+      >
+        <view class="post-card-header">
+          <image class="post-avatar" src="{{item.publisher.avatar}}" mode="aspectFill"></image>
+          <text class="post-nickname">{{item.publisher.nickname}}</text>
+        </view>
+        <view class="post-card-body">
+          <view class="post-destination">
+            <text class="label">目的地</text>
+            <text class="value">{{item.destination}}</text>
+          </view>
+          <view class="post-meta">
+            <text class="meta-item">出发 {{item.departureTime}}</text>
+            <text class="meta-item">还缺 {{item.peopleNeeded}} 人</text>
+          </view>
+          <view class="post-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+            <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="post-tag">{{tag}}</text>
           </view>
         </view>
       </view>
     </view>
-  </view>
-</view>
-
-<!-- 最新攻略 -->
-<view wx:if="{{newsList.length >0}}" class="common">
-  <view class="common_title">
-    <text>最新攻略</text>
-    <view class="news_more" bind:tap="onGoNews">
-      <text>更多</text>
-      <image src="../../images/more.png"></image>
+    <view wx:if="{{postList.length === 0}}" class="empty-posts">
+      <text>暂无搭子帖子，快来发布第一个吧</text>
     </view>
   </view>
-  <view class="news_list">
-    <news-list wx:for="{{newsList}}" wx:key="index" title="{{item.title}}" time="{{item.time}}" image="{{item.picture}}" id="{{item._id}}" number="{{index}}"></news-list>
-  </view>
-</view>
 
-<!-- 合作伙伴 -->
-<view wx:if="{{partnersList.length >0}}" class="common">
-  <view class="common_title">合作伙伴</view>
-  <view class="partners_list">
-    <view wx:for="{{partnersList}}" wx:key="index" class="partners_item">
-      <image src="{{item.pic}}"></image>
+  <!-- 最新攻略（保留） -->
+  <view wx:if="{{newsList.length > 0}}" class="section news-section">
+    <view class="section-header">
+      <text class="section-title">最新攻略</text>
+      <view class="section-more" bindtap="onGoNews">更多</view>
+    </view>
+    <view class="news_list">
+      <news-list wx:for="{{newsList}}" wx:key="index" title="{{item.title}}" time="{{item.time}}" image="{{item.picture}}" id="{{item._id}}" number="{{index}}"></news-list>
     </view>
   </view>
-</view>
 
-<!-- 版本信息 -->
-<version-info wx:if="{{partnersList.length >0}}"></version-info>
+  <version-info wx:if="{{partnersList.length > 0}}"></version-info>
+</scroll-view>

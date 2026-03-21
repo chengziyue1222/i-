@@ -1,0 +1,35 @@
+<view class="post-detail" wx:if="{{post && postId}}">
+  <view class="post-header">
+    <image class="avatar" src="{{post.publisher.avatar}}" mode="aspectFill"></image>
+    <view class="publisher-info">
+      <text class="nickname">{{post.publisher.nickname}}</text>
+      <text class="destination">目的地：{{post.destination}}</text>
+    </view>
+  </view>
+  <view class="post-body">
+    <view class="info-row">
+      <text class="label">出发时间</text>
+      <text class="value">{{post.departureTime}}</text>
+    </view>
+    <view class="info-row">
+      <text class="label">人数需求</text>
+      <text class="value">还缺 {{post.peopleNeeded}} 人</text>
+    </view>
+    <view class="tags-row" wx:if="{{post.tags.length > 0}}">
+      <text class="label">活动标签</text>
+      <view class="tags">
+        <text wx:for="{{post.tags}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+    </view>
+    <view class="content-row" wx:if="{{post.content}}">
+      <text class="label">行程说明</text>
+      <text class="content">{{post.content}}</text>
+    </view>
+  </view>
+  <view class="post-footer">
+    <button class="btn-apply" bindtap="onApplyJoin">申请加入</button>
+  </view>
+</view>
+<view class="empty-state" wx:elif="{{postId && loaded && !post}}">
+  <text>帖子不存在或已删除</text>
+</view>

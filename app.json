@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/profile/index",
+    "pages/post-detail/index",
     "pages/route/scenic-list",
     "pages/solution/index",
     "pages/aboutUs/index",
@@ -73,8 +75,8 @@
         "selectedIconPath": "images/icons/solution-active.png"
       },
       {
-        "pagePath": "pages/aboutUs/index",
-        "text": "联系我们",
+        "pagePath": "pages/profile/index",
+        "text": "我的",
         "iconPath": "images/icons/about.png",
         "selectedIconPath": "images/icons/about-active.png"
       }

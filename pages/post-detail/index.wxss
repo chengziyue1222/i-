@@ -1,0 +1,129 @@
+.post-detail {
+  min-height: 100vh;
+  background: #f2f4f8;
+  padding: 24rpx;
+  padding-bottom: 120rpx;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+}
+
+.publisher-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.nickname {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 8rpx;
+}
+
+.destination {
+  font-size: 26rpx;
+  color: #868e96;
+}
+
+.post-body {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.info-row, .tags-row, .content-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+}
+
+.info-row:last-child, .tags-row:last-child, .content-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  width: 140rpx;
+  font-size: 26rpx;
+  color: #868e96;
+  flex-shrink: 0;
+}
+
+.value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #212529;
+}
+
+.tags {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.tag {
+  padding: 8rpx 20rpx;
+  background: #e7f5ff;
+  color: #339af0;
+  font-size: 24rpx;
+  border-radius: 24rpx;
+}
+
+.content {
+  flex: 1;
+  font-size: 28rpx;
+  color: #495057;
+  line-height: 1.6;
+}
+
+.post-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.btn-apply {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #0f62fe;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 44rpx;
+  border: none;
+}
+
+.btn-apply::after {
+  border: none;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  font-size: 28rpx;
+  color: #868e96;
+}

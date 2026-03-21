@@ -49,7 +49,7 @@
   },
   "appid": "wxc9eab6c0bb5917c3",
   "projectname": "tcb-official-website",
-  "libVersion": "3.7.3",
+  "libVersion": "3.13.1",
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
   "cloudfunctionRoot": "cloudfunctions/",
   "condition": {

@@ -1,0 +1,71 @@
+<view class="profile-page">
+  <!-- 1. 用户信息卡片 (30%) -->
+  <view class="user-card">
+    <view class="user-avatar-wrap">
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image class="user-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      </button>
+    </view>
+    <text class="user-nickname">{{userInfo.nickName}}</text>
+    <text class="user-manifesto">{{userInfo.manifesto}}</text>
+    <view class="user-tags">
+      <text wx:for="{{userInfo.tags}}" wx:key="*this" class="tag">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 2. 数据统计栏 (10%) -->
+  <view class="stats-bar">
+    <view class="stat-item">
+      <text class="stat-value">{{stats.checkinCount}}</text>
+      <text class="stat-label">已打卡景点</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.travelDays}}</text>
+      <text class="stat-label">行程天数</text>
+    </view>
+  </view>
+
+  <!-- 3. 功能列表 (50%) -->
+  <view class="func-list">
+    <view class="func-item" bindtap="onMyTrips">
+      <view class="func-left">
+        <view class="func-icon" style="background: #e7f5ff;">📋</view>
+        <view class="func-text">
+          <text class="func-title">我的行程库</text>
+          <text class="func-desc">查看和管理旅行计划</text>
+        </view>
+      </view>
+      <text class="func-arrow">›</text>
+    </view>
+    <view class="func-item" bindtap="onSafetyCenter">
+      <view class="func-left">
+        <view class="func-icon" style="background: #fff3bf;">🛡</view>
+        <view class="func-text">
+          <text class="func-title">安全中心</text>
+          <text class="func-desc">紧急联系人、位置分享</text>
+        </view>
+      </view>
+      <text class="func-arrow">›</text>
+    </view>
+    <view class="func-item" bindtap="onSettings">
+      <view class="func-left">
+        <view class="func-icon" style="background: #f1f3f5;">⚙</view>
+        <view class="func-text">
+          <text class="func-title">设置</text>
+          <text class="func-desc">账号与隐私</text>
+        </view>
+      </view>
+      <text class="func-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 4. 底部区域 (10%) -->
+  <view class="bottom-area">
+    <version-info></version-info>
+    <view class="customer-entry" bindtap="onCustomerService">
+      <text>客服与反馈</text>
+      <text class="entry-arrow">›</text>
+    </view>
+  </view>
+</view>
