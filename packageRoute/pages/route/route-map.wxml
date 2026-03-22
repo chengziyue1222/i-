@@ -65,6 +65,9 @@
 
     <!-- 操作按钮 -->
     <view class="action-buttons">
+      <button class="action-button secondary" bindtap="onSaveToLibrary">
+        保存到行程库
+      </button>
       <button class="action-button secondary" bindtap="onViewDetail">
         查看攻略
       </button>

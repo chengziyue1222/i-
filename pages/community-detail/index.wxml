@@ -1,0 +1,108 @@
+<view class="cd-page">
+  <!-- 帖子主图 -->
+  <image class="cd-hero-img" src="{{post.image}}" mode="aspectFill"></image>
+
+  <view class="cd-body">
+    <!-- 作者信息 + 关注 -->
+    <view class="cd-author-row">
+      <view class="cd-author-left">
+        <image class="cd-author-avatar" src="{{post.author.avatar}}" mode="aspectFill"></image>
+        <view class="cd-author-info">
+          <text class="cd-author-name">{{post.author.name}}</text>
+          <text class="cd-author-sub">{{post.author.followers}}人关注 · {{post.postTime}}</text>
+        </view>
+      </view>
+      <view
+        class="cd-follow-btn {{isFollowed ? 'cd-follow-btn-active' : ''}}"
+        bindtap="onToggleFollow"
+      >
+        <text>{{isFollowed ? '✓ 已关注' : '+ 关注'}}</text>
+      </view>
+    </view>
+
+    <!-- 帖子标题与内容 -->
+    <view class="cd-content">
+      <text class="cd-title">{{post.title}}</text>
+      <text class="cd-text">{{post.content}}</text>
+      <view class="cd-tags">
+        <text wx:for="{{post.tags}}" wx:key="*this" class="cd-tag">#{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 互动数据栏 -->
+    <view class="cd-actions">
+      <view class="cd-action-item" bindtap="onToggleLike">
+        <text class="cd-action-icon {{isLiked ? 'liked' : ''}}">{{isLiked ? '❤️' : '🤍'}}</text>
+        <text class="cd-action-label {{isLiked ? 'liked' : ''}}">{{likeCount}}</text>
+      </view>
+      <view class="cd-action-item" bindtap="onFocusComment">
+        <text class="cd-action-icon">💬</text>
+        <text class="cd-action-label">{{comments.length}}</text>
+      </view>
+      <view class="cd-action-item" bindtap="onShare">
+        <text class="cd-action-icon">🔗</text>
+        <text class="cd-action-label">分享</text>
+      </view>
+      <view class="cd-action-item cd-find-buddy" bindtap="onFindBuddy">
+        <text>找同款搭子 →</text>
+      </view>
+    </view>
+
+    <!-- 评论区 -->
+    <view class="cd-comments-section">
+      <view class="cd-comments-title">
+        <text class="cd-comments-label">评论</text>
+        <text class="cd-comments-count">{{comments.length}}</text>
+      </view>
+
+      <!-- 评论列表 -->
+      <view wx:for="{{comments}}" wx:key="id" class="cd-comment-item">
+        <image class="cd-comment-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <view class="cd-comment-main">
+          <view class="cd-comment-header">
+            <text class="cd-comment-name">{{item.nickname}}</text>
+            <text class="cd-comment-time">{{item.time}}</text>
+          </view>
+          <text class="cd-comment-text">{{item.text}}</text>
+          <view class="cd-comment-footer">
+            <view class="cd-comment-reply" bindtap="onReply" data-item="{{item}}">回复</view>
+            <view class="cd-comment-like" bindtap="onLikeComment" data-id="{{item.id}}">
+              <text class="{{item.liked ? 'liked' : ''}}">❤ {{item.likes}}</text>
+            </view>
+          </view>
+          <!-- 回复列表 -->
+          <view wx:if="{{item.replies && item.replies.length}}" class="cd-replies">
+            <view wx:for="{{item.replies}}" wx:key="id" wx:for-item="reply" class="cd-reply-item">
+              <text class="cd-reply-name">{{reply.nickname}}</text>
+              <text class="cd-reply-text">：{{reply.text}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="cd-no-comment" wx:if="{{comments.length === 0}}">
+        <text>还没有评论，快来抢沙发～</text>
+      </view>
+    </view>
+
+    <!-- 底部占位（防止被输入栏遮挡） -->
+    <view style="height:120rpx;"></view>
+  </view>
+
+  <!-- 底部评论输入栏 -->
+  <view class="cd-input-bar">
+    <image class="cd-input-avatar" src="{{myAvatar}}" mode="aspectFill"></image>
+    <input
+      class="cd-input"
+      placeholder="{{replyTo ? '回复 ' + replyTo + '...' : '说点什么吧～'}}"
+      value="{{inputText}}"
+      bindinput="onCommentInput"
+      confirm-type="send"
+      bindconfirm="onSendComment"
+      focus="{{inputFocus}}"
+      cursor-spacing="20"
+      adjust-position
+    />
+    <view class="cd-send-btn {{inputText ? 'cd-send-active' : ''}}" bindtap="onSendComment">发送</view>
+  </view>
+</view>

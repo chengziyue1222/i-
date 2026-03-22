@@ -35,8 +35,19 @@ Page({
       scenicId,
       selectedEndPoint: 'current' // 默认选择当前位置作为终点
     });
+    this.recordCheckin(scenicId);
     this.loadScenicDetail(scenicId);
     this.getCurrentLocation();
+  },
+
+  // 记录打卡（首次进入景区计入）
+  recordCheckin(scenicId) {
+    const checked = wx.getStorageSync('checkedScenics') || [];
+    if (checked.includes(scenicId)) return;
+    checked.push(scenicId);
+    wx.setStorageSync('checkedScenics', checked);
+    const count = wx.getStorageSync('checkinCount') || 0;
+    wx.setStorageSync('checkinCount', count + 1);
   },
 
   // 下拉刷新

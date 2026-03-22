@@ -1,0 +1,19 @@
+<view class="safety-page">
+  <view class="section">
+    <view class="section-title">紧急联系人</view>
+    <view class="form-item">
+      <text class="label">姓名</text>
+      <input class="input" placeholder="请输入紧急联系人姓名" value="{{contactName}}" bindinput="onNameInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">电话</text>
+      <input class="input" type="number" placeholder="请输入紧急联系人电话" value="{{contactPhone}}" bindinput="onPhoneInput" />
+    </view>
+    <button class="btn-save" bindtap="onSaveContact">保存</button>
+  </view>
+  <view class="section">
+    <view class="section-title">位置分享</view>
+    <view class="desc">将当前位置在地图中打开，可截图或分享给他人</view>
+    <button class="btn-location" bindtap="onShareLocation">打开我的位置</button>
+  </view>
+</view>

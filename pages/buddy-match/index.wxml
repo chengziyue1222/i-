@@ -1,0 +1,61 @@
+<view class="match-page">
+  <view class="match-hero">
+    <text class="match-hero-icon">🤖</text>
+    <text class="match-hero-title">AI 正在为你匹配搭子</text>
+    <view class="match-params">
+      <text class="match-param">📍 {{destination}}</text>
+      <text class="match-param">📅 {{time}}</text>
+    </view>
+  </view>
+
+  <view class="match-score-card">
+    <view class="score-ring">
+      <text class="score-number">{{matchScore}}</text>
+      <text class="score-unit">分</text>
+    </view>
+    <text class="score-label">综合匹配度</text>
+  </view>
+
+  <view class="match-reasons-card" wx:if="{{reasons.length}}">
+    <text class="section-title">✨ 匹配理由</text>
+    <view class="reasons-list">
+      <view wx:for="{{reasons}}" wx:key="*this" class="reason-item">
+        <text class="reason-dot">•</text>
+        <text class="reason-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="match-results">
+    <text class="section-title">推荐搭子（{{matchedGroups.length}}个）</text>
+    <view wx:for="{{matchedGroups}}" wx:key="groupId" class="result-card">
+      <view class="result-user">
+        <image class="result-avatar" src="{{item.user.avatar}}" mode="aspectFill"></image>
+        <view class="result-info">
+          <view class="result-name-row">
+            <text class="result-name">{{item.user.nickname}}</text>
+            <text class="result-personality">{{item.user.personality}}</text>
+          </view>
+          <text class="result-dest">📍 {{item.destination}}  📅 {{item.time}}</text>
+        </view>
+        <text class="result-score">{{item.score}}%</text>
+      </view>
+      <view class="result-tags">
+        <text wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag" class="result-tag">{{tag}}</text>
+      </view>
+      <view class="result-actions">
+        <view class="result-btn-join" bindtap="onJoinGroup" data-group="{{item}}">申请加入</view>
+      </view>
+    </view>
+    <view class="empty-match" wx:if="{{!matchedGroups.length}}">
+      <text class="empty-icon">🧳</text>
+      <text class="empty-text">暂无完全匹配的搭子</text>
+      <text class="empty-sub">试试调整目的地或时间</text>
+    </view>
+  </view>
+
+  <view class="match-footer">
+    <view class="btn-reselect" bindtap="onBack">重新选择</view>
+    <view class="btn-create" bindtap="onCreateOwn">自己发起组队</view>
+  </view>
+</view>

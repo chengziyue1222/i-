@@ -1,0 +1,4 @@
+.ts-bar { display:flex; background:#fff; border-bottom:1rpx solid #eee; padding:0 32rpx; }
+.ts-item { flex:1; text-align:center; padding:20rpx 0 0 0; font-size:30rpx; color:#999; position:relative; padding-bottom:20rpx; }
+.ts-on { color:#0f62fe; font-weight:700; }
+.ts-line { position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:48rpx; height:6rpx; background:#0f62fe; border-radius:3rpx; }

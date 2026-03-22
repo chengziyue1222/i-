@@ -8,7 +8,7 @@
     </view>
     <view class="search-bar">
       <icon type="search" size="16" color="#999"></icon>
-      <input placeholder="搜索景点/路线" disabled />
+      <input placeholder="搜索景点/路线" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" />
     </view>
   </view>
 

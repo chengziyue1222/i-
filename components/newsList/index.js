@@ -39,7 +39,7 @@ Component({
   methods: {
     async goDetail(event){
       wx.navigateTo({
-        url: `/pages/detail/index?type=news&id=${this.id}&title=${event.currentTarget.dataset.title}`
+        url: `/pages/detail/index?type=news&id=${this.properties.id}&title=${event.currentTarget.dataset.title}`
       })
     }  
   },

@@ -1,0 +1,23 @@
+<view class="trip-library-page">
+  <view wx:if="{{tripList.length > 0}}" class="trip-list">
+    <view
+      wx:for="{{tripList}}"
+      wx:key="id"
+      class="trip-card"
+      bindtap="onTripTap"
+      data-index="{{index}}"
+    >
+      <view class="trip-info">
+        <text class="trip-name">{{item.name}}</text>
+        <text class="trip-meta">{{item.scenicName}} · {{item.createTime}}</text>
+      </view>
+      <view class="trip-actions">
+        <view class="delete-btn" catchtap="onDelete" data-id="{{item.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+  <view wx:else class="empty-state">
+    <text class="empty-text">暂无行程</text>
+    <text class="empty-desc">在景区详情页生成路线后，可保存到行程库</text>
+  </view>
+</view>

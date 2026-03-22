@@ -1,0 +1,42 @@
+<view class="tag-edit-page">
+  <view class="section">
+    <view class="section-title">自定义添加</view>
+    <view class="add-row">
+      <input
+        class="add-input"
+        placeholder="输入新标签，按确认添加"
+        value="{{editTagInput}}"
+        bindinput="onTagInput"
+        bindconfirm="onAddTag"
+      />
+      <view class="add-btn" bindtap="onAddTag">添加</view>
+    </view>
+  </view>
+  <view class="section">
+    <view class="section-title">我的标签 ({{tags.length}}/8)</view>
+    <view class="my-tags" wx:if="{{tags.length > 0}}">
+      <view wx:for="{{tags}}" wx:key="*this" class="my-tag">
+        <text>{{item}}</text>
+        <text class="remove" bindtap="onRemoveTag" data-index="{{index}}">×</text>
+      </view>
+    </view>
+    <view class="empty" wx:else>暂无标签，从下方推荐选择或自定义添加</view>
+  </view>
+  <view class="section">
+    <view class="section-title">推荐标签</view>
+    <view class="preset-tags">
+      <view
+        wx:for="{{presetTags}}"
+        wx:key="*this"
+        class="preset-tag {{tags.indexOf(item) > -1 ? 'selected' : ''}}"
+        bindtap="onSelectPreset"
+        data-tag="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+  <view class="footer">
+    <button class="confirm-btn" bindtap="onConfirm">完成</button>
+  </view>
+</view>

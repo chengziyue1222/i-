@@ -14,7 +14,8 @@ Page({
     hotScenicList: [],
     postList: [],
     activeShortcut: 'walk',
-    routeFilter: 'time'
+    routeFilter: 'time',
+    searchKeyword: ''
   },
   async onLoad() {
     await this.getRequestList();
@@ -104,6 +105,14 @@ Page({
       wx.hideLoading();  
     }   
   },
+  onSearchInput(e) {
+    this.setData({ searchKeyword: e.detail.value });
+  },
+  onSearchConfirm() {
+    const keyword = (this.data.searchKeyword || '').trim();
+    wx.setStorageSync('homeSearchKeyword', keyword);
+    wx.switchTab({ url: '/pages/route/scenic-list' });
+  },
   onShortcutTap(e) {
     const id = e.currentTarget.dataset.id;
     this.setData({ activeShortcut: id });
@@ -113,7 +122,15 @@ Page({
   },
   onRouteFilterTap(e) {
     const filter = e.currentTarget.dataset.filter;
-    this.setData({ routeFilter: filter });
+    let hotScenicList = [...(this.data.hotScenicList || [])];
+    if (filter === 'time') {
+      hotScenicList.sort((a, b) => (b.heat || 0) - (a.heat || 0));
+    } else if (filter === 'checkin') {
+      hotScenicList.sort((a, b) => (b.heat || 0) - (a.heat || 0));
+    } else if (filter === 'route') {
+      hotScenicList.sort((a, b) => (a.scenicName || '').localeCompare(b.scenicName || ''));
+    }
+    this.setData({ routeFilter: filter, hotScenicList });
   },
   onPostTap(e) {
     const postId = e.currentTarget.dataset.postId;

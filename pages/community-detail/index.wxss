@@ -1,0 +1,74 @@
+.cd-page { min-height:100vh; background:#fff; padding-bottom: env(safe-area-inset-bottom); }
+
+/* 主图 */
+.cd-hero-img { width:100%; height:520rpx; display:block; }
+
+/* 正文区 */
+.cd-body { padding:0 32rpx; }
+
+/* 作者行 */
+.cd-author-row { display:flex; align-items:center; justify-content:space-between; padding:28rpx 0 24rpx; border-bottom:1rpx solid #f1f3f5; }
+.cd-author-left { display:flex; align-items:center; gap:16rpx; }
+.cd-author-avatar { width:80rpx; height:80rpx; border-radius:50%; border:2rpx solid #e7f0ff; flex-shrink:0; }
+.cd-author-info { display:flex; flex-direction:column; gap:6rpx; }
+.cd-author-name { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.cd-author-sub { font-size:22rpx; color:#aaa; }
+
+/* 关注按钮 */
+.cd-follow-btn { padding:14rpx 32rpx; border-radius:32rpx; background:#0f62fe; color:#fff; font-size:26rpx; font-weight:600; box-shadow:0 4rpx 12rpx rgba(15,98,254,0.3); transition:all 0.2s; }
+.cd-follow-btn:active { opacity:0.8; }
+.cd-follow-btn-active { background:#f1f3f5; color:#868e96; box-shadow:none; }
+
+/* 帖子内容 */
+.cd-content { padding:28rpx 0 24rpx; border-bottom:1rpx solid #f1f3f5; }
+.cd-title { display:block; font-size:34rpx; font-weight:700; color:#1a1a1a; line-height:1.5; margin-bottom:16rpx; }
+.cd-text { display:block; font-size:28rpx; color:#444; line-height:1.8; margin-bottom:20rpx; }
+.cd-tags { display:flex; flex-wrap:wrap; gap:12rpx; }
+.cd-tag { font-size:24rpx; color:#0f62fe; font-weight:500; }
+
+/* 互动栏 */
+.cd-actions { display:flex; align-items:center; padding:24rpx 0; border-bottom:2rpx solid #f1f3f5; gap:8rpx; }
+.cd-action-item { display:flex; align-items:center; gap:8rpx; padding:12rpx 20rpx; border-radius:32rpx; background:#f8f9fa; margin-right:8rpx; }
+.cd-action-item:active { background:#e9ecef; }
+.cd-action-icon { font-size:32rpx; line-height:1; }
+.cd-action-label { font-size:24rpx; color:#555; }
+.cd-action-icon.liked, .cd-action-label.liked { color:#e03131; }
+.cd-find-buddy { background:linear-gradient(135deg,#ff6b6b,#ff8e53) !important; margin-left:auto; margin-right:0; }
+.cd-find-buddy text { color:#fff; font-size:24rpx; font-weight:600; }
+
+/* 评论区标题 */
+.cd-comments-section { padding-top:32rpx; }
+.cd-comments-title { display:flex; align-items:center; gap:12rpx; margin-bottom:24rpx; }
+.cd-comments-label { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.cd-comments-count { font-size:24rpx; color:#aaa; background:#f1f3f5; padding:4rpx 14rpx; border-radius:16rpx; }
+
+/* 评论条目 */
+.cd-comment-item { display:flex; gap:16rpx; margin-bottom:28rpx; }
+.cd-comment-avatar { width:64rpx; height:64rpx; border-radius:50%; flex-shrink:0; border:2rpx solid #f1f3f5; }
+.cd-comment-main { flex:1; }
+.cd-comment-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8rpx; }
+.cd-comment-name { font-size:26rpx; font-weight:600; color:#1a1a1a; }
+.cd-comment-time { font-size:22rpx; color:#bbb; }
+.cd-comment-text { display:block; font-size:28rpx; color:#333; line-height:1.7; margin-bottom:12rpx; }
+.cd-comment-footer { display:flex; align-items:center; justify-content:flex-end; gap:32rpx; }
+.cd-comment-reply { font-size:24rpx; color:#aaa; }
+.cd-comment-reply:active { color:#0f62fe; }
+.cd-comment-like { font-size:24rpx; color:#aaa; }
+.cd-comment-like .liked { color:#e03131; }
+
+/* 回复列表 */
+.cd-replies { background:#f8f9fa; border-radius:12rpx; padding:16rpx 20rpx; margin-top:12rpx; }
+.cd-reply-item { display:flex; flex-wrap:wrap; margin-bottom:8rpx; }
+.cd-reply-item:last-child { margin-bottom:0; }
+.cd-reply-name { font-size:24rpx; font-weight:600; color:#0f62fe; }
+.cd-reply-text { font-size:24rpx; color:#555; line-height:1.6; }
+
+/* 无评论 */
+.cd-no-comment { text-align:center; padding:48rpx 0; font-size:26rpx; color:#bbb; }
+
+/* 底部输入栏 */
+.cd-input-bar { position:fixed; bottom:0; left:0; right:0; display:flex; align-items:center; gap:16rpx; padding:16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom)); background:#fff; border-top:1rpx solid #f1f3f5; box-shadow:0 -4rpx 16rpx rgba(0,0,0,0.06); z-index:100; }
+.cd-input-avatar { width:64rpx; height:64rpx; border-radius:50%; flex-shrink:0; }
+.cd-input { flex:1; height:72rpx; background:#f4f5f7; border-radius:36rpx; padding:0 24rpx; font-size:26rpx; color:#333; }
+.cd-send-btn { padding:0 28rpx; height:72rpx; line-height:72rpx; border-radius:36rpx; background:#e9ecef; color:#aaa; font-size:26rpx; font-weight:600; flex-shrink:0; transition:all 0.2s; }
+.cd-send-active { background:#0f62fe !important; color:#fff !important; box-shadow:0 4rpx 12rpx rgba(15,98,254,0.3); }

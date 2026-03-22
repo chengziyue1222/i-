@@ -1,0 +1,15 @@
+<view class="sb-wrap">
+  <view class="sb-inner">
+    <text class="sb-icon">🔍</text>
+    <input
+      class="sb-input"
+      placeholder="{{placeholder}}"
+      placeholder-class="sb-ph"
+      value="{{value}}"
+      bindinput="onInput"
+      bindconfirm="onConfirm"
+      confirm-type="search"
+    />
+    <text class="sb-clear" wx:if="{{value}}" bindtap="onClear">✕</text>
+  </view>
+</view>

@@ -1,4 +1,8 @@
 {
-  "usingComponents": {},
-  "navigationBarTitleText": "解决方案"
+  "navigationBarTitleText": "搭子大厅",
+  "usingComponents": {
+    "card-buddy": "../../components/card-buddy/index",
+    "search-bar": "../../components/search-bar/index",
+    "tab-switch": "../../components/tab-switch/index"
+  }
 }

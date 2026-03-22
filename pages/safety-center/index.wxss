@@ -1,0 +1,71 @@
+.safety-page {
+  min-height: 100vh;
+  background: #f2f4f8;
+  padding: 24rpx;
+}
+
+.section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 24rpx;
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.form-item .label {
+  display: block;
+  font-size: 26rpx;
+  color: #868e96;
+  margin-bottom: 12rpx;
+}
+
+.form-item .input {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.btn-save {
+  margin-top: 16rpx;
+  background: #0f62fe;
+  color: #fff;
+  font-size: 30rpx;
+  border-radius: 12rpx;
+  border: none;
+}
+
+.btn-save::after {
+  border: none;
+}
+
+.desc {
+  font-size: 26rpx;
+  color: #868e96;
+  margin-bottom: 24rpx;
+  line-height: 1.5;
+}
+
+.btn-location {
+  background: #e7f5ff;
+  color: #0f62fe;
+  font-size: 30rpx;
+  border-radius: 12rpx;
+  border: none;
+}
+
+.btn-location::after {
+  border: none;
+}

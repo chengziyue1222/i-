@@ -7,7 +7,15 @@
     "pages/solution/index",
     "pages/aboutUs/index",
     "pages/news/index",
-    "pages/detail/index"
+    "pages/detail/index",
+    "pages/safety-center/index",
+    "pages/settings/index",
+    "pages/trip-library/index",
+    "pages/tag-edit/index",
+    "pages/buddy-match/index",
+    "pages/buddy-apply/index",
+    "pages/buddy-detail/index",
+    "pages/community-detail/index"
   ],
   "subPackages": [
     {
@@ -26,8 +34,9 @@
     "backgroundColor": "#F6F6F6",
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F6F6F6",
-    "navigationBarTitleText": "企业官网",
-    "navigationBarTextStyle": "black"
+    "navigationBarTitleText": "i旅图",
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "default"
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",
@@ -83,6 +92,10 @@
     ]
   },
   "usingComponents": {
-    "cloud-template-guide": "/components/cloud-template-guide/index"
+    "cloud-template-guide": "/components/cloud-template-guide/index",
+    "card-buddy": "/components/card-buddy/index",
+    "card-scenic": "/components/card-scenic/index",
+    "search-bar": "/components/search-bar/index",
+    "tab-switch": "/components/tab-switch/index"
   }
 }

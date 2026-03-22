@@ -1,0 +1,12 @@
+<view class="ts-bar">
+  <view
+    wx:for="{{tabs}}"
+    wx:key="id"
+    class="ts-item {{active===item.id?'ts-on':''}}"
+    bindtap="onSwitch"
+    data-val="{{item.id}}"
+  >
+    {{item.label}}
+    <view class="ts-line" wx:if="{{active===item.id}}"></view>
+  </view>
+</view>

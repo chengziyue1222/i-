@@ -1,0 +1,46 @@
+<view class="page" wx:if="{{group}}">
+  <!-- 目标组队摘要 -->
+  <view class="summary" style="background:{{group.cover.color}}">
+    <text class="s-emoji">{{group.cover.emoji}}</text>
+    <view class="s-overlay"></view>
+    <view class="s-content">
+      <text class="s-title">申请加入「{{group.destination}}」</text>
+      <view class="s-meta">
+        <text class="s-item">📅 {{group.startTime}}</text>
+        <text class="s-item">👥 {{group.current}}/{{group.max}} 人</text>
+        <text class="s-item">🧑 {{group.nickname}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 表单 -->
+  <view class="form-card">
+    <view class="form-header">
+      <text class="form-title">自我介绍 <text class="req">*</text></text>
+      <text class="form-count">{{charCount}}/200</text>
+    </view>
+    <text class="form-hint">介绍一下自己，提高队长通过率～</text>
+    <textarea
+      class="textarea"
+      placeholder="例：性格开朗，喜欢拍照，有徒步经验，期待与大家同行！"
+      value="{{message}}"
+      bindinput="onInput"
+      maxlength="200"
+      auto-height
+      cursor-spacing="80"
+    ></textarea>
+  </view>
+
+  <!-- 提示 -->
+  <view class="tips">
+    <text class="tip">💡 提交后队长将收到申请通知</text>
+    <text class="tip">💡 通过后即可加入组队群</text>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer">
+    <view class="btn-submit {{submitted?'btn-done':''}}" bindtap="onSubmit">
+      {{submitted ? '✅ 申请已提交' : '提交申请'}}
+    </view>
+  </view>
+</view>

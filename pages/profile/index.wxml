@@ -1,36 +1,95 @@
 <view class="profile-page">
-  <!-- 1. 用户信息卡片 (30%) -->
-  <view class="user-card">
-    <view class="user-avatar-wrap">
-      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-        <image class="user-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
-      </button>
+  <!-- 沉浸式导航栏 -->
+  <view class="custom-nav-bar">
+    <view class="nav-title">我的</view>
+  </view>
+
+  <!-- 1. 用户信息卡片 (30%) - 背景图 + 用户信息 -->
+  <view class="user-card-container">
+    <!-- 背景图层 -->
+    <image class="bg-image" src="{{userInfo.bgImage}}" mode="aspectFill" wx:if="{{userInfo.bgImage}}"></image>
+    <view class="bg-overlay"></view>
+    
+    <!-- 背景上传按钮 -->
+    <view class="bg-upload-btn" wx:if="{{isLoggedIn}}" bindtap="onUploadBgImage">
+      <text>📷</text>
     </view>
-    <text class="user-nickname">{{userInfo.nickName}}</text>
-    <text class="user-manifesto">{{userInfo.manifesto}}</text>
-    <view class="user-tags">
-      <text wx:for="{{userInfo.tags}}" wx:key="*this" class="tag">{{item}}</text>
+
+    <!-- 用户信息内容 -->
+    <view class="user-card-content">
+      <block wx:if="{{isLoggedIn}}">
+        <view class="user-avatar-wrap">
+          <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <image class="user-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+          </button>
+        </view>
+        
+        <view class="user-info-main">
+          <view class="user-nickname-row" bindtap="onNicknameTap">
+            <text class="user-nickname">{{userInfo.nickName}}</text>
+            <text class="mbti-badge">✨ ENFP</text>
+            <text class="edit-icon">✎</text>
+          </view>
+          <text class="user-manifesto">{{userInfo.manifesto}}</text>
+        </view>
+
+        <!-- 彩色标签 + 内联编辑按钮 -->
+        <view class="user-tags-section">
+          <view class="user-tags">
+            <view wx:for="{{userInfo.tags}}" wx:key="*this" class="tag" style="{{getTagStyle(item)}}">
+              {{item}}
+            </view>
+            <view class="tag-add-btn" bindtap="onTagsTap">
+              <text class="tag-add-icon">+</text>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="login-prompt">
+          <text class="login-title">登录 i旅图</text>
+          <text class="login-desc">微信授权登录后，可自定义昵称和旅行标签</text>
+          <button class="btn-wechat-login" bindtap="onWechatLogin">微信授权登录</button>
+        </view>
+      </block>
     </view>
   </view>
 
-  <!-- 2. 数据统计栏 (10%) -->
+  <!-- 昵称编辑弹窗 -->
+  <view class="modal-mask" wx:if="{{showNicknameEdit}}" bindtap="onNicknameCancel">
+    <view class="modal-box" catchtap="">
+      <view class="modal-title">修改昵称</view>
+      <input class="modal-input" placeholder="请输入昵称" value="{{editNickname}}" bindinput="onNicknameInput" focus="{{showNicknameEdit}}" />
+      <view class="modal-actions">
+        <view class="modal-btn" bindtap="onNicknameCancel">取消</view>
+        <view class="modal-btn primary" bindtap="onNicknameConfirm">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 2. 数据统计栏 (10%) - 带图标 -->
   <view class="stats-bar">
     <view class="stat-item">
+      <view class="stat-icon">📍</view>
       <text class="stat-value">{{stats.checkinCount}}</text>
       <text class="stat-label">已打卡景点</text>
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">
+      <view class="stat-icon">📅</view>
       <text class="stat-value">{{stats.travelDays}}</text>
       <text class="stat-label">行程天数</text>
     </view>
   </view>
 
-  <!-- 3. 功能列表 (50%) -->
+  <!-- 3. 功能列表 (50%) - 统一图标风格 -->
   <view class="func-list">
     <view class="func-item" bindtap="onMyTrips">
       <view class="func-left">
-        <view class="func-icon" style="background: #e7f5ff;">📋</view>
+        <view class="func-icon" style="background: linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%);">
+          <text class="func-icon-text">📋</text>
+        </view>
         <view class="func-text">
           <text class="func-title">我的行程库</text>
           <text class="func-desc">查看和管理旅行计划</text>
@@ -38,9 +97,12 @@
       </view>
       <text class="func-arrow">›</text>
     </view>
+    
     <view class="func-item" bindtap="onSafetyCenter">
       <view class="func-left">
-        <view class="func-icon" style="background: #fff3bf;">🛡</view>
+        <view class="func-icon" style="background: linear-gradient(135deg, #fff3bf 0%, #ffe066 100%);">
+          <text class="func-icon-text">🛡</text>
+        </view>
         <view class="func-text">
           <text class="func-title">安全中心</text>
           <text class="func-desc">紧急联系人、位置分享</text>
@@ -48,9 +110,12 @@
       </view>
       <text class="func-arrow">›</text>
     </view>
+    
     <view class="func-item" bindtap="onSettings">
       <view class="func-left">
-        <view class="func-icon" style="background: #f1f3f5;">⚙</view>
+        <view class="func-icon" style="background: linear-gradient(135deg, #f1f3f5 0%, #e9ecef 100%);">
+          <text class="func-icon-text">⚙</text>
+        </view>
         <view class="func-text">
           <text class="func-title">设置</text>
           <text class="func-desc">账号与隐私</text>
@@ -67,5 +132,6 @@
       <text>客服与反馈</text>
       <text class="entry-arrow">›</text>
     </view>
+    <view class="footer-slogan">i旅图 - 懂旅行，更懂你</view>
   </view>
 </view>

@@ -1,0 +1,14 @@
+<view class="sc-card" bindtap="onTap">
+  <image class="sc-img" src="{{scenic.image}}" mode="aspectFill" lazy-load></image>
+  <view class="sc-body">
+    <view class="sc-top">
+      <text class="sc-name">{{scenic.name}}</text>
+      <view class="sc-heat">🔥{{scenic.heat}}</view>
+    </view>
+    <view class="sc-meta">
+      <text class="sc-cat">{{scenic.category}}</text>
+      <text class="sc-dur">⏱ {{scenic.duration}}</text>
+    </view>
+    <text class="sc-addr">📍 {{scenic.address}}</text>
+  </view>
+</view>

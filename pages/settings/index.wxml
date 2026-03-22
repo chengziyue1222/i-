@@ -1,0 +1,15 @@
+<view class="settings-page">
+  <view class="section">
+    <view class="setting-item" bindtap="onAbout">
+      <text class="item-title">关于我们</text>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="setting-item" bindtap="onClearCache">
+      <text class="item-title">清除缓存</text>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+  <view class="version-info">
+    <text>i旅图 v{{version}}</text>
+  </view>
+</view>

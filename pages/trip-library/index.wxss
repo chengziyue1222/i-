@@ -1,0 +1,72 @@
+.trip-library-page {
+  min-height: 100vh;
+  background: #f2f4f8;
+  padding: 24rpx;
+}
+
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.trip-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.trip-card:active {
+  background: #f8f9fa;
+}
+
+.trip-info {
+  flex: 1;
+}
+
+.trip-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 8rpx;
+}
+
+.trip-meta {
+  font-size: 24rpx;
+  color: #868e96;
+}
+
+.trip-actions {
+  margin-left: 24rpx;
+}
+
+.delete-btn {
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+  color: #ff6b6b;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 48rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #495057;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #868e96;
+  text-align: center;
+}

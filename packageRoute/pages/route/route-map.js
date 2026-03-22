@@ -424,6 +424,33 @@ Page({
   },
 
   // 查看攻略详情
+  onSaveToLibrary() {
+    const { scheme, scenicId, sortedAttractions } = this.data;
+    if (!scheme || !scheme.pathData) {
+      wx.showToast({ title: '路线数据不完整', icon: 'none' });
+      return;
+    }
+    const pathData = scheme.pathData;
+    const library = wx.getStorageSync('tripLibrary') || [];
+    const now = new Date();
+    const createTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const trip = {
+      id: 'trip_' + Date.now(),
+      name: scheme.name || '行程',
+      scenicName: scheme.name || '景区路线',
+      scenicId: scenicId || '',
+      createTime,
+      scheme,
+      sortedAttractions: sortedAttractions || [],
+      pathData
+    };
+    library.unshift(trip);
+    wx.setStorageSync('tripLibrary', library);
+    const days = wx.getStorageSync('travelDays') || 0;
+    wx.setStorageSync('travelDays', days + 1);
+    wx.showToast({ title: '已保存到行程库', icon: 'success' });
+  },
+
   onViewDetail() {
     const params = encodeURIComponent(JSON.stringify({
       scheme: this.data.scheme,

@@ -1,0 +1,11 @@
+.sc-card { background:#fff; border-radius:20rpx; overflow:hidden; box-shadow:0 4rpx 20rpx rgba(0,0,0,.07); margin-bottom:20rpx; }
+.sc-card:active { opacity:.9; }
+.sc-img { width:100%; height:240rpx; display:block; }
+.sc-body { padding:20rpx 24rpx 24rpx; }
+.sc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10rpx; }
+.sc-name { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.sc-heat { font-size:22rpx; color:#f03e3e; background:#fff0f0; padding:4rpx 14rpx; border-radius:12rpx; }
+.sc-meta { display:flex; gap:16rpx; margin-bottom:10rpx; }
+.sc-cat { font-size:24rpx; color:#0f62fe; background:#e7f0ff; padding:5rpx 16rpx; border-radius:12rpx; }
+.sc-dur { font-size:24rpx; color:#666; }
+.sc-addr { display:block; font-size:22rpx; color:#999; }

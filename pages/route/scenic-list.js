@@ -13,6 +13,16 @@ Page({
   onLoad() {
     this.getCurrentLocation();
   },
+  onShow() {
+    const keyword = wx.getStorageSync('homeSearchKeyword');
+    if (keyword !== undefined && keyword !== '' && keyword !== null) {
+      wx.removeStorageSync('homeSearchKeyword');
+      this.setData({ searchKeyword: keyword });
+      const list = this.data.scenicList || [];
+      const filtered = list.filter(item => item.scenicName && item.scenicName.includes(keyword));
+      this.setData({ filteredScenicList: filtered });
+    }
+  },
 
   // 获取缓存的定位信息
   getCachedLocation() {
@@ -48,40 +58,33 @@ Page({
     }
   },
 
-  // 获取当前位置
+  // 获取当前位置，返回 Promise
   getCurrentLocation() {
-    // 尝试读取缓存的定位
-    const cachedLocation = this.getCachedLocation();
-    
-    if (cachedLocation) {
-      this.setData({
-        currentLatitude: cachedLocation.latitude,
-        currentLongitude: cachedLocation.longitude
-      });
-      this.loadScenicList();
-      return;
-    }
-
-    // 缓存不存在或已过期,重新获取定位
-    wx.getLocation({
-      type: 'gcj02',
-      success: (res) => {
-        // 保存到缓存
-        this.saveLocationToCache(res.latitude, res.longitude);
-        
+    return new Promise((resolve) => {
+      const cachedLocation = this.getCachedLocation();
+      if (cachedLocation) {
         this.setData({
-          currentLatitude: res.latitude,
-          currentLongitude: res.longitude
+          currentLatitude: cachedLocation.latitude,
+          currentLongitude: cachedLocation.longitude
         });
-        this.loadScenicList();
-      },
-      fail: () => {
-        wx.showToast({
-          title: '定位失败，使用默认排序',
-          icon: 'none'
-        });
-        this.loadScenicList();
+        this.loadScenicList().then(resolve).catch(resolve);
+        return;
       }
+      wx.getLocation({
+        type: 'gcj02',
+        success: (res) => {
+          this.saveLocationToCache(res.latitude, res.longitude);
+          this.setData({
+            currentLatitude: res.latitude,
+            currentLongitude: res.longitude
+          });
+          this.loadScenicList().then(resolve).catch(resolve);
+        },
+        fail: () => {
+          wx.showToast({ title: '定位失败，使用默认排序', icon: 'none' });
+          this.loadScenicList().then(resolve).catch(resolve);
+        }
+      });
     });
   },
 
@@ -127,15 +130,19 @@ Page({
     try {
       const list = await fetchScenicSpotData();
       const sortedList = this.sortByDistance(list);
+      const keyword = wx.getStorageSync('homeSearchKeyword') || '';
+      let filtered = sortedList;
+      if (keyword) {
+        wx.removeStorageSync('homeSearchKeyword');
+        this.setData({ searchKeyword: keyword });
+        filtered = sortedList.filter(item => item.scenicName && item.scenicName.includes(keyword));
+      }
       this.setData({
         scenicList: sortedList,
-        filteredScenicList: sortedList
+        filteredScenicList: filtered
       });
     } catch (error) {
-      wx.showToast({
-        title: '加载失败',
-        icon: 'none'
-      });
+      wx.showToast({ title: '加载失败', icon: 'none' });
     } finally {
       wx.hideLoading();
     }

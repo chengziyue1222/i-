@@ -6,11 +6,16 @@ import { DATA_MODEL_KEY } from '../../config/model'
 /** 获取解决方案数据 */
 export async function fetchSolutionData() {
   if (cloudbaseTemplateConfig.useMock) {
-    /** 返回解决方案mock数据 */
     return SolutionData;
   }
-
-  return await getAll({
-    name: DATA_MODEL_KEY.SOLUTION_LIST
-  });
+  const modelKey = DATA_MODEL_KEY.SOLUTION_LIST;
+  if (!modelKey) {
+    return SolutionData;
+  }
+  try {
+    return await getAll({ name: modelKey });
+  } catch (err) {
+    console.warn('[solution] 云数据库获取失败，降级 Mock:', err.message);
+    return SolutionData;
+  }
 }

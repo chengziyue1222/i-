@@ -1,0 +1,76 @@
+<view class="page" wx:if="{{group}}">
+  <!-- 封面英雄区 -->
+  <view class="hero" style="background:{{group.cover.color}}">
+    <text class="hero-emoji">{{group.cover.emoji}}</text>
+    <view class="hero-overlay"></view>
+    <view class="hero-info">
+      <text class="hero-dest">{{group.destination}}</text>
+      <view class="hero-status hero-status-{{group.status}}">
+        {{group.status==='recruiting'?'🟢 招募中':'🔴 已满员'}}
+      </view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="scroll">
+    <!-- 发起人 -->
+    <view class="section">
+      <view class="creator-row">
+        <view class="c-avatar">{{group.nickname[0]}}</view>
+        <view class="c-info">
+          <view class="c-name-row">
+            <text class="c-name">{{group.nickname}}</text>
+            <text class="c-mbti">{{group.personality}}</text>
+          </view>
+          <text class="c-role">队长 · 发起人</text>
+        </view>
+        <view class="share-btn" bindtap="onShare">分享</view>
+      </view>
+    </view>
+
+    <!-- 行程信息 -->
+    <view class="section">
+      <text class="section-title">行程信息</text>
+      <view class="info-card">
+        <view class="info-row"><text class="i-label">📍 目的地</text><text class="i-val dest">{{group.destination}}</text></view>
+        <view class="info-row"><text class="i-label">📅 出发时间</text><text class="i-val">{{group.startTime}}</text></view>
+        <view class="info-row">
+          <text class="i-label">👥 人数</text>
+          <text class="i-val">{{group.current}}/{{group.max}} 人</text>
+          <view class="pbar"><view class="pbar-fill" style="width:{{group.current/group.max*100}}%"></view></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标签 -->
+    <view class="section">
+      <text class="section-title">旅行标签</text>
+      <view class="tags-wrap">
+        <text wx:for="{{group.tags}}" wx:key="*this" wx:for-item="t" class="tag">{{t}}</text>
+        <text wx:if="{{!group.tags.length}}" class="tag-empty">暂无标签</text>
+      </view>
+    </view>
+
+    <!-- 匹配理由 -->
+    <view class="section" wx:if="{{group.matchReasons.length}}">
+      <text class="section-title">✨ 匹配理由</text>
+      <view class="reasons-wrap">
+        <text wx:for="{{group.matchReasons}}" wx:key="*this" wx:for-item="r" class="reason">{{r}}</text>
+      </view>
+    </view>
+
+    <!-- 队长介绍 -->
+    <view class="section">
+      <text class="section-title">队长介绍</text>
+      <view class="intro-box"><text>{{group.intro}}</text></view>
+    </view>
+
+    <view style="height:160rpx"></view>
+  </scroll-view>
+
+  <!-- 底部按钮 -->
+  <view class="footer">
+    <view class="btn-apply {{group.status!=='recruiting'||applied?'btn-disabled':''}}" bindtap="onApply">
+      {{applied ? '✅ 已申请' : group.status==='recruiting' ? '申请加入' : '队伍已满'}}
+    </view>
+  </view>
+</view>

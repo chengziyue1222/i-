@@ -1,19 +1,78 @@
-<cloud-template-guide />
-<view class="solution">
-  <view 
-    class="solution_list" 
-    wx:for="{{solutionList}}" 
-    wx:key="index"  
-    style="background-image: url({{item.pic}});" 
-    catch:tap="goDetail" 
-    data-id="{{item._id}}" 
-    data-title="{{item.title}}"
-  >
-    <view class="solution_tag">
-      <image src="{{item.icon}}"></image>
-      <text>{{item.text}}</text>
+<view class="page">
+  <!-- 搜索栏 -->
+  <search-bar placeholder="搜索目的地 / 搭子" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" bindclear="onSearchClear"></search-bar>
+
+  <!-- Tab -->
+  <tab-switch tabs="{{tabs}}" active="{{tab}}" bindswitch="onTabSwitch"></tab-switch>
+
+  <!-- ── 找搭子 ── -->
+  <block wx:if="{{tab==='buddy'}}">
+    <!-- AI Banner -->
+    <view class="ai-banner" bindtap="onToggleAi">
+      <view class="ai-left">
+        <view class="ai-badge">✨ AI 智能匹配</view>
+        <text class="ai-title">告诉我你想去哪\n我来帮你找搭子</text>
+        <text class="ai-hint">根据目的地·时间·性格精准推荐</text>
+      </view>
+      <text class="ai-robot">🤖</text>
     </view>
-    <view class="solution_title">{{item.title}}</view>
-    <view class="solution_desc">{{item.content}}</view>
-  </view>
+
+    <!-- AI 展开面板 -->
+    <view class="ai-panel" wx:if="{{showAiPanel}}">
+      <text class="ai-panel-title">快速匹配搭子</text>
+      <input class="ai-input" placeholder="输入目的地，如：七星岩" value="{{aiDest}}" bindinput="onAiDestInput" cursor-spacing="40"/>
+      <view class="ai-go" bindtap="onStartAiMatch">开始匹配 🚀</view>
+    </view>
+
+    <!-- 筛选胶囊 -->
+    <scroll-view scroll-x class="chip-scroll" show-scrollbar="{{false}}">
+      <view class="chip-row">
+        <view wx:for="{{chips}}" wx:key="id"
+          class="chip {{activeChip===item.id?'chip-on':''}}"
+          bindtap="onChip" data-id="{{item.id}}">{{item.label}}</view>
+      </view>
+    </scroll-view>
+
+    <!-- 卡片网格 -->
+    <scroll-view scroll-y class="list-scroll">
+      <view class="card-grid">
+        <card-buddy
+          wx:for="{{filtered}}"
+          wx:key="id"
+          group="{{item}}"
+          bindtap="onCardTap"
+        ></card-buddy>
+      </view>
+      <view class="empty" wx:if="{{filtered.length===0}}">
+        <text>🧳</text><text class="empty-t">暂无符合的搭子</text>
+      </view>
+      <view class="list-end">— 已经到底啦 —</view>
+    </scroll-view>
+  </block>
+
+  <!-- ── 社区 ── -->
+  <scroll-view scroll-y class="community-scroll" wx:if="{{tab==='community'}}">
+    <view class="community-list">
+      <view wx:for="{{posts}}" wx:key="id" class="post-card">
+        <view class="post-cover" style="background:{{item.cover.color}}">
+          <text class="post-emoji">{{item.cover.emoji}}</text>
+        </view>
+        <view class="post-body">
+          <text class="post-title">{{item.title}}</text>
+          <view class="post-meta">
+            <view class="post-author">
+              <view class="post-av">{{item.author[0]}}</view>
+              <text class="post-name">{{item.author}}</text>
+            </view>
+            <text class="post-like">❤️ {{item.likes}}</text>
+          </view>
+          <view class="find-btn" catchtap="onFindSameBuddy" data-dest="{{item.destination}}">找同款搭子 →</view>
+        </view>
+      </view>
+    </view>
+    <view class="list-end">— 已经到底啦 —</view>
+  </scroll-view>
+
+  <!-- FAB -->
+  <view class="fab" bindtap="onPublish"><text class="fab-icon">+</text></view>
 </view>
