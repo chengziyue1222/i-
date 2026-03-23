@@ -27,6 +27,11 @@
       <text class="bc-score">{{group.current/group.max*100}}%</text>
     </view>
 
+    <view class="bc-actions">
+      <view class="bc-btn bc-btn-chat" catchtap="onChatTap">聊一聊</view>
+      <view class="bc-btn bc-btn-join" catchtap="onJoinTap">申请加入</view>
+    </view>
+
     <view class="bc-reasons" wx:if="{{group.matchReasons.length}}">
       <text wx:for="{{group.matchReasons}}" wx:key="*this" wx:for-item="r" class="bc-reason">{{r}}</text>
     </view>

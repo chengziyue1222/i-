@@ -1,0 +1,57 @@
+page { background: #f4f7fc; }
+
+.scenic-page {
+  min-height: 100vh;
+  padding: 18rpx 16rpx 30rpx;
+  box-sizing: border-box;
+}
+
+.page-head {
+  background: linear-gradient(135deg, #0d2f6f 0%, #226bcb 100%);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 18rpx;
+}
+
+.head-title {
+  display: block;
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: 800;
+  margin-bottom: 6rpx;
+}
+
+.head-sub {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 23rpx;
+}
+
+.waterfall,
+.skeleton-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 14rpx;
+}
+
+.wf-col,
+.skeleton-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.skeleton-card {
+  border-radius: 16rpx;
+  background: linear-gradient(90deg, #edf1f8 25%, #f8fafc 37%, #edf1f8 63%);
+  background-size: 400% 100%;
+  margin-bottom: 14rpx;
+  animation: shimmer 1.35s infinite;
+}
+
+.h1 { height: 500rpx; }
+.h2 { height: 460rpx; }
+.h3 { height: 540rpx; }
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}

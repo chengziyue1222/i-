@@ -117,6 +117,22 @@ Page({
     wx.navigateTo({ url: '/pages/buddy-detail/index?id=' + group.id });
   },
 
+  onChatTap: function(e) {
+    var group = e.detail.group || {};
+    if (!group.id) return;
+    var groupName = encodeURIComponent(group.destination || '搭子会话');
+    var partnerName = encodeURIComponent(group.nickname || '队长');
+    wx.navigateTo({
+      url: '/pages/chat/index?groupId=' + group.id + '&groupName=' + groupName + '&partnerName=' + partnerName
+    });
+  },
+
+  onJoinTap: function(e) {
+    var group = e.detail.group || {};
+    if (!group.id) return;
+    wx.navigateTo({ url: '/pages/buddy-apply/index?id=' + group.id });
+  },
+
   onToggleAi: function() { this.setData({ showAiPanel: !this.data.showAiPanel }); },
   onAiDestInput: function(e) { this.setData({ aiDest: e.detail.value }); },
   onStartAiMatch: function() {

@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "scenic-card": "/components/scenic-card/index"
+  }
+}

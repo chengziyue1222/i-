@@ -1,0 +1,23 @@
+<view class="sc-card" bindtap="onTap">
+  <view class="sc-media" style="height: {{scenic._displayHeight || 500}}rpx;">
+    <view wx:if="{{!imageLoaded}}" class="img-skeleton"></view>
+
+    <image
+      class="sc-img {{imageLoaded ? 'show' : ''}}"
+      src="{{imageError ? 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png' : (scenic.cover || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png')}}"
+      mode="aspectFill"
+      lazy-load="{{true}}"
+      bindload="onImageLoad"
+      binderror="onImageError"
+    ></image>
+
+    <view class="sc-overlay"></view>
+    <view class="sc-meta">
+      <text class="sc-name">{{scenic.name}}</text>
+      <text class="sc-location">{{scenic.location}}</text>
+      <view class="sc-tags">
+        <text wx:for="{{scenic.tags}}" wx:key="*this" wx:for-item="tag" class="sc-tag">{{tag}}</text>
+      </view>
+    </view>
+  </view>
+</view>

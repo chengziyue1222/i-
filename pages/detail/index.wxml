@@ -1,9 +1,36 @@
 <cloud-template-guide />
-<view class="detail_page">
-  <view class="detail_title">{{article.sub_title||article.title}}</view>
-  <view class="detail_time">{{article.time}}</view>
-  <view class="detail_image">
-    <image mode="widthfix" src="{{article.detail_pic||article.picture || article.subPic}}"></image>
+
+<block wx:if="{{mode === 'scenic' && scenic}}">
+  <view class="scenic-detail-page">
+    <swiper class="hero-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="3200" circular="{{true}}">
+      <swiper-item wx:for="{{scenic.images}}" wx:key="*this">
+        <image class="hero-img" src="{{item}}" mode="aspectFill" lazy-load="{{true}}"></image>
+      </swiper-item>
+    </swiper>
+
+    <view class="scenic-main">
+      <text class="scenic-title">{{scenic.name}}</text>
+      <text class="scenic-location">📍 {{scenic.location}}</text>
+
+      <view class="tag-wrap">
+        <text wx:for="{{scenic.tags}}" wx:key="*this" wx:for-item="tag" class="tag-item">{{tag}}</text>
+      </view>
+
+      <view class="desc-card">
+        <text class="desc-title">景区简介</text>
+        <text class="desc-content">{{scenic.desc}}</text>
+      </view>
+    </view>
   </view>
-  <rich-text class="detail_cont" nodes="{{article.header || article.content || article.description }}"></rich-text>
-</view>
+</block>
+
+<block wx:else>
+  <view class="detail_page">
+    <view class="detail_title">{{article.sub_title||article.title}}</view>
+    <view class="detail_time">{{article.time}}</view>
+    <view class="detail_image">
+      <image mode="widthfix" src="{{article.detail_pic||article.picture || article.subPic}}"></image>
+    </view>
+    <rich-text class="detail_cont" nodes="{{article.header || article.content || article.description }}"></rich-text>
+  </view>
+</block>

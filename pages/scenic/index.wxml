@@ -1,0 +1,39 @@
+<view class="scenic-page">
+  <view class="page-head">
+    <text class="head-title">旅行景区灵感墙</text>
+    <text class="head-sub">热门山水 · 城市漫游 · 轻松打卡</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="skeleton-wrap">
+    <view class="skeleton-col">
+      <view class="skeleton-card h1"></view>
+      <view class="skeleton-card h2"></view>
+      <view class="skeleton-card h3"></view>
+    </view>
+    <view class="skeleton-col">
+      <view class="skeleton-card h2"></view>
+      <view class="skeleton-card h3"></view>
+      <view class="skeleton-card h1"></view>
+    </view>
+  </view>
+
+  <view wx:else class="waterfall">
+    <view class="wf-col">
+      <scenic-card
+        wx:for="{{leftList}}"
+        wx:key="id"
+        scenic="{{item}}"
+        bindtap="onCardTap"
+      ></scenic-card>
+    </view>
+
+    <view class="wf-col">
+      <scenic-card
+        wx:for="{{rightList}}"
+        wx:key="id"
+        scenic="{{item}}"
+        bindtap="onCardTap"
+      ></scenic-card>
+    </view>
+  </view>
+</view>

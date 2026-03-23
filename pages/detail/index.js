@@ -1,39 +1,60 @@
 import { fetchSceneDetail } from '../../services/scene/index';
+import { getScenicDemoById } from '../../config/scenic-demo';
+
+const DEFAULT_COVER = 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png';
 
 Page({
-  /**
-   * 页面的初始数据
-   */
   data: {
-    article:null
+    article: null,
+    mode: 'article',
+    scenic: null
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   async onLoad(options) {
-    // 获取页面url search数据
-    const { id, title, type } = options;
-    // 动态设置页面标题
-    wx.setNavigationBarTitle({
-      title: title
-    })
-    await this.getArticle(id,type);
+    const { id, title, type, mode = 'article', scenicId, scenicData } = options;
+
+    if (mode === 'scenic') {
+      wx.setNavigationBarTitle({ title: '景区详情' });
+      let scenic = null;
+
+      if (scenicData) {
+        try {
+          scenic = JSON.parse(decodeURIComponent(scenicData));
+        } catch (e) {
+          scenic = null;
+        }
+      }
+
+      if (!scenic && scenicId) {
+        scenic = getScenicDemoById(scenicId);
+      }
+
+      if (scenic) {
+        this.setData({
+          mode: 'scenic',
+          scenic: {
+            ...scenic,
+            images: Array.isArray(scenic.images) && scenic.images.length ? scenic.images : [scenic.cover || DEFAULT_COVER],
+            cover: scenic.cover || DEFAULT_COVER
+          }
+        });
+      }
+      return;
+    }
+
+    wx.setNavigationBarTitle({ title: title || '详情' });
+    await this.getArticle(id, type);
   },
 
-  async getArticle(id,type){
+  async getArticle(id, type) {
     try {
-      wx.showLoading({
-        title: '加载中',
-      })
-      const article = await fetchSceneDetail(id,type);
-      this.setData({
-        article
-      })
+      wx.showLoading({ title: '加载中' });
+      const article = await fetchSceneDetail(id, type);
+      this.setData({ article, mode: 'article' });
     } catch (error) {
-    } finally{
-      // 请求完成关闭loading框
-      wx.hideLoading()
+      console.error('[detail] getArticle error:', error);
+    } finally {
+      wx.hideLoading();
     }
-  },
-})
+  }
+});

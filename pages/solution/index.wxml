@@ -43,6 +43,8 @@
             wx:key="id"
             group="{{item}}"
             bindtap="onCardTap"
+            bindchat="onChatTap"
+            bindjoin="onJoinTap"
           ></card-buddy>
         </view>
 
@@ -52,6 +54,8 @@
             wx:key="id"
             group="{{item}}"
             bindtap="onCardTap"
+            bindchat="onChatTap"
+            bindjoin="onJoinTap"
           ></card-buddy>
         </view>
       </view>
