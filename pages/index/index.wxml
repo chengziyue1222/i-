@@ -45,7 +45,7 @@
       <text class="section-more" bindtap="onGoScenicList">更多</text>
     </view>
     <view class="featured-card" bindtap="goScenicDetail" data-id="{{hotScenicList[0].scenicId}}" data-name="{{hotScenicList[0].scenicName}}">
-      <image class="featured-bg" src="{{(hotScenicList[0].images && hotScenicList[0].images[0]) || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
+      <image class="featured-bg" src="{{hotScenicList[0].imageUrl || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
       <view class="featured-overlay">
         <text class="featured-name">{{hotScenicList[0].scenicName}}</text>
         <text class="featured-desc">{{hotScenicList[0].description || '肇庆知名景区'}}</text>
@@ -77,7 +77,7 @@
         data-id="{{item.scenicId}}"
         data-name="{{item.scenicName}}"
       >
-        <image class="route-card-img" src="{{(item.images && item.images[0]) || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
+        <image class="route-card-img" src="{{item.imageUrl || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
         <view class="route-card-info">
           <text class="route-card-name">{{item.scenicName}}</text>
           <text class="route-card-meta">建议 {{item.suggestedDuration || 4}} 小时 · 热度 {{item.heat || 0}}°</text>

@@ -1,27 +1,34 @@
 <view class="buddy-card" bindtap="onTap">
-  <view class="bc-cover" style="background:{{group.cover.color}}">
-    <text class="bc-emoji">{{group.cover.emoji}}</text>
+  <view class="bc-cover-wrap">
+    <image class="bc-cover" src="{{group.imageUrl}}" mode="aspectFill"></image>
+    <view class="bc-mask"></view>
     <view class="bc-status bc-status-{{group.status}}">
-      {{group.status==='recruiting'?'招募中':'已满员'}}
+      {{group.status==='recruiting'?'🔥 招募中':'已满员'}}
+    </view>
+    <view class="bc-cover-bottom">
+      <text class="bc-dest">{{group.destination}}</text>
+      <text class="bc-time">{{group.startTime || '时间待定'}}</text>
     </view>
   </view>
+
   <view class="bc-body">
-    <text class="bc-dest">{{group.destination}}</text>
     <view class="bc-tags">
       <text wx:for="{{group.tags}}" wx:key="*this" wx:for-item="t" class="bc-tag">{{t}}</text>
     </view>
-    <view class="bc-meta">
-      <text class="bc-meta-item">📅 {{group.startTime}}</text>
-      <text class="bc-meta-item">👥 {{group.current}}/{{group.max}}</text>
+
+    <view class="bc-user-row">
+      <view class="bc-user">
+        <view class="bc-avatar">{{group.nickname[0]}}</view>
+        <view class="bc-user-meta">
+          <text class="bc-name">{{group.nickname}}</text>
+          <text class="bc-sub">{{group.current}}/{{group.max}} 人 · {{group.personality}}</text>
+        </view>
+      </view>
+      <text class="bc-score">{{group.current/group.max*100}}%</text>
     </view>
-    <view class="bc-pbar"><view class="bc-fill" style="width:{{group.current/group.max*100}}%"></view></view>
-    <view class="bc-user">
-      <view class="bc-avatar">{{group.nickname[0]}}</view>
-      <text class="bc-name">{{group.nickname}}</text>
-      <text class="bc-mbti">{{group.personality}}</text>
-    </view>
+
     <view class="bc-reasons" wx:if="{{group.matchReasons.length}}">
-      <text wx:for="{{group.matchReasons}}" wx:key="*this" wx:for-item="r" class="bc-reason">✨{{r}}</text>
+      <text wx:for="{{group.matchReasons}}" wx:key="*this" wx:for-item="r" class="bc-reason">{{r}}</text>
     </view>
   </view>
 </view>

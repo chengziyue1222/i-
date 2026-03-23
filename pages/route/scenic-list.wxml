@@ -1,9 +1,8 @@
 <!--pages/route/scenic-list.wxml-->
 <view class="scenic-list-container">
-  <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-input-wrapper">
-      <icon type="search" size="16" color="#999"></icon>
+      <icon type="search" size="16" color="#9aa2af"></icon>
       <input
         class="search-input"
         placeholder="搜索景区名称"
@@ -13,47 +12,51 @@
     </view>
   </view>
 
-  <!-- 景区列表 -->
-  <scroll-view
-    class="scenic-scroll"
-    scroll-y="{{true}}"
-    enable-back-to-top="{{true}}"
-  >
+  <scroll-view class="scenic-scroll" scroll-y="{{true}}" enable-back-to-top="{{true}}">
     <view
       wx:for="{{filteredScenicList}}"
       wx:key="scenicId"
+      wx:for-item="item"
+      wx:for-index="index"
       class="scenic-card"
       bindtap="onScenicTap"
       data-scenic="{{item}}"
     >
-      <image class="scenic-image" src="{{(item.images && item.images[0]) || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
+      <view class="scenic-image-wrap">
+        <view class="image-skeleton" wx:if="{{item._imageLoading}}"></view>
+        <image
+          class="scenic-image"
+          src="{{item.imageUrl}}"
+          mode="aspectFill"
+          data-index="{{index}}"
+          bindload="onImageLoad"
+          binderror="onImageError"
+        />
+      </view>
+
       <view class="scenic-info">
         <view class="scenic-header">
           <text class="scenic-name">{{item.scenicName}}</text>
           <view class="scenic-tag">{{item.level || 'AAAAA'}}</view>
         </view>
-        <text class="scenic-desc">{{item.description}}</text>
+        <text class="scenic-desc">{{item.description || '自然风光与人文景观兼具，值得慢慢体验。'}}</text>
         <view class="scenic-meta">
           <view class="meta-item">
-            <icon type="waiting" size="12" color="#666"></icon>
-            <text>{{item.suggestedDuration}}小时</text>
-          </view>
-          <view class="meta-item">
-            <icon type="waiting" size="12" color="#666"></icon>
-            <text>{{item.openingHours}}</text>
+            <icon type="waiting" size="12" color="#8f9bb3"></icon>
+            <text>{{item.openingHours || '08:00-18:00'}}</text>
           </view>
           <view class="meta-item" wx:if="{{item.distance}}">
-            <icon type="waiting" size="12" color="#666"></icon>
+            <icon type="location" size="12" color="#8f9bb3"></icon>
             <text>{{item.distance}}m</text>
           </view>
         </view>
       </view>
     </view>
 
-    <!-- 空状态 -->
     <view wx:if="{{filteredScenicList.length === 0}}" class="empty-state">
-      <icon type="info" size="48" color="#ccc"></icon>
+      <icon type="info" size="48" color="#b8c0cc"></icon>
       <text class="empty-text">暂无景区数据</text>
+      <text class="empty-desc">请稍后重试或检查筛选条件</text>
     </view>
   </scroll-view>
 </view>

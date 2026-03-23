@@ -11,7 +11,8 @@
     <view class="ai-banner" bindtap="onToggleAi">
       <view class="ai-left">
         <view class="ai-badge">✨ AI 智能匹配</view>
-        <text class="ai-title">告诉我你想去哪\n我来帮你找搭子</text>
+        <text class="ai-title">告诉我你想去哪
+我来帮你找搭子</text>
         <text class="ai-hint">根据目的地·时间·性格精准推荐</text>
       </view>
       <text class="ai-robot">🤖</text>
@@ -33,20 +34,32 @@
       </view>
     </scroll-view>
 
-    <!-- 卡片网格 -->
+    <!-- 双列瀑布流 -->
     <scroll-view scroll-y class="list-scroll">
-      <view class="card-grid">
-        <card-buddy
-          wx:for="{{filtered}}"
-          wx:key="id"
-          group="{{item}}"
-          bindtap="onCardTap"
-        ></card-buddy>
+      <view class="waterfall">
+        <view class="waterfall-col">
+          <card-buddy
+            wx:for="{{leftGroups}}"
+            wx:key="id"
+            group="{{item}}"
+            bindtap="onCardTap"
+          ></card-buddy>
+        </view>
+
+        <view class="waterfall-col">
+          <card-buddy
+            wx:for="{{rightGroups}}"
+            wx:key="id"
+            group="{{item}}"
+            bindtap="onCardTap"
+          ></card-buddy>
+        </view>
       </view>
+
       <view class="empty" wx:if="{{filtered.length===0}}">
         <text>🧳</text><text class="empty-t">暂无符合的搭子</text>
       </view>
-      <view class="list-end">— 已经到底啦 —</view>
+      <view class="list-end" wx:if="{{filtered.length>0}}">— 已经到底啦 —</view>
     </scroll-view>
   </block>
 

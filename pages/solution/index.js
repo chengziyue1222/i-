@@ -8,12 +8,39 @@ var CHIPS = [
 ];
 var TABS = [{id:'buddy',label:'找搭子'},{id:'community',label:'社区'}];
 
+var DEFAULT_SCENIC_IMAGE = 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png';
+var SCENIC_IMAGE_MAP = {
+  '七星岩风景区': 'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
+  '七星岩': 'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
+  '鼎湖山景区': 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
+  '鼎湖山': 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
+  '端州古城': 'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
+  '肇庆古城': 'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
+  '星湖风景区': 'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
+  '星湖': 'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
+  '龙母祖庙': 'https://main.qcloudimg.com/raw/28644f5655e9f2b5e470676d77903bcb.png',
+  '端州美食街': 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80'
+};
+
+function scenicImageByDestination(destination) {
+  var key = (destination || '').trim();
+  return SCENIC_IMAGE_MAP[key] || DEFAULT_SCENIC_IMAGE;
+}
+
+function stableCoverHeight(group) {
+  var text = String(group.id || group.destination || 'group');
+  var sum = 0;
+  for (var i = 0; i < text.length; i++) sum += text.charCodeAt(i);
+  return 214 + (sum % 86);
+}
+
 Page({
   data: {
     tabs: TABS, tab: 'buddy',
     chips: CHIPS, activeChip: 'all',
     keyword: '',
     groups: [], filtered: [], posts: [],
+    leftGroups: [], rightGroups: [],
     showAiPanel: false,
     aiDest: ''
   },
@@ -28,10 +55,47 @@ Page({
     this.applyFilter();
   },
 
+  decorateGroups: function(list) {
+    return (list || []).map(function(group) {
+      return Object.assign({}, group, {
+        imageUrl: group.imageUrl || scenicImageByDestination(group.destination),
+        coverHeight: group.coverHeight || stableCoverHeight(group)
+      });
+    });
+  },
+
+  splitToWaterfall: function(list) {
+    var left = [];
+    var right = [];
+    var leftH = 0;
+    var rightH = 0;
+
+    (list || []).forEach(function(group) {
+      var tags = (group.tags || []).length;
+      var introLen = (group.intro || '').length;
+      var estimate = (group.coverHeight || 240) + 150 + tags * 14 + Math.min(introLen, 36);
+      if (leftH <= rightH) {
+        left.push(group);
+        leftH += estimate;
+      } else {
+        right.push(group);
+        rightH += estimate;
+      }
+    });
+
+    return { left: left, right: right };
+  },
+
   applyFilter: function() {
     var data = this.data;
-    var filtered = store.filterGroups(data.groups, { chip: data.activeChip, keyword: data.keyword });
-    this.setData({ filtered: filtered });
+    var filteredRaw = store.filterGroups(data.groups, { chip: data.activeChip, keyword: data.keyword });
+    var filtered = this.decorateGroups(filteredRaw);
+    var columns = this.splitToWaterfall(filtered);
+    this.setData({
+      filtered: filtered,
+      leftGroups: columns.left,
+      rightGroups: columns.right
+    });
   },
 
   onTabSwitch: function(e) { this.setData({ tab: e.detail.val }); },
@@ -67,15 +131,24 @@ Page({
       title: '发起组队', editable: true, placeholderText: '目的地，如：七星岩',
       success: function(res) {
         if (!res.confirm || !res.content) return;
-        var covers = [
-          {color:'linear-gradient(135deg,#667eea,#764ba2)',emoji:'🏔️'},
-          {color:'linear-gradient(135deg,#f093fb,#f5576c)',emoji:'🏯'},
-          {color:'linear-gradient(135deg,#4facfe,#00f2fe)',emoji:'🌊'},
-          {color:'linear-gradient(135deg,#43e97b,#38f9d7)',emoji:'🌿'}
-        ];
-        var cover = covers[Math.floor(Math.random() * covers.length)];
         var ui = wx.getStorageSync('userInfo') || {};
-        var g = { id:'g_'+Date.now(), nickname: ui.nickName||'我', personality:'ENFP', destination: res.content, startTime:'待定', current:1, max:4, status:'recruiting', tags:[], intro:'欢迎加入！', matchReasons:[], cover: cover };
+        var destination = res.content.trim();
+        var g = {
+          id:'g_'+Date.now(),
+          nickname: ui.nickName || '我',
+          personality:'ENFP',
+          destination: destination,
+          startTime:'待定',
+          current:1,
+          max:4,
+          status:'recruiting',
+          tags:['轻松游'],
+          intro:'欢迎加入，一起出发。',
+          matchReasons:[],
+          imageUrl: scenicImageByDestination(destination),
+          coverHeight: 240,
+          cover:{ color:'linear-gradient(135deg,#4facfe,#00f2fe)', emoji:'🌄' }
+        };
         var list = store.saveGroup(g);
         self.setData({ groups: list });
         self.applyFilter();

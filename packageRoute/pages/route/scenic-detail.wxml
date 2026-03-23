@@ -2,7 +2,7 @@
 <view class="scenic-detail-container">
   <!-- 景区头部信息 -->
   <view class="scenic-header">
-    <image class="header-image" src="{{scenicInfo.images[0]}}" mode="aspectFill"></image>
+    <image class="header-image" src="{{scenicInfo.imageUrl || (scenicInfo.images && scenicInfo.images[0]) || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
     <view class="header-overlay">
       <text class="scenic-title">{{scenicInfo.scenicName}}</text>
       <text class="scenic-desc">{{scenicInfo.description}}</text>

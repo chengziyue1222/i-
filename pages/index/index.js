@@ -2,6 +2,7 @@ import { fetchIndexData } from '../../services/index/index';
 import { fetchScenicSpotData } from '../../services/scene/index';
 import { fetchNewsData } from '../../services/news/index';
 import { fetchPostList } from '../../services/post/index';
+import { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } from '../../config/scenic-images';
 
 Page({
   data: {
@@ -40,12 +41,19 @@ Page({
       const res1 = await fetchScenicSpotData();
       console.log('[首页] 景区数据加载完成:', res1);
       
-      if (!res1) {
+      // 在 setData 之前统一注入 imageUrl
+      const scenicList = (res1 || []).map((item) => {
+        const scenicName = (item.scenicName || item.name || '').trim();
+        return {
+          ...item,
+          imageUrl: item.imageUrl || resolveScenicImageUrlByName(scenicName) || DEFAULT_SCENIC_IMAGE
+        };
+      });
+
+      if (!scenicList || scenicList.length === 0) {
         console.error('[首页] ❌ 景区数据返回为空！');
-      } else if (res1.length === 0) {
-        console.warn('[首页] ⚠️ 景区数据为空数组！');
       } else {
-        console.log('[首页] ✅ 成功获取景区数据，共', res1.length, '条');
+        console.log('[首页] ✅ 成功获取景区数据，共', scenicList.length, '条');
       }
       
       const res2 = await fetchNewsData({pageSize:3});
@@ -59,11 +67,11 @@ Page({
 
       // 处理热门景区列表（按热度排序，取前5个）
       let hotScenicList = [];
-      console.log('[首页] 原始景区数据 res1:', res1);
+      console.log('[首页] 原始景区数据 scenicList:', scenicList);
       
       // 云数据库已按热度降序排序，直接取前5个
-      if (res1 && res1.length > 0) {
-        hotScenicList = res1.slice(0, 5);
+      if (scenicList && scenicList.length > 0) {
+        hotScenicList = scenicList.slice(0, 5);
         console.log('[首页] ✅ 热门景区列表:', hotScenicList.length, '个');
         console.log('[首页] 热门景区详情:', hotScenicList.map(item => ({
           name: item.scenicName,
@@ -80,7 +88,7 @@ Page({
         bannerList: index_show || [],
         productAbilityList: function_show || [],
         partnersList: cooperation || [],
-        applicationScene: res1 || [],
+        applicationScene: scenicList || [],
         newsList: res2 || [],
         hotScenicList: hotScenicList,
         postList: res3 || []

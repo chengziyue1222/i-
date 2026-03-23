@@ -1,5 +1,11 @@
 import {SceneData, SolutionData, NewsData, ScenicSpotData, AttractionData} from '../cloudbaseMock/index'
 import { DATA_MODEL_KEY } from '../../config/model'
+import { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } from '../../config/scenic-images';
+
+function resolveScenicImageUrl(item = {}) {
+  const scenicName = (item.scenicName || item.name || '').trim();
+  return item.imageUrl || resolveScenicImageUrlByName(scenicName) || (item.images && item.images[0]) || DEFAULT_SCENIC_IMAGE;
+}
 
 /** 获取应用场景数据 */
 export async function fetchSceneData(params) {
@@ -42,8 +48,11 @@ export async function fetchScenicSpotData() {
       console.log('[服务层] 第一条数据内容:', result.data[0]);
     }
     
-    // 返回数据数组
-    return result.data || [];
+    // 返回数据数组，注入 imageUrl
+    return (result.data || []).map(item => ({
+      ...item,
+      imageUrl: resolveScenicImageUrl(item)
+    }));
   } catch (error) {
     console.error('[服务层] ❌ 从云数据库获取数据失败:', error.message);
     return [];
@@ -75,7 +84,11 @@ export async function fetchScenicSpotDetail(scenicId) {
     }
 
     console.log('[服务层] ✅ 景区详情查询成功:', result);
-    return result.data && result.data.length > 0 ? result.data[0] : null;
+    if (result.data && result.data.length > 0) {
+      const item = result.data[0];
+      return { ...item, imageUrl: resolveScenicImageUrl(item) };
+    }
+    return null;
   } catch (error) {
     console.error('[服务层] ❌ 从云数据库获取景区详情失败:', error.message);
     return null;
