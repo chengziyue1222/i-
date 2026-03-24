@@ -2,24 +2,25 @@ var store = require('../../store/index');
 
 var CHIPS = [
   {id:'all',label:'全部'},{id:'recruit',label:'招募中'},
-  {id:'hiking',label:'🥾 徒步'},{id:'food',label:'🍜 美食'},
-  {id:'photo',label:'📸 拍照'},{id:'citywalk',label:'🚶 citywalk'},
-  {id:'couple',label:'💑 cpdd'}
+  {id:'hiking',label:'徒步'},{id:'food',label:'美食'},
+  {id:'photo',label:'拍照'}
 ];
 var TABS = [{id:'buddy',label:'找搭子'},{id:'community',label:'社区'}];
 
-var DEFAULT_SCENIC_IMAGE = 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png';
+var DEFAULT_SCENIC_IMAGE = '/images/scenic/qixingyan.jpg';
 var SCENIC_IMAGE_MAP = {
-  '七星岩风景区': 'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
-  '七星岩': 'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
-  '鼎湖山景区': 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
-  '鼎湖山': 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
-  '端州古城': 'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
-  '肇庆古城': 'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
-  '星湖风景区': 'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
-  '星湖': 'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
-  '龙母祖庙': 'https://main.qcloudimg.com/raw/28644f5655e9f2b5e470676d77903bcb.png',
-  '端州美食街': 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80'
+  '七星岩风景区': '/images/scenic/qixingyan.jpg',
+  '七星岩': '/images/scenic/qixingyan.jpg',
+  '鼎湖山景区': '/images/scenic/dinghushan.jpg',
+  '鼎湖山': '/images/scenic/dinghushan.jpg',
+  '端州古城': '/images/scenic/duanzhou.jpg',
+  '肇庆古城': '/images/scenic/duanzhou.jpg',
+  '星湖风景区': '/images/scenic/xinghu.jpg',
+  '星湖': '/images/scenic/xinghu.jpg',
+  '龙母祖庙': '/images/scenic/longmu.jpg',
+  '端州美食街': 'https://picsum.photos/seed/duanzhou-food/400/500',
+  '西江苗寨': 'https://picsum.photos/seed/xijiang/400/500',
+  '鸡笼顶': 'https://picsum.photos/seed/jilongding/400/500'
 };
 
 function scenicImageByDestination(destination) {
@@ -27,11 +28,47 @@ function scenicImageByDestination(destination) {
   return SCENIC_IMAGE_MAP[key] || DEFAULT_SCENIC_IMAGE;
 }
 
+function hasScenicMapping(destination) {
+  var key = (destination || '').trim();
+  return Object.prototype.hasOwnProperty.call(SCENIC_IMAGE_MAP, key);
+}
+
 function stableCoverHeight(group) {
   var text = String(group.id || group.destination || 'group');
   var sum = 0;
   for (var i = 0; i < text.length; i++) sum += text.charCodeAt(i);
   return 214 + (sum % 86);
+}
+
+function stableMatchPercent(group) {
+  var text = String(group.id || group.destination || 'group');
+  var sum = 0;
+  for (var i = 0; i < text.length; i++) sum += text.charCodeAt(i);
+  return 75 + (sum % 21); // 75 - 95
+}
+
+function parseStartTimestamp(startTime) {
+  if (!startTime || startTime === '待定') return 0;
+  var match = /^(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$/.exec(startTime);
+  if (!match) return 0;
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = parseInt(match[1], 10) - 1;
+  var day = parseInt(match[2], 10);
+  var hour = parseInt(match[3], 10);
+  var minute = parseInt(match[4], 10);
+  var target = new Date(year, month, day, hour, minute, 0, 0).getTime();
+  if (target < now.getTime()) {
+    target = new Date(year + 1, month, day, hour, minute, 0, 0).getTime();
+  }
+  return target;
+}
+
+function isLeavingSoon(startTime) {
+  var ts = parseStartTimestamp(startTime);
+  if (!ts) return false;
+  var diff = ts - Date.now();
+  return diff > 0 && diff <= 24 * 60 * 60 * 1000;
 }
 
 Page({
@@ -42,7 +79,8 @@ Page({
     groups: [], filtered: [], posts: [],
     leftGroups: [], rightGroups: [],
     showAiPanel: false,
-    aiDest: ''
+    aiDest: '',
+    refresherTriggered: false
   },
 
   onLoad: function() { this.reload(); },
@@ -57,9 +95,19 @@ Page({
 
   decorateGroups: function(list) {
     return (list || []).map(function(group) {
+      var mapped = scenicImageByDestination(group.destination);
+      var shouldUseMapped = hasScenicMapping(group.destination);
+      var current = Number(group.current || 0);
+      var max = Number(group.max || 0);
+      var remain = Math.max(max - current, 0);
+      var startTime = group.startTime || '待定';
       return Object.assign({}, group, {
-        imageUrl: group.imageUrl || scenicImageByDestination(group.destination),
-        coverHeight: group.coverHeight || stableCoverHeight(group)
+        imageUrl: shouldUseMapped ? mapped : (group.imageUrl || mapped),
+        coverHeight: group.coverHeight || stableCoverHeight(group),
+        matchPercent: group.matchPercent || stableMatchPercent(group),
+        remainCount: remain,
+        startTimeDisplay: startTime,
+        isLeavingSoon: isLeavingSoon(startTime)
       });
     });
   },
@@ -177,5 +225,19 @@ Page({
     var dest = e.currentTarget.dataset.dest;
     this.setData({ tab: 'buddy', keyword: dest, activeChip: 'all' });
     this.applyFilter();
+  },
+
+  onPullDownRefresh: function() {
+    this.reload();
+    wx.stopPullDownRefresh();
+  },
+
+  onRefresherRefresh: function() {
+    var self = this;
+    this.setData({ refresherTriggered: true });
+    this.reload();
+    setTimeout(function() {
+      self.setData({ refresherTriggered: false });
+    }, 400);
   }
 });

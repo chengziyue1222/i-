@@ -2,9 +2,9 @@
   display: block;
   width: 100%;
   background: #fff;
-  border-radius: 22rpx;
+  border-radius: 20rpx;
   overflow: hidden;
-  box-shadow: 0 10rpx 30rpx rgba(27, 67, 122, 0.12);
+  box-shadow: 0 14rpx 36rpx rgba(17, 42, 84, 0.16);
   margin-bottom: 18rpx;
 }
 
@@ -17,7 +17,7 @@
   position: relative;
   width: 100%;
   height: 0;
-  padding-bottom: 124%;
+  padding-bottom: 60%;
   background: linear-gradient(160deg, #9fd1ff 0%, #57b7ff 38%, #2e8cf0 100%);
 }
 
@@ -31,50 +31,49 @@
 .bc-mask {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 28%, rgba(0, 0, 0, 0.68) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 26%, rgba(0, 0, 0, 0.7) 100%);
 }
 
-.bc-status {
+.bc-top-badges {
   position: absolute;
-  top: 0;
-  right: 0;
-  min-width: 120rpx;
-  text-align: center;
-  font-size: 20rpx;
-  font-weight: 800;
-  letter-spacing: 1rpx;
-  padding: 10rpx 14rpx 10rpx 18rpx;
-  border-radius: 0 20rpx 0 20rpx;
+  top: 12rpx;
+  right: 12rpx;
+  display: flex;
+  gap: 8rpx;
   z-index: 3;
-  border-left: 2rpx solid rgba(255,255,255,.28);
-  border-bottom: 2rpx solid rgba(255,255,255,.2);
 }
 
-.bc-status-recruiting {
-  background: linear-gradient(135deg, #24c26a, #10a54f);
+.bc-badge {
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
   color: #fff;
-  box-shadow: 0 8rpx 18rpx rgba(36, 194, 106, 0.38);
 }
 
-.bc-status-full {
-  background: linear-gradient(135deg, #6b7280, #4b5563);
-  color: #eef2ff;
-  box-shadow: 0 8rpx 18rpx rgba(75, 85, 99, 0.28);
+.bc-badge-green {
+  background: linear-gradient(135deg, #24c26a, #10a54f);
+  box-shadow: 0 6rpx 14rpx rgba(36, 194, 106, 0.35);
+}
+
+.bc-badge-red {
+  background: linear-gradient(135deg, #ff5d5d, #f03e3e);
+  box-shadow: 0 6rpx 14rpx rgba(240, 62, 62, 0.36);
 }
 
 .bc-cover-bottom {
   position: absolute;
   left: 16rpx;
   right: 16rpx;
-  bottom: 14rpx;
+  bottom: 12rpx;
   z-index: 2;
   display: flex;
-  flex-direction: column;
-  gap: 6rpx;
+  align-items: flex-end;
+  justify-content: space-between;
 }
 
 .bc-dest {
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 800;
   color: #fff;
   text-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.25);
@@ -83,10 +82,30 @@
 .bc-time {
   font-size: 22rpx;
   color: rgba(255, 255, 255, 0.88);
+  margin-left: 12rpx;
+  flex-shrink: 0;
 }
 
 .bc-body {
-  padding: 14rpx 14rpx 16rpx;
+  padding: 16rpx 16rpx 18rpx;
+}
+
+.bc-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+}
+
+.bc-title-main {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1e2a3d;
+}
+
+.bc-title-time {
+  font-size: 22rpx;
+  color: #7b889d;
 }
 
 .bc-tags {
@@ -107,8 +126,8 @@
 .bc-user-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10rpx;
+  margin-bottom: 10rpx;
 }
 
 .bc-user {
@@ -150,17 +169,23 @@
 
 .bc-sub {
   font-size: 20rpx;
-  color: #8392a9;
+  color: #3f7ae0;
+  font-weight: 600;
 }
 
-.bc-score {
-  font-size: 22rpx;
-  font-weight: 700;
-  color: #0f62fe;
-  background: #e7f0ff;
-  border-radius: 999rpx;
-  padding: 6rpx 12rpx;
-  flex-shrink: 0;
+.bc-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx 10rpx;
+  margin-bottom: 12rpx;
+}
+
+.bc-status-item {
+  font-size: 20rpx;
+  color: #6d7a90;
+  background: #f3f6fb;
+  border-radius: 10rpx;
+  padding: 4rpx 10rpx;
 }
 
 .bc-actions {
@@ -185,8 +210,9 @@
 }
 
 .bc-btn-join {
-  background: linear-gradient(135deg, #1a75ff, #36a2ff);
+  background: linear-gradient(135deg, #0f62fe, #228be6);
   color: #fff;
+  box-shadow: 0 6rpx 14rpx rgba(15, 98, 254, 0.3);
 }
 
 .bc-reasons {

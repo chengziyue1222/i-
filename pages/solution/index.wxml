@@ -11,11 +11,21 @@
     <view class="ai-banner" bindtap="onToggleAi">
       <view class="ai-left">
         <view class="ai-badge">✨ AI 智能匹配</view>
-        <text class="ai-title">告诉我你想去哪
-我来帮你找搭子</text>
-        <text class="ai-hint">根据目的地·时间·性格精准推荐</text>
+        <text class="ai-title">告诉我你的旅行偏好</text>
+        <text class="ai-title ai-title-strong">帮你快速找到同频搭子</text>
+        <text class="ai-hint">结合目的地、时间和兴趣，一键给出更合拍的人选</text>
+
+        <view class="ai-metas">
+          <text class="ai-meta">偏好匹配</text>
+          <text class="ai-meta">时间同步</text>
+          <text class="ai-meta">路线同向</text>
+        </view>
       </view>
-      <text class="ai-robot">🤖</text>
+
+      <view class="ai-right">
+        <view class="ai-orb">🤖</view>
+        <view class="ai-entry-btn" catchtap="onToggleAi">立即匹配</view>
+      </view>
     </view>
 
     <!-- AI 展开面板 -->
@@ -35,7 +45,13 @@
     </scroll-view>
 
     <!-- 双列瀑布流 -->
-    <scroll-view scroll-y class="list-scroll">
+    <scroll-view
+      scroll-y
+      class="list-scroll"
+      refresher-enabled="{{true}}"
+      refresher-triggered="{{refresherTriggered}}"
+      bindrefresherrefresh="onRefresherRefresh"
+    >
       <view class="waterfall">
         <view class="waterfall-col">
           <card-buddy

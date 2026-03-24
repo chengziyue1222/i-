@@ -76,8 +76,8 @@
       {
         "pagePath": "pages/route/scenic-list",
         "text": "路线",
-        "iconPath": "images/icons/address.png",
-        "selectedIconPath": "images/icons/about-active.png"
+        "iconPath": "images/icons/index.png",
+        "selectedIconPath": "images/icons/index-active.png"
       },
       {
         "pagePath": "pages/solution/index",

@@ -1,17 +1,31 @@
 <view class="buddy-card" bindtap="onTap">
   <view class="bc-cover-wrap">
-    <image class="bc-cover" src="{{group.imageUrl}}" mode="aspectFill"></image>
+    <image
+      class="bc-cover"
+      src="{{imageFailed ? 'https://picsum.photos/seed/default-scenic/400/500' : group.imageUrl}}"
+      mode="aspectFill"
+      lazy-load="true"
+      binderror="onImageError"
+    ></image>
     <view class="bc-mask"></view>
-    <view class="bc-status bc-status-{{group.status}}">
-      {{group.status==='recruiting'?'🔥 招募中':'已满员'}}
+    <view class="bc-top-badges">
+      <view class="bc-badge bc-badge-green">
+        {{group.status==='recruiting'?'招募中':'已满员'}}
+      </view>
+      <view class="bc-badge bc-badge-red" wx:if="{{group.isLeavingSoon}}">即将出发</view>
     </view>
     <view class="bc-cover-bottom">
       <text class="bc-dest">{{group.destination}}</text>
-      <text class="bc-time">{{group.startTime || '时间待定'}}</text>
+      <text class="bc-time">{{group.startTimeDisplay || group.startTime || '时间待定'}}</text>
     </view>
   </view>
 
   <view class="bc-body">
+    <view class="bc-title-row">
+      <text class="bc-title-main">{{group.destination}}</text>
+      <text class="bc-title-time">{{group.startTimeDisplay || group.startTime || '待定'}}</text>
+    </view>
+
     <view class="bc-tags">
       <text wx:for="{{group.tags}}" wx:key="*this" wx:for-item="t" class="bc-tag">{{t}}</text>
     </view>
@@ -21,15 +35,20 @@
         <view class="bc-avatar">{{group.nickname[0]}}</view>
         <view class="bc-user-meta">
           <text class="bc-name">{{group.nickname}}</text>
-          <text class="bc-sub">{{group.current}}/{{group.max}} 人 · {{group.personality}}</text>
+          <text class="bc-sub">匹配度 {{group.matchPercent || 85}}%</text>
         </view>
       </view>
-      <text class="bc-score">{{group.current/group.max*100}}%</text>
+    </view>
+
+    <view class="bc-status-row">
+      <text class="bc-status-item">已有人数 {{group.current}}/{{group.max}}</text>
+      <text class="bc-status-item">剩余名额 {{group.remainCount}}人</text>
+      <text class="bc-status-item">出发 {{group.startTimeDisplay || group.startTime || '待定'}}</text>
     </view>
 
     <view class="bc-actions">
-      <view class="bc-btn bc-btn-chat" catchtap="onChatTap">聊一聊</view>
-      <view class="bc-btn bc-btn-join" catchtap="onJoinTap">申请加入</view>
+      <view class="bc-btn bc-btn-chat" catchtap="onChatTap">先聊一下</view>
+      <view class="bc-btn bc-btn-join" catchtap="onJoinTap">立即加入</view>
     </view>
 
     <view class="bc-reasons" wx:if="{{group.matchReasons.length}}">

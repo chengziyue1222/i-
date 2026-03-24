@@ -1,62 +1,140 @@
-<!--pages/route/scenic-list.wxml-->
-<view class="scenic-list-container">
-  <view class="search-bar">
-    <view class="search-input-wrapper">
-      <icon type="search" size="16" color="#9aa2af"></icon>
-      <input
-        class="search-input"
-        placeholder="搜索景区名称"
-        value="{{searchKeyword}}"
-        bindinput="onSearchInput"
-      />
+<view class="route-page">
+  <view class="custom-route-card">
+    <view class="custom-head">
+      <text class="custom-title">自定义路线生成</text>
+      <view class="add-spot-btn" bindtap="onOpenSpotPopup">+ 添加地点</view>
+    </view>
+
+    <input
+      class="preference-input"
+      placeholder="输入你的需求：如轻松拍照、少走路、预算200内"
+      value="{{userPreference}}"
+      bindinput="onPreferenceInput"
+      cursor-spacing="40"
+    />
+
+    <view class="selected-row">
+      <text wx:if="{{selectedSpots.length===0}}" class="selected-empty">请先添加想去的地点</text>
+      <view wx:for="{{selectedSpots}}" wx:key="*this" wx:for-item="spot" class="spot-tag">
+        <text class="spot-name">{{spot}}</text>
+        <text class="spot-del" data-spot="{{spot}}" bindtap="onRemoveSpot">×</text>
+      </view>
+    </view>
+
+    <view class="generate-main-btn" bindtap="onGenerateRoute">一键生成</view>
+  </view>
+
+  <view class="filter-panel">
+    <view class="filter-group">
+      <text class="filter-label">时间</text>
+      <view class="filter-row">
+        <view
+          wx:for="{{timeFilters}}"
+          wx:key="id"
+          class="filter-chip {{activeTime===item.id?'on':''}}"
+          data-id="{{item.id}}"
+          bindtap="onTimeFilterTap"
+        >{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="filter-group">
+      <text class="filter-label">类型</text>
+      <view class="filter-row">
+        <view
+          wx:for="{{typeFilters}}"
+          wx:key="id"
+          class="filter-chip {{activeType===item.id?'on':''}}"
+          data-id="{{item.id}}"
+          bindtap="onTypeFilterTap"
+        >{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="sort-row">
+      <text class="sort-title">热度排序</text>
+      <view class="sort-btn {{sortMode==='hot'?'on':''}}" bindtap="onSortToggle">
+        {{sortMode==='hot'?'高到低':'低到高'}}
+      </view>
     </view>
   </view>
 
-  <scroll-view class="scenic-scroll" scroll-y="{{true}}" enable-back-to-top="{{true}}">
+  <scroll-view class="route-scroll" scroll-y="{{true}}" enable-back-to-top="{{true}}">
     <view
-      wx:for="{{filteredScenicList}}"
-      wx:key="scenicId"
+      wx:for="{{filteredRouteList}}"
+      wx:key="id"
       wx:for-item="item"
-      wx:for-index="index"
-      class="scenic-card"
-      bindtap="onScenicTap"
-      data-scenic="{{item}}"
+      class="route-card"
+      bindtap="onRouteTap"
+      data-route="{{item}}"
     >
-      <view class="scenic-image-wrap">
-        <view class="image-skeleton" wx:if="{{item._imageLoading}}"></view>
-        <image
-          class="scenic-image"
-          src="{{item.imageUrl}}"
-          mode="aspectFill"
-          data-index="{{index}}"
-          bindload="onImageLoad"
-          binderror="onImageError"
-        />
+      <view class="route-cover-wrap">
+        <image class="route-cover" src="{{item.cover}}" mode="aspectFill" lazy-load="true" />
       </view>
 
-      <view class="scenic-info">
-        <view class="scenic-header">
-          <text class="scenic-name">{{item.scenicName}}</text>
-          <view class="scenic-tag">{{item.level || 'AAAAA'}}</view>
+      <view class="route-info">
+        <view class="route-header">
+          <text class="route-name">{{item.name}}</text>
         </view>
-        <text class="scenic-desc">{{item.description || '自然风光与人文景观兼具，值得慢慢体验。'}}</text>
-        <view class="scenic-meta">
+        <text class="route-spots">覆盖景点：{{item.spotsText}}</text>
+
+        <view class="meta-grid">
           <view class="meta-item">
-            <icon type="waiting" size="12" color="#8f9bb3"></icon>
-            <text>{{item.openingHours || '08:00-18:00'}}</text>
+            <text class="meta-k">总时长</text>
+            <text class="meta-v">{{item.totalDuration}}</text>
           </view>
-          <view class="meta-item" wx:if="{{item.distance}}">
-            <icon type="location" size="12" color="#8f9bb3"></icon>
-            <text>{{item.distance}}m</text>
+          <view class="meta-item">
+            <text class="meta-k">距离</text>
+            <text class="meta-v">{{item.distanceKm}} km</text>
           </view>
+          <view class="meta-item">
+            <text class="meta-k">预算</text>
+            <text class="meta-v">{{item.budget}}</text>
+          </view>
+        </view>
+
+        <view class="tag-row">
+          <text class="route-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text>
         </view>
       </view>
     </view>
 
-    <view wx:if="{{filteredScenicList.length === 0}}" class="empty-state">
+    <view wx:if="{{filteredRouteList.length === 0}}" class="empty-state">
       <icon type="info" size="48" color="#b8c0cc"></icon>
-      <text class="empty-text">暂无景区数据</text>
+      <text class="empty-text">暂无匹配路线</text>
       <text class="empty-desc">请稍后重试或检查筛选条件</text>
     </view>
   </scroll-view>
+
+  <view wx:if="{{showSpotPopup}}" class="spot-popup-mask" catchtap="onCloseSpotPopup">
+    <view class="spot-popup" catchtap="noop">
+      <view class="popup-head">
+        <text class="popup-title">选择地点</text>
+        <text class="popup-close" bindtap="onCloseSpotPopup">关闭</text>
+      </view>
+
+      <input
+        class="popup-search"
+        placeholder="搜索景点"
+        value="{{spotKeyword}}"
+        bindinput="onSpotSearchInput"
+      />
+
+      <view class="popup-sub-title">推荐景点</view>
+      <scroll-view scroll-y class="popup-list">
+        <view
+          wx:for="{{popupSpots}}"
+          wx:key="*this"
+          class="popup-spot-item"
+          data-spot="{{item}}"
+          bindtap="onSelectSpot"
+        >
+          <text>{{item}}</text>
+          <text class="popup-add">添加</text>
+        </view>
+
+        <view wx:if="{{popupSpots.length===0}}" class="popup-empty">暂无匹配地点</view>
+      </scroll-view>
+    </view>
+  </view>
 </view>

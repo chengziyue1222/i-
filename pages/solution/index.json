@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "搭子大厅",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#eef3fb",
   "usingComponents": {
     "card-buddy": "../../components/card-buddy/index",
     "search-bar": "../../components/search-bar/index",

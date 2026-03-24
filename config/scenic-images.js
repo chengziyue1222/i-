@@ -1,17 +1,19 @@
-// 统一景区图片配置
-
-export const DEFAULT_SCENIC_IMAGE = 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png';
+// 统一景区图片配置（核心景区使用本地压缩图）
+export const DEFAULT_SCENIC_IMAGE = '/images/scenic/qixingyan.jpg';
 
 export const SCENIC_IMAGE_MAP = {
-  '七星岩风景区': 'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
-  '七星岩': 'https://qcloudimg.tencent-cloud.cn/raw/962c82d62bf201702204a74b4a20035c.png',
-  '鼎湖山景区': 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
-  '鼎湖山': 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png',
-  '星湖风景区': 'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
-  '星湖': 'https://qcloudimg.tencent-cloud.cn/raw/3ea5139beeae6c4e2e98d30ad1ed7ade.png',
-  '端州古城': 'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
-  '肇庆古城': 'https://main.qcloudimg.com/raw/a329db7230d1a9c79a0b10e096b236e8.png',
-  '龙母祖庙': 'https://main.qcloudimg.com/raw/28644f5655e9f2b5e470676d77903bcb.png'
+  '七星岩风景区': '/images/scenic/qixingyan.jpg',
+  '七星岩': '/images/scenic/qixingyan.jpg',
+  '鼎湖山景区': '/images/scenic/dinghushan.jpg',
+  '鼎湖山': '/images/scenic/dinghushan.jpg',
+  '星湖风景区': '/images/scenic/xinghu.jpg',
+  '星湖': '/images/scenic/xinghu.jpg',
+  '端州古城': '/images/scenic/duanzhou.jpg',
+  '肇庆古城': '/images/scenic/duanzhou.jpg',
+  '龙母祖庙': '/images/scenic/longmu.jpg',
+  '端州美食街': 'https://picsum.photos/seed/duanzhou-food/400/500',
+  '西江苗寨': 'https://picsum.photos/seed/xijiang/400/500',
+  '鸡笼顶': 'https://picsum.photos/seed/jilongding/400/500'
 };
 
 export function resolveScenicImageUrlByName(name = '') {
