@@ -27,6 +27,7 @@
     </view>
   </view>
   <view class="post-footer">
+    <button class="btn-copy" bindtap="onCopyToRoutePlan">复制行程</button>
     <button class="btn-apply" bindtap="onApplyJoin">申请加入</button>
   </view>
 </view>

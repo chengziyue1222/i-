@@ -1,0 +1,434 @@
+/* ================================================================
+   i旅图 · 消息中心
+   ================================================================ */
+
+page {
+  background: #f2f3f7;
+  height: 100%;
+}
+
+.msg-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f2f3f7;
+}
+
+/* ─── Tab 栏 ─── */
+.msg-tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid #e8eaef;
+  flex-shrink: 0;
+  padding: 0 32rpx;
+}
+
+.msg-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx 0 20rpx;
+  position: relative;
+}
+
+.msg-tab-inner {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-badge {
+  min-width: 30rpx;
+  height: 30rpx;
+  border-radius: 999rpx;
+  background: #ff4757;
+  color: #fff;
+  font-size: 18rpx;
+  line-height: 30rpx;
+  text-align: center;
+  padding: 0 8rpx;
+  position: absolute;
+  right: -28rpx;
+  top: -10rpx;
+}
+
+.msg-tab text {
+  font-size: 28rpx;
+  color: #868e96;
+  font-weight: 500;
+  letter-spacing: 1rpx;
+}
+
+.msg-tab-active text {
+  color: #0f62fe;
+  font-weight: 700;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 5rpx;
+  background: #0f62fe;
+  border-radius: 999rpx;
+}
+
+/* ─── 列表容器 ─── */
+.msg-list {
+  flex: 1;
+  height: 0;
+  padding: 16rpx 0;
+}
+
+/* ─── 空状态 ─── */
+.empty-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  gap: 20rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #adb5bd;
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* ─── 会话条目 ─── */
+.conv-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 28rpx 32rpx;
+  margin-bottom: 2rpx;
+  gap: 24rpx;
+}
+
+.conv-avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.conv-avatar-emoji {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f62fe, #4d94ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38rpx;
+  line-height: 88rpx;
+  text-align: center;
+  display: block;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f62fe22, #4d94ff22);
+  font-size: 38rpx;
+  line-height: 88rpx;
+  text-align: center;
+}
+
+.conv-unread-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  background: #ff4757;
+  border: 2rpx solid #fff;
+}
+
+.conv-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.conv-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.conv-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.conv-time {
+  font-size: 22rpx;
+  color: #adb5bd;
+  flex-shrink: 0;
+  margin-left: 12rpx;
+}
+
+.conv-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.conv-last {
+  font-size: 26rpx;
+  color: #868e96;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-badge {
+  min-width: 36rpx;
+  height: 36rpx;
+  border-radius: 999rpx;
+  background: #ff4757;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+  flex-shrink: 0;
+  margin-left: 12rpx;
+}
+
+.conv-badge-text {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ─── 通知 / 互动条目 ─── */
+.notify-item {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  padding: 28rpx 32rpx;
+  margin-bottom: 2rpx;
+  gap: 24rpx;
+  position: relative;
+}
+
+.notify-unread {
+  background: #f0f5ff;
+}
+
+.notify-icon-wrap {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e7f5ff, #d0ebff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.interact-icon-wrap {
+  background: linear-gradient(135deg, #fff0f6, #ffd6e7);
+}
+
+.notify-icon {
+  font-size: 34rpx;
+  line-height: 80rpx;
+  text-align: center;
+  display: block;
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+}
+
+.notify-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notify-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.notify-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.notify-time {
+  font-size: 22rpx;
+  color: #adb5bd;
+  flex-shrink: 0;
+  margin-left: 12rpx;
+}
+
+.notify-desc {
+  font-size: 26rpx;
+  color: #868e96;
+  line-height: 1.6;
+}
+
+.unread-dot {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff4757;
+}
+
+/* ─── 分组标题 ─── */
+.section-title {
+  font-size: 22rpx;
+  color: #adb5bd;
+  padding: 20rpx 32rpx 8rpx;
+  letter-spacing: 2rpx;
+  font-weight: 600;
+}
+
+/* ─── 申请审核卡片 ─── */
+.apply-item {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  padding: 24rpx 32rpx;
+  margin-bottom: 2rpx;
+  gap: 20rpx;
+}
+
+.apply-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe8cc, #ffd6a5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 36rpx;
+  line-height: 80rpx;
+  text-align: center;
+}
+
+.apply-avatar-emoji {
+  display: block;
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-size: 36rpx;
+}
+
+.apply-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.apply-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+
+.apply-top-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.mini-unread-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #ff4757;
+}
+
+.apply-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.apply-time {
+  font-size: 22rpx;
+  color: #adb5bd;
+}
+
+.apply-desc {
+  font-size: 26rpx;
+  color: #495057;
+  margin-bottom: 4rpx;
+}
+
+.apply-msg {
+  font-size: 24rpx;
+  color: #868e96;
+  font-style: italic;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.apply-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+
+.apply-btn {
+  flex: 1;
+  height: 60rpx;
+  line-height: 60rpx;
+  text-align: center;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.apply-reject {
+  background: #f1f3f5;
+  color: #868e96;
+}
+
+.apply-accept {
+  background: linear-gradient(135deg, #0f62fe, #228be6);
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(15,98,254,.3);
+}
+
+.apply-result {
+  margin-top: 12rpx;
+  display: inline-flex;
+  align-items: center;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.apply-result-ok {
+  background: #d3f9d8;
+  color: #2f9e44;
+}
+
+.apply-result-no {
+  background: #ffe3e3;
+  color: #e03131;
+}

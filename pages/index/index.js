@@ -4,6 +4,8 @@ import { fetchNewsData } from '../../services/news/index';
 import { fetchPostList } from '../../services/post/index';
 import { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } from '../../config/scenic-images';
 
+const store = require('../../store/index');
+
 Page({
   data: {
     showUploadTip: false,
@@ -14,6 +16,7 @@ Page({
     partnersList: [],
     hotScenicList: [],
     postList: [],
+    postAppliedMap: {},
     activeShortcut: 'walk',
     routeFilter: 'time',
     searchKeyword: ''
@@ -60,7 +63,8 @@ Page({
       console.log('[首页] 新闻数据加载完成:', res2);
 
       const res3 = await fetchPostList({ pageSize: 20 });
-      console.log('[首页] 搭子帖子加载完成:', res3?.length ?? 0);
+      const postList = this.decoratePostsWithApplyStatus(res3 || []);
+      console.log('[首页] 搭子帖子加载完成:', postList.length);
 
       const {index_show,function_show,cooperation} = res?.[0] || {};
       console.log('[首页] 解析首页数据:', {index_show, function_show, cooperation});
@@ -91,7 +95,7 @@ Page({
         applicationScene: scenicList || [],
         newsList: res2 || [],
         hotScenicList: hotScenicList,
-        postList: res3 || []
+        postList: postList
       }, () => {
         console.log('[首页] ✅ setData完成');
         console.log('[首页] 最终 hotScenicList:', this.data.hotScenicList);
@@ -140,11 +144,107 @@ Page({
     }
     this.setData({ routeFilter: filter, hotScenicList });
   },
+
+  getCurrentUserId() {
+    const ui = wx.getStorageSync('userInfo') || {};
+    return String(ui.userId || ui._id || ui.openid || 'me');
+  },
+
+  decoratePostsWithApplyStatus(posts) {
+    const uid = this.getCurrentUserId();
+    return (posts || []).map((item) => {
+      const postId = item.postId || item._id;
+      const applied = postId ? store.hasAppliedApplication(String(postId), uid) : false;
+      return { ...item, _applied: applied };
+    });
+  },
   onPostTap(e) {
     const postId = e.currentTarget.dataset.postId;
     if (postId) {
       wx.navigateTo({ url: `/pages/post-detail/index?postId=${postId}` });
     }
+  },
+
+  onPostChatTap(e) {
+    const post = e.currentTarget.dataset.post || {};
+    const postId = post.postId || post._id || ('post_' + Date.now());
+    const partnerName = (post.publisher && post.publisher.nickname) || '帖子作者';
+    const groupName = post.destination || post.title || '搭子会话';
+
+    store.track('post_chat_tap', {
+      postId: String(postId),
+      destination: groupName
+    });
+
+    store.getOrCreateConversation({
+      groupId: String(postId),
+      groupName: groupName,
+      partnerName: partnerName
+    });
+
+    wx.navigateTo({
+      url: '/pages/chat/index?groupId=' + encodeURIComponent(String(postId))
+        + '&groupName=' + encodeURIComponent(groupName)
+        + '&partnerName=' + encodeURIComponent(partnerName)
+    });
+  },
+
+  onPostCommentTap(e) {
+    const post = e.currentTarget.dataset.post || {};
+    const postId = post.postId || post._id;
+    if (!postId) return;
+
+    store.track('post_comment_tap', {
+      postId: String(postId),
+      destination: post.destination || ''
+    });
+
+    wx.navigateTo({
+      url: '/pages/post-comment/index?postId=' + encodeURIComponent(String(postId))
+        + '&postTitle=' + encodeURIComponent(post.title || post.destination || '搭子帖子')
+        + '&postAuthor=' + encodeURIComponent((post.publisher && post.publisher.nickname) || '')
+    });
+  },
+
+  onPostApplyTap(e) {
+    const post = e.currentTarget.dataset.post || {};
+    const postId = post.postId || post._id;
+    if (!postId) return;
+
+    const uid = this.getCurrentUserId();
+    if (store.hasAppliedApplication(String(postId), uid)) {
+      wx.showToast({ title: '你已申请过该帖子', icon: 'none' });
+      return;
+    }
+
+    const nick = (wx.getStorageSync('userInfo') || {}).nickName || '我';
+    const result = store.submitApplication({
+      groupId: String(postId),
+      groupName: post.destination || post.title || '搭子行程',
+      destination: post.destination || '',
+      fromUserId: uid,
+      fromUserName: nick,
+      fromUserEmoji: '🙋',
+      message: '我想加入这个行程，一起出发！'
+    });
+
+    if (result && result.duplicated) {
+      wx.showToast({ title: '你已申请过该帖子', icon: 'none' });
+      return;
+    }
+
+    store.track('post_apply_submit', {
+      postId: String(postId),
+      destination: post.destination || ''
+    });
+
+    const nextList = (this.data.postList || []).map((item) => {
+      const id = item.postId || item._id;
+      if (String(id) === String(postId)) return { ...item, _applied: true };
+      return item;
+    });
+    this.setData({ postList: nextList });
+    wx.showToast({ title: '申请已提交', icon: 'success' });
   },
   onGoScenicList() {
     wx.switchTab({ url: '/pages/route/scenic-list' });

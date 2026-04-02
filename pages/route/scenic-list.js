@@ -1,5 +1,7 @@
 import { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } from '../../config/scenic-images';
 
+const store = require('../../store/index');
+
 const TIME_FILTERS = [
   { id: 'all', label: '全部' },
   { id: 'half', label: '半天' },
@@ -99,6 +101,31 @@ function collectRecommendedSpots() {
   return Object.keys(map);
 }
 
+function resolveSpotLocation(name, index) {
+  const LOCATION_MAP = {
+    '七星岩': { latitude: 23.105994, longitude: 112.470000 },
+    '鼎湖山': { latitude: 23.170000, longitude: 112.550000 },
+    '星湖风景区': { latitude: 23.108000, longitude: 112.480000 },
+    '星湖': { latitude: 23.108000, longitude: 112.480000 },
+    '端州古城': { latitude: 23.050000, longitude: 112.465000 },
+    '龙母祖庙': { latitude: 23.285000, longitude: 111.670000 }
+  };
+  if (LOCATION_MAP[name]) return LOCATION_MAP[name];
+
+  return {
+    latitude: 23.105994 + index * 0.01,
+    longitude: 112.470000 + index * 0.01
+  };
+}
+
+function formatGenerateTime(ts) {
+  const date = new Date(ts || Date.now());
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  const ss = String(date.getSeconds()).padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
 Page({
   data: {
     routeList: [],
@@ -113,7 +140,8 @@ Page({
     showSpotPopup: false,
     spotKeyword: '',
     recommendedSpots: collectRecommendedSpots(),
-    popupSpots: collectRecommendedSpots()
+    popupSpots: collectRecommendedSpots(),
+    lastGenerate: null
   },
 
   onLoad() {
@@ -238,21 +266,98 @@ Page({
   },
 
   onGenerateRoute() {
-    const selected = this.data.selectedSpots || [];
+    let selected = this.data.selectedSpots || [];
+    const pref = (this.data.userPreference || '').trim();
+    const recommended = this.data.recommendedSpots || [];
+    let matched = [];
+
+    // 兜底：未手动添加地点时，尝试从输入中自动识别地点
+    if (!selected.length && pref) {
+      matched = recommended.filter((spot) => pref.indexOf(spot) > -1);
+
+      if (matched.length) {
+        selected = matched;
+        this.setData({ selectedSpots: selected });
+        wx.showToast({ title: '已从输入命中地点', icon: 'none' });
+      }
+    }
+
     if (!selected.length) {
-      wx.showToast({ title: '请先添加地点', icon: 'none' });
+      const reason = !pref ? '无地点：请先添加地点或输入目的地' : '无匹配：输入中未识别到已知景点';
+      this.setData({
+        lastGenerate: {
+          time: formatGenerateTime(Date.now()),
+          keyword: pref || '(未输入)',
+          matchedSpots: [],
+          status: 'failed',
+          reason
+        }
+      });
+      store.track('generate_route_failed', {
+        reason,
+        keyword: pref || '',
+        selectedCount: 0
+      });
+      wx.showToast({ title: reason, icon: 'none' });
       return;
     }
 
-    const pref = (this.data.userPreference || '').trim();
-    wx.showLoading({ title: '生成中...' });
+    const requestTime = Date.now();
+    this.setData({
+      lastGenerate: {
+        time: formatGenerateTime(requestTime),
+        keyword: pref || '(无偏好关键词)',
+        matchedSpots: selected.slice(0, 6),
+        status: 'success',
+        reason: ''
+      }
+    });
+
+    wx.showLoading({ title: 'AI生成中...' });
+
     setTimeout(() => {
       wx.hideLoading();
-      wx.showToast({
-        title: pref ? '已按需求生成路线' : '已生成推荐路线',
-        icon: 'success'
+
+      // 组装 route-plan 需要的完整路线点：起点 + 景点 + 终点
+      const startPoint = {
+        id: 'start_' + Date.now(),
+        name: '当前位置',
+        type: 'start',
+        location: { latitude: 23.105994, longitude: 112.470000 }
+      };
+
+      const attractionPoints = selected.map((spot, index) => ({
+        id: 'spot_' + Date.now() + '_' + index,
+        name: spot,
+        type: 'attraction',
+        duration: 60,
+        location: resolveSpotLocation(spot, index)
+      }));
+
+      const endPoint = {
+        id: 'end_' + Date.now(),
+        name: '当前位置',
+        type: 'end',
+        location: { latitude: 23.105994, longitude: 112.470000 }
+      };
+
+      const payload = {
+        scenicId: selected[0] || '',
+        routePoints: [startPoint].concat(attractionPoints).concat([endPoint]),
+        preference: pref,
+        source: 'tab-custom'
+      };
+
+      store.track('generate_route_success', {
+        keyword: pref || '',
+        selectedCount: selected.length,
+        selectedSpots: selected.slice(0, 6)
       });
-    }, 700);
+
+      wx.navigateTo({
+        url: `/packageRoute/pages/route/route-plan?data=${encodeURIComponent(JSON.stringify(payload))}`
+      });
+    }, 500);
   },
 
   onPullDownRefresh() {

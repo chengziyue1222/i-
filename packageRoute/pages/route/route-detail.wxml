@@ -80,7 +80,7 @@
       分享给朋友
     </button>
     <button class="action-button primary" bindtap="onBackToMap">
-      返回地图
+      查看地图路线
     </button>
   </view>
 </view>

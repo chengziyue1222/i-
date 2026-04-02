@@ -47,7 +47,7 @@
     </view>
 
     <view class="bc-actions">
-      <view class="bc-btn bc-btn-chat" catchtap="onChatTap">先聊一下</view>
+      <view class="bc-btn bc-btn-chat" catchtap="onChatTap">💬 联系TA</view>
       <view class="bc-btn bc-btn-join" catchtap="onJoinTap">立即加入</view>
     </view>
 

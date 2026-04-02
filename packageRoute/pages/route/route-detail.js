@@ -7,10 +7,11 @@ Page({
   },
 
   onLoad(options) {
-    const data = JSON.parse(decodeURIComponent(options.data));
+    const raw = options && options.data ? options.data : encodeURIComponent('{}');
+    const data = JSON.parse(decodeURIComponent(raw));
     this.setData({
-      scheme: data.scheme,
-      scenicId: data.scenicId,
+      scheme: data.scheme || {},
+      scenicId: data.scenicId || '',
       routePoints: data.routePoints || []
     });
   },
@@ -26,9 +27,24 @@ Page({
     });
   },
 
-  // 返回地图
+  // 返回地图（从攻略详情进入地图路线页）
   onBackToMap() {
-    wx.navigateBack();
+    const scheme = this.data.scheme || {};
+    const routePoints = this.data.routePoints || [];
+    const schemeStops = scheme.stops || routePoints || [];
+
+    const params = encodeURIComponent(JSON.stringify({
+      scheme: {
+        ...scheme,
+        stops: schemeStops
+      },
+      scenicId: this.data.scenicId || '',
+      routePoints: routePoints,
+      sortedAttractions: routePoints
+    }));
+    wx.navigateTo({
+      url: `/packageRoute/pages/route/route-map?data=${params}`
+    });
   },
 
   // 分享给好友

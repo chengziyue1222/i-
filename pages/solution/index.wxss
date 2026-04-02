@@ -1,5 +1,5 @@
-page { background:#eef3fb; }
-.page { display:flex; flex-direction:column; height:100vh; background:#eef3fb; }
+page { background:#f2f3f7; }
+.page { display:flex; flex-direction:column; height:100vh; background:#f2f3f7; }
 
 .ai-banner {
   margin: 20rpx 24rpx 0;
@@ -155,7 +155,7 @@ page { background:#eef3fb; }
 
 .community-scroll { flex:1; height:0; }
 .community-list { padding:20rpx 24rpx 100rpx; display:flex; flex-direction:column; gap:20rpx; }
-.post-card { background:#fff; border-radius:20rpx; overflow:hidden; box-shadow:0 4rpx 20rpx rgba(0,0,0,.07); }
+.post-card { background:#fff; border-radius:20rpx; overflow:hidden; border:1rpx solid #e8edf4; box-shadow:none; }
 .post-cover { height:280rpx; display:flex; align-items:center; justify-content:center; }
 .post-emoji { font-size:80rpx; }
 .post-body { padding:20rpx 24rpx 24rpx; }
@@ -163,10 +163,73 @@ page { background:#eef3fb; }
 .post-meta { display:flex; align-items:center; justify-content:space-between; margin-bottom:20rpx; }
 .post-author { display:flex; align-items:center; gap:10rpx; }
 .post-av { width:44rpx; height:44rpx; border-radius:50%; background:linear-gradient(135deg,#0f62fe,#228be6); color:#fff; font-size:20rpx; font-weight:700; display:flex; align-items:center; justify-content:center; }
-.post-name { font-size:24rpx; color:#666; }
+.post-name { font-size:24rpx; color:#7f8ea3; }
 .post-like { font-size:24rpx; color:#f03e3e; }
+.post-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.post-action-btn {
+  flex: 1;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.post-like-btn {
+  background: #fff0f6;
+  color: #e03131;
+}
+
+.post-cmt-btn {
+  background: #e7f5ff;
+  color: #0f62fe;
+}
+
+.post-dm-btn {
+  background: #f3f0ff;
+  color: #7048e8;
+}
+
 .find-btn { background:linear-gradient(135deg,#f5576c,#f093fb); color:#fff; text-align:center; padding:20rpx; border-radius:12rpx; font-size:26rpx; font-weight:600; }
 .find-btn:active { opacity:.85; }
+
+/* ── 帖子操作按钮 ── */
+.post-actions {
+  display: flex;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+
+.post-action-btn {
+  flex: 1;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.post-like-btn {
+  background: #fff0f6;
+  color: #e03131;
+}
+
+.post-cmt-btn {
+  background: #e7f5ff;
+  color: #0f62fe;
+}
+
+.post-dm-btn {
+  background: #f3f0ff;
+  color: #7048e8;
+}
 
 .fab {
   position:fixed;
@@ -184,3 +247,116 @@ page { background:#eef3fb; }
 }
 .fab:active { transform:scale(.92); }
 .fab-icon { color:#fff; font-size:58rpx; font-weight:300; line-height:1; margin-top:-4rpx; }
+
+.publish-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 36, 0.45);
+  display: flex;
+  align-items: flex-end;
+  z-index: 120;
+}
+
+.publish-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 24rpx 24rpx calc(24rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -12rpx 30rpx rgba(0, 0, 0, 0.15);
+}
+
+.publish-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+}
+
+.publish-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1b315c;
+}
+
+.publish-close {
+  font-size: 24rpx;
+  color: #6d7f99;
+}
+
+.publish-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.publish-datetime-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12rpx;
+}
+
+.publish-picker {
+  height: 78rpx;
+  line-height: 78rpx;
+  box-sizing: border-box;
+  background: #f2f6ff;
+  border: 1rpx solid #d9e6ff;
+  border-radius: 12rpx;
+  padding: 0 16rpx;
+  font-size: 26rpx;
+  color: #9aa6bb;
+}
+
+.publish-picker.has-value {
+  color: #2b3f67;
+}
+
+.publish-input,
+.publish-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f2f6ff;
+  border: 1rpx solid #d9e6ff;
+  border-radius: 12rpx;
+  padding: 0 16rpx;
+  font-size: 26rpx;
+  color: #2b3f67;
+}
+
+.publish-input {
+  height: 78rpx;
+  line-height: 78rpx;
+}
+
+.publish-textarea {
+  min-height: 120rpx;
+  padding-top: 14rpx;
+  line-height: 1.45;
+}
+
+.publish-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+
+.publish-cancel,
+.publish-submit {
+  flex: 1;
+  height: 76rpx;
+  line-height: 76rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.publish-cancel {
+  background: #eef2f8;
+  color: #5e6f88;
+}
+
+.publish-submit {
+  background: linear-gradient(135deg,#1a75ff,#36a2ff);
+  color: #fff;
+}

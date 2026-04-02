@@ -80,7 +80,16 @@ Page({
     leftGroups: [], rightGroups: [],
     showAiPanel: false,
     aiDest: '',
-    refresherTriggered: false
+    refresherTriggered: false,
+    showPublishForm: false,
+    publishForm: {
+      destination: '',
+      publishDate: '',
+      publishTime: '',
+      max: '',
+      tagsText: '',
+      intro: ''
+    }
   },
 
   onLoad: function() { this.reload(); },
@@ -168,6 +177,11 @@ Page({
   onChatTap: function(e) {
     var group = e.detail.group || {};
     if (!group.id) return;
+    store.getOrCreateConversation({
+      groupId: group.id,
+      groupName: group.destination || '搭子会话',
+      partnerName: group.nickname || '队长'
+    });
     var groupName = encodeURIComponent(group.destination || '搭子会话');
     var partnerName = encodeURIComponent(group.nickname || '队长');
     wx.navigateTo({
@@ -189,35 +203,130 @@ Page({
     wx.navigateTo({ url: '/pages/buddy-match/index?destination=' + encodeURIComponent(this.data.aiDest) });
   },
 
+  noop: function() {},
+
   onPublish: function() {
-    var self = this;
-    wx.showModal({
-      title: '发起组队', editable: true, placeholderText: '目的地，如：七星岩',
-      success: function(res) {
-        if (!res.confirm || !res.content) return;
-        var ui = wx.getStorageSync('userInfo') || {};
-        var destination = res.content.trim();
-        var g = {
-          id:'g_'+Date.now(),
-          nickname: ui.nickName || '我',
-          personality:'ENFP',
-          destination: destination,
-          startTime:'待定',
-          current:1,
-          max:4,
-          status:'recruiting',
-          tags:['轻松游'],
-          intro:'欢迎加入，一起出发。',
-          matchReasons:[],
-          imageUrl: scenicImageByDestination(destination),
-          coverHeight: 240,
-          cover:{ color:'linear-gradient(135deg,#4facfe,#00f2fe)', emoji:'🌄' }
-        };
-        var list = store.saveGroup(g);
-        self.setData({ groups: list });
-        self.applyFilter();
-        wx.showToast({ title: '发布成功🎉', icon: 'success' });
+    store.track('publish_open', { scene: 'solution' });
+    this.setData({
+      showPublishForm: true,
+      publishForm: {
+        destination: '',
+        publishDate: '',
+        publishTime: '',
+        max: '',
+        tagsText: '',
+        intro: ''
       }
+    });
+  },
+
+  onClosePublishForm: function() {
+    this.setData({ showPublishForm: false });
+  },
+
+  onPublishFieldInput: function(e) {
+    var field = e.currentTarget.dataset.field;
+    var value = e.detail.value || '';
+    var form = this.data.publishForm || {};
+    form[field] = value;
+    this.setData({ publishForm: form });
+  },
+
+  onSubmitPublish: function() {
+    var form = this.data.publishForm || {};
+    var destination = (form.destination || '').trim();
+    if (!destination) {
+      wx.showToast({ title: '请填写目的地', icon: 'none' });
+      return;
+    }
+
+    var startTime = '待定';
+    if (form.publishDate && form.publishTime) {
+      var md = (form.publishDate || '').slice(5);
+      startTime = md + ' ' + form.publishTime;
+    } else if (form.publishDate || form.publishTime) {
+      wx.showToast({ title: '请同时选择日期和时间', icon: 'none' });
+      return;
+    }
+
+    var max = parseInt(form.max || '4', 10);
+    if (!max || max < 2 || max > 20) {
+      wx.showToast({ title: '人数需在2-20之间', icon: 'none' });
+      return;
+    }
+
+    var tags = (form.tagsText || '轻松游')
+      .split(/[，,\s]+/)
+      .filter(function(t) { return !!t; })
+      .slice(0, 4);
+    if (!tags.length) tags = ['轻松游'];
+
+    var intro = (form.intro || '').trim() || '欢迎加入，一起出发。';
+
+    var ui = wx.getStorageSync('userInfo') || {};
+    var g = {
+      id:'g_'+Date.now(),
+      nickname: ui.nickName || '我',
+      personality:'ENFP',
+      destination: destination,
+      startTime: startTime,
+      current:1,
+      max:max,
+      status:'recruiting',
+      tags:tags,
+      intro:intro,
+      matchReasons:[],
+      imageUrl: scenicImageByDestination(destination),
+      coverHeight: 240,
+      cover:{ color:'linear-gradient(135deg,#4facfe,#00f2fe)', emoji:'🌄' }
+    };
+
+    var list = store.saveGroup(g);
+    store.track('publish_submit_success', {
+      destination: destination,
+      max: max,
+      tags: tags
+    });
+    this.setData({ groups: list, showPublishForm: false });
+    this.applyFilter();
+    wx.showToast({ title: '发布成功🎉', icon: 'success' });
+  },
+
+  onLikePost: function(e) {
+    var post = e.currentTarget.dataset.post || {};
+    var myName = (wx.getStorageSync('userInfo') || {}).nickName || '我';
+    store.addInteraction({
+      type: 'like',
+      userEmoji: '👍',
+      userName: myName,
+      desc: myName + ' 赞了帖子《' + (post.title || '') + '》',
+      postId: post.id || ''
+    });
+    wx.showToast({ title: '已点赞 ❤️', icon: 'none' });
+  },
+
+  onCommentPost: function(e) {
+    var post = e.currentTarget.dataset.post || {};
+    wx.navigateTo({
+      url: '/pages/post-comment/index?postId=' + (post.id || '')
+        + '&postTitle=' + encodeURIComponent(post.title || '')
+        + '&postAuthor=' + encodeURIComponent(post.author || '')
+    });
+  },
+
+  onDmAuthor: function(e) {
+    var post = e.currentTarget.dataset.post || {};
+    var authorId = 'post_' + (post.id || Date.now());
+    var authorName = post.author || '作者';
+    store.getOrCreateConversation({
+      groupId: authorId,
+      groupName: post.title || '社区私信',
+      partnerName: authorName
+    });
+    var groupName = encodeURIComponent(post.title || '社区私信');
+    var partnerName = encodeURIComponent(authorName);
+    wx.navigateTo({
+      url: '/pages/chat/index?groupId=' + authorId + '&groupName=' + groupName + '&partnerName=' + partnerName
     });
   },
 

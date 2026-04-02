@@ -97,14 +97,52 @@
               <view class="post-av">{{item.author[0]}}</view>
               <text class="post-name">{{item.author}}</text>
             </view>
-            <text class="post-like">❤️ {{item.likes}}</text>
           </view>
-          <view class="find-btn" catchtap="onFindSameBuddy" data-dest="{{item.destination}}">找同款搭子 →</view>
+          <view class="post-actions">
+            <view class="post-action-btn post-like-btn" catchtap="onLikePost" data-post="{{item}}">❤️ {{item.likes}}</view>
+            <view class="post-action-btn post-cmt-btn" catchtap="onCommentPost" data-post="{{item}}">💬 评论</view>
+            <view class="post-action-btn post-dm-btn" catchtap="onDmAuthor" data-post="{{item}}">✉️ 私聊</view>
+          </view>
         </view>
       </view>
     </view>
     <view class="list-end">— 已经到底啦 —</view>
   </scroll-view>
+
+  <!-- 发布组队表单 -->
+  <view wx:if="{{showPublishForm}}" class="publish-mask" catchtap="onClosePublishForm">
+    <view class="publish-sheet" catchtap="noop">
+      <view class="publish-head">
+        <text class="publish-title">发起组队</text>
+        <text class="publish-close" bindtap="onClosePublishForm">关闭</text>
+      </view>
+
+      <view class="publish-form">
+        <input class="publish-input" data-field="destination" value="{{publishForm.destination}}" bindinput="onPublishFieldInput" placeholder="目的地（必填，如：七星岩）" />
+
+        <view class="publish-datetime-row">
+          <picker mode="date" value="{{publishForm.publishDate}}" bindchange="onPublishFieldInput" data-field="publishDate">
+            <view class="publish-picker {{publishForm.publishDate ? 'has-value' : ''}}">
+              {{publishForm.publishDate || '选择出发日期'}}
+            </view>
+          </picker>
+          <picker mode="time" value="{{publishForm.publishTime}}" bindchange="onPublishFieldInput" data-field="publishTime">
+            <view class="publish-picker {{publishForm.publishTime ? 'has-value' : ''}}">
+              {{publishForm.publishTime || '选择出发时间'}}
+            </view>
+          </picker>
+        </view>
+        <input class="publish-input" data-field="max" type="number" value="{{publishForm.max}}" bindinput="onPublishFieldInput" placeholder="队伍人数（如：4，默认4人）" />
+        <input class="publish-input" data-field="tagsText" value="{{publishForm.tagsText}}" bindinput="onPublishFieldInput" placeholder="标签（如：轻松游,拍照,美食）" />
+        <textarea class="publish-textarea" data-field="intro" value="{{publishForm.intro}}" bindinput="onPublishFieldInput" placeholder="组队简介（可选）" maxlength="100"></textarea>
+      </view>
+
+      <view class="publish-actions">
+        <view class="publish-cancel" bindtap="onClosePublishForm">取消</view>
+        <view class="publish-submit" bindtap="onSubmitPublish">发布组队</view>
+      </view>
+    </view>
+  </view>
 
   <!-- FAB -->
   <view class="fab" bindtap="onPublish"><text class="fab-icon">+</text></view>

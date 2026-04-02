@@ -1,28 +1,120 @@
 <view class="chat-page">
-  <view class="chat-head">
-    <text class="chat-title">{{groupName}}</text>
-    <text class="chat-sub">与 {{partnerName}} 沟通集合、路线与注意事项</text>
+  <!-- 顶部导航栏 -->
+  <view class="chat-navbar">
+    <view class="navbar-back" bindtap="onBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <view class="navbar-center">
+      <view class="navbar-avatar">
+        <text class="navbar-avatar-emoji">🧭</text>
+      </view>
+      <view class="navbar-info">
+        <text class="navbar-title">{{partnerName}}</text>
+        <text class="navbar-sub">{{groupName}}</text>
+      </view>
+    </view>
+    <view class="navbar-more">
+      <text class="more-dot">•••</text>
+    </view>
   </view>
 
-  <scroll-view scroll-y class="chat-list" scroll-with-animation="{{true}}" scroll-into-view="msg-{{messages.length - 1}}">
-    <view wx:for="{{messages}}" wx:key="id" class="msg-row {{item.sender === 'me' ? 'mine' : 'other'}}" id="msg-{{index}}">
-      <view class="msg-bubble">
-        <text class="msg-text">{{item.text}}</text>
+  <!-- 消息列表 -->
+  <scroll-view
+    scroll-y
+    class="chat-list"
+    scroll-with-animation="{{true}}"
+    scroll-into-view="msg-anchor-{{messages.length}}"
+    enhanced="{{true}}"
+    show-scrollbar="{{false}}"
+  >
+    <view class="chat-list-inner">
+      <!-- 顶部日期标签 -->
+      <view class="time-divider">
+        <text class="time-divider-text">今天</text>
       </view>
-      <text class="msg-time">{{item.time}}</text>
+
+      <!-- 消息气泡 -->
+      <block wx:for="{{messages}}" wx:key="id">
+        <!-- 对方消息 -->
+        <view wx:if="{{item.sender !== 'me'}}" class="msg-row other" id="msg-{{index}}">
+          <view class="msg-avatar other-avatar">
+            <text class="avatar-emoji">{{partnerEmoji}}</text>
+          </view>
+          <view class="msg-body">
+            <text class="msg-sender-name">{{item.senderName}}</text>
+            <view class="bubble other-bubble">
+              <text class="msg-text">{{item.text}}</text>
+            </view>
+            <text class="msg-time">{{item.time}}</text>
+          </view>
+        </view>
+
+        <!-- 我的消息 -->
+        <view wx:if="{{item.sender === 'me'}}" class="msg-row mine" id="msg-{{index}}">
+          <view class="msg-body mine-body">
+            <view class="bubble mine-bubble">
+              <text class="msg-text mine-text">{{item.text}}</text>
+            </view>
+            <text class="msg-time mine-time">{{item.time}}</text>
+          </view>
+          <view class="msg-avatar mine-avatar">
+            <text class="avatar-emoji">🙋</text>
+          </view>
+        </view>
+      </block>
+
+      <!-- 正在输入提示 -->
+      <view class="typing-row" wx:if="{{isTyping}}">
+        <view class="msg-avatar other-avatar">
+          <text class="avatar-emoji">{{partnerEmoji}}</text>
+        </view>
+        <view class="typing-bubble">
+          <view class="typing-dot"></view>
+          <view class="typing-dot"></view>
+          <view class="typing-dot"></view>
+        </view>
+      </view>
+
+      <!-- 滚动锚点 -->
+      <view id="msg-anchor-{{messages.length}}" class="scroll-anchor"></view>
     </view>
   </scroll-view>
 
-  <view class="chat-input-wrap">
-    <input
-      class="chat-input"
-      placeholder="输入消息..."
-      value="{{inputValue}}"
-      bindinput="onInput"
-      confirm-type="send"
-      bindconfirm="onSend"
-      cursor-spacing="24"
-    />
-    <view class="send-btn" bindtap="onSend">发送</view>
+  <!-- 底部输入栏 -->
+  <view class="chat-input-bar">
+    <!-- 快捷回复 -->
+    <scroll-view scroll-x class="quick-replies" show-scrollbar="{{false}}">
+      <view class="quick-reply-list">
+        <view
+          class="quick-reply-chip"
+          wx:for="{{quickReplies}}"
+          wx:key="*this"
+          bindtap="onQuickReply"
+          data-text="{{item}}"
+        >
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 输入行 -->
+    <view class="input-row">
+      <view class="input-wrap">
+        <input
+          class="chat-input"
+          placeholder="发消息…"
+          placeholder-class="input-placeholder"
+          value="{{inputValue}}"
+          bindinput="onInput"
+          confirm-type="send"
+          bindconfirm="onSend"
+          cursor-spacing="20"
+          adjust-position="{{true}}"
+        />
+      </view>
+      <view class="send-btn {{inputValue ? 'send-active' : ''}}" bindtap="onSend">
+        <text class="send-icon">↑</text>
+      </view>
+    </view>
   </view>
 </view>

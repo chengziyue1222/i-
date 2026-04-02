@@ -1,0 +1,139 @@
+<view class="msg-page">
+  <!-- Tab 切换栏 -->
+  <view class="msg-tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="id"
+      class="msg-tab {{activeTab === item.id ? 'msg-tab-active' : ''}}"
+      bindtap="onTabTap"
+      data-id="{{item.id}}"
+    >
+      <view class="msg-tab-inner">
+        <text>{{item.label}}</text>
+        <view class="tab-badge" wx:if="{{(item.id==='dm' && unreadSummary.dm>0) || (item.id==='notify' && unreadSummary.notify>0) || (item.id==='interact' && unreadSummary.interact>0)}}">
+          {{item.id==='dm' ? unreadSummary.dm : (item.id==='notify' ? unreadSummary.notify : unreadSummary.interact)}}
+        </view>
+      </view>
+      <view class="tab-indicator" wx:if="{{activeTab === item.id}}"></view>
+    </view>
+  </view>
+
+  <!-- ── 私信 ── -->
+  <scroll-view scroll-y class="msg-list" wx:if="{{activeTab === 'dm'}}">
+    <view wx:if="{{conversations.length === 0}}" class="empty-wrap">
+      <text class="empty-icon">💬</text>
+      <text class="empty-text">还没有私信\n去找个搭子聊聊吧</text>
+    </view>
+    <view
+      wx:for="{{conversations}}"
+      wx:key="groupId"
+      class="conv-item"
+      bindtap="onConvTap"
+      data-conv="{{item}}"
+    >
+      <view class="conv-avatar">
+        <text class="conv-avatar-emoji">{{item.emoji}}</text>
+        <view class="conv-unread-dot" wx:if="{{item.unread > 0}}"></view>
+      </view>
+      <view class="conv-body">
+        <view class="conv-top">
+          <text class="conv-name">{{item.partnerName}}</text>
+          <text class="conv-time">{{item.time}}</text>
+        </view>
+        <view class="conv-bottom">
+          <text class="conv-last">{{item.lastMsg}}</text>
+          <view class="conv-badge" wx:if="{{item.unread > 0}}">
+            <text class="conv-badge-text">{{item.unread}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- ── 通知（系统 + 申请审核）── -->
+  <scroll-view scroll-y class="msg-list" wx:if="{{activeTab === 'notify'}}">
+
+    <!-- 申请审核区 -->
+    <view class="section-title">入队申请</view>
+    <view wx:if="{{applications.length === 0}}" class="empty-wrap">
+      <text class="empty-icon">📭</text>
+      <text class="empty-text">暂无申请</text>
+    </view>
+    <view wx:for="{{applications}}" wx:key="id" class="apply-item {{item.unread ? 'notify-unread' : ''}}" bindtap="onApplicationTap" data-app="{{item}}">
+      <view class="apply-avatar">
+        <text class="apply-avatar-emoji">{{item.fromUserEmoji}}</text>
+      </view>
+      <view class="apply-body">
+        <view class="apply-top">
+          <text class="apply-name">{{item.fromUserName}}</text>
+          <view class="apply-top-right">
+            <text class="apply-time">{{item.createTimeStr || '刚刚'}}</text>
+            <view class="mini-unread-dot" wx:if="{{item.unread}}"></view>
+          </view>
+        </view>
+        <text class="apply-desc">申请加入「{{item.groupName}}」</text>
+        <text class="apply-msg" wx:if="{{item.message}}">Ta说：{{item.message}}</text>
+        <!-- 待审核：显示按钮 -->
+        <view class="apply-actions" wx:if="{{item.status === 'pending'}}">
+          <view class="apply-btn apply-reject" catchtap="onReject" data-app="{{item}}">拒绝</view>
+          <view class="apply-btn apply-accept" catchtap="onAccept" data-app="{{item}}">同意</view>
+        </view>
+        <!-- 已通过 -->
+        <view class="apply-result apply-result-ok" wx:if="{{item.status === 'accepted'}}">
+          <text>✔ 已同意加入</text>
+        </view>
+        <!-- 已拒绝 -->
+        <view class="apply-result apply-result-no" wx:if="{{item.status === 'rejected'}}">
+          <text>✖ 已拒绝</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 系统通知区 -->
+    <view class="section-title" style="margin-top:16rpx">系统通知</view>
+    <view
+      wx:for="{{systemNotify}}"
+      wx:key="id"
+      class="notify-item {{item.unread ? 'notify-unread' : ''}}"
+    >
+      <view class="notify-icon-wrap">
+        <text class="notify-icon">{{item.icon}}</text>
+      </view>
+      <view class="notify-body">
+        <view class="notify-top">
+          <text class="notify-title">{{item.title}}</text>
+          <text class="notify-time">{{item.time}}</text>
+        </view>
+        <text class="notify-desc">{{item.desc}}</text>
+      </view>
+      <view class="unread-dot" wx:if="{{item.unread}}"></view>
+    </view>
+  </scroll-view>
+
+  <!-- ── 互动 ── -->
+  <scroll-view scroll-y class="msg-list" wx:if="{{activeTab === 'interact'}}">
+    <view wx:if="{{interactions.length === 0}}" class="empty-wrap">
+      <text class="empty-icon">✨</text>
+      <text class="empty-text">暂无互动消息</text>
+    </view>
+    <view
+      wx:for="{{interactions}}"
+      wx:key="id"
+      class="notify-item {{item.unread ? 'notify-unread' : ''}}"
+      bindtap="onInteractTap"
+      data-item="{{item}}"
+    >
+      <view class="notify-icon-wrap interact-icon-wrap">
+        <text class="notify-icon">{{item.userEmoji}}</text>
+      </view>
+      <view class="notify-body">
+        <view class="notify-top">
+          <text class="notify-title">{{item.userName}}</text>
+          <text class="notify-time">{{item.time}}</text>
+        </view>
+        <text class="notify-desc">{{item.desc}}</text>
+      </view>
+      <view class="unread-dot" wx:if="{{item.unread}}"></view>
+    </view>
+  </scroll-view>
+</view>

@@ -1,0 +1,48 @@
+<view class="cmt-page">
+  <!-- 帖子标题 -->
+  <view class="cmt-header">
+    <text class="cmt-post-title">{{postTitle}}</text>
+    <text class="cmt-count">{{comments.length}} 条评论</text>
+  </view>
+
+  <!-- 评论列表 -->
+  <scroll-view scroll-y class="cmt-list">
+    <view wx:if="{{comments.length === 0}}" class="empty-wrap">
+      <text class="empty-icon">💬</text>
+      <text class="empty-text">还没有评论\n快来抢沙发！</text>
+    </view>
+    <view wx:for="{{comments}}" wx:key="id" class="cmt-item">
+      <view class="cmt-avatar">
+        <text class="cmt-avatar-emoji">{{item.userEmoji}}</text>
+      </view>
+      <view class="cmt-body">
+        <view class="cmt-top">
+          <text class="cmt-name">{{item.userName}}</text>
+          <text class="cmt-time">{{item.time}}</text>
+        </view>
+        <text class="cmt-content">{{item.content}}</text>
+      </view>
+    </view>
+    <view class="list-end" wx:if="{{comments.length > 0}}">— 已经到底啦 —</view>
+  </scroll-view>
+
+  <!-- 底部输入栏 -->
+  <view class="cmt-input-bar">
+    <view class="cmt-input-wrap">
+      <input
+        class="cmt-input"
+        placeholder="写下你的评论…"
+        placeholder-class="cmt-placeholder"
+        value="{{inputValue}}"
+        bindinput="onInput"
+        confirm-type="send"
+        bindconfirm="onSend"
+        cursor-spacing="20"
+        adjust-position="{{true}}"
+      />
+    </view>
+    <view class="cmt-send-btn {{inputValue ? 'cmt-send-active' : ''}}" bindtap="onSend">
+      <text class="cmt-send-icon">↑</text>
+    </view>
+  </view>
+</view>

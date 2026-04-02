@@ -22,6 +22,14 @@
     </view>
 
     <view class="generate-main-btn" bindtap="onGenerateRoute">一键生成</view>
+
+    <view wx:if="{{lastGenerate}}" class="last-generate {{lastGenerate.status==='failed' ? 'last-generate-failed' : ''}}">
+      <text class="lg-title">最近生成</text>
+      <text class="lg-line">时间：{{lastGenerate.time}}</text>
+      <text class="lg-line">关键词：{{lastGenerate.keyword}}</text>
+      <text class="lg-line">命中景点：{{lastGenerate.matchedSpots.length ? lastGenerate.matchedSpots.join('、') : '无'}}</text>
+      <text wx:if="{{lastGenerate.status==='failed'}}" class="lg-reason">失败原因：{{lastGenerate.reason}}</text>
+    </view>
   </view>
 
   <view class="filter-panel">

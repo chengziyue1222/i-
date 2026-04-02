@@ -115,6 +115,11 @@
           <view class="post-tags" wx:if="{{item.tags && item.tags.length > 0}}">
             <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="post-tag">{{tag}}</text>
           </view>
+          <view class="post-actions">
+            <view class="post-action-btn action-chat" catchtap="onPostChatTap" data-post="{{item}}">联系TA</view>
+            <view class="post-action-btn action-comment" catchtap="onPostCommentTap" data-post="{{item}}">评论</view>
+            <view class="post-action-btn {{item._applied ? 'action-applied' : 'action-apply'}}" catchtap="onPostApplyTap" data-post="{{item}}">{{item._applied ? '已申请' : '申请'}}</view>
+          </view>
         </view>
       </view>
     </view>

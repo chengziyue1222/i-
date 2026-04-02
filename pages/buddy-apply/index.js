@@ -29,6 +29,15 @@ Page({
     if (data.submitted) return;
     if (!data.message.trim()) { wx.showToast({ title: '请填写自我介绍', icon: 'none' }); return; }
     store.submitApply({ groupId: data.group.id, destination: data.group.destination, message: data.message });
+    store.submitApplication({
+      groupId: data.group.id,
+      groupName: data.group.destination,
+      destination: data.group.destination,
+      fromUserId: 'me',
+      fromUserName: (wx.getStorageSync('userInfo') || {}).nickName || '我',
+      fromUserEmoji: '🙋',
+      message: data.message
+    });
     this.setData({ submitted: true });
     wx.showToast({ title: '申请已提交！', icon: 'success' });
     setTimeout(function() { wx.navigateBack(); }, 1500);

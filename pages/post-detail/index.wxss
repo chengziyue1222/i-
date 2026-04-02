@@ -101,10 +101,28 @@
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
   background: #fff;
   box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06);
+  display: flex;
+  gap: 16rpx;
+}
+
+.btn-copy {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #e9f2ff;
+  color: #0f62fe;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 44rpx;
+  border: none;
+}
+
+.btn-copy::after {
+  border: none;
 }
 
 .btn-apply {
-  width: 100%;
+  flex: 1;
   height: 88rpx;
   line-height: 88rpx;
   background: #0f62fe;

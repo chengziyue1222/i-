@@ -2,6 +2,8 @@
 page { background:#f2f3f7; height:100%; }
 .home-scroll { height:100vh; box-sizing:border-box; }
 
+/* 统一视觉基线：主按钮 76rpx / 圆角 14rpx / 标题 30rpx / 次级文案 #7f8ea3 */
+
 /* ── 顶部品牌区 ── */
 .home-header { padding:24rpx 32rpx 28rpx; background:#fff; }
 .brand { margin-bottom:20rpx; }
@@ -26,10 +28,16 @@ page { background:#f2f3f7; height:100%; }
 .shortcut-item.active .shortcut-icon { box-shadow:0 6rpx 20rpx rgba(15,98,254,.3); }
 
 /* ── 通用区块 ── */
-.section { margin:0 24rpx 20rpx; background:#fff; border-radius:20rpx; padding:28rpx; box-shadow:0 4rpx 16rpx rgba(0,0,0,.06); }
+.section { margin:0 24rpx 20rpx; background:#fff; border-radius:20rpx; padding:28rpx; border:1rpx solid #e8edf4; box-shadow:none; }
 .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20rpx; }
-.section-title { font-size:32rpx; font-weight:700; color:#1a1a1a; }
+.section-title { font-size:30rpx; font-weight:700; color:#1a1a1a; }
 .section-more { font-size:26rpx; color:#0f62fe; }
+
+/* 帖子区和整体风格统一：降低分割感 */
+.post-square-section {
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,.04);
+}
 
 /* ── 大推荐卡片 ── */
 .hot-attraction-section .featured-card { position:relative; height:340rpx; border-radius:16rpx; overflow:hidden; }
@@ -53,21 +61,140 @@ page { background:#f2f3f7; height:100%; }
 .route-card-meta { font-size:24rpx; color:#868e96; }
 
 /* ── 搭子帖子广场 ── */
-.post-cards { display:flex; flex-direction:column; gap:16rpx; }
-.post-card { padding:24rpx; background:#f8f9fa; border-radius:16rpx; }
-.post-card:active { background:#edf2ff; }
-.post-card-header { display:flex; align-items:center; margin-bottom:14rpx; }
-.post-avatar { width:60rpx; height:60rpx; border-radius:50%; margin-right:14rpx; }
-.post-nickname { font-size:28rpx; font-weight:700; color:#1a1a1a; }
-.post-card-body { padding-left:74rpx; }
-.post-destination { display:flex; align-items:baseline; gap:8rpx; margin-bottom:10rpx; }
-.post-destination .label { font-size:22rpx; color:#999; }
-.post-destination .value { font-size:30rpx; font-weight:700; color:#0f62fe; }
-.post-meta { display:flex; gap:16rpx; margin-bottom:12rpx; }
-.meta-item { font-size:24rpx; color:#868e96; }
-.post-tags { display:flex; flex-wrap:wrap; gap:10rpx; }
-.post-tag { padding:6rpx 16rpx; background:#e7f5ff; color:#0f62fe; font-size:22rpx; border-radius:20rpx; font-weight:500; }
-.empty-posts { padding:48rpx 0; text-align:center; font-size:28rpx; color:#868e96; }
+.post-square-section {
+  background: #fff;
+}
+
+.post-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.post-card {
+  padding: 20rpx 8rpx;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1rpx solid #edf1f5;
+}
+
+.post-card:last-child {
+  border-bottom: none;
+}
+
+.post-card:active {
+  background: #f8fbff;
+}
+
+.post-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.post-avatar {
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.post-nickname {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1f2a37;
+}
+
+.post-card-body {
+  padding-left: 70rpx;
+}
+
+.post-destination {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.post-destination .label {
+  font-size: 22rpx;
+  color: #98a2ad;
+}
+
+.post-destination .value {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #0f62fe;
+}
+
+.post-meta {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 10rpx;
+}
+
+.meta-item {
+  font-size: 24rpx;
+  color: #8b95a1;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.post-tag {
+  padding: 4rpx 14rpx;
+  background: #eef5ff;
+  color: #2b6dd8;
+  font-size: 21rpx;
+  border-radius: 999rpx;
+  font-weight: 500;
+}
+
+.post-actions {
+  display: flex;
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.post-action-btn {
+  flex: 1;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.action-chat {
+  background: #edf5ff;
+  color: #2f6fd8;
+}
+
+.action-comment {
+  background: #f2efff;
+  color: #6a4fd1;
+}
+
+.action-apply {
+  background: #ecfaf5;
+  color: #169b6b;
+}
+
+.action-applied {
+  background: #eef2f7;
+  color: #7b8794;
+}
+
+.empty-posts {
+  padding: 48rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  color: #868e96;
+}
 
 /* ── 最新攻略 ── */
 .news-section .section-header { margin-bottom:16rpx; }

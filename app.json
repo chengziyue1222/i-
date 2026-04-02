@@ -17,7 +17,9 @@
     "pages/buddy-apply/index",
     "pages/chat/index",
     "pages/buddy-detail/index",
-    "pages/community-detail/index"
+    "pages/community-detail/index",
+    "pages/message/index",
+    "pages/post-comment/index"
   ],
   "subPackages": [
     {
@@ -76,14 +78,20 @@
       {
         "pagePath": "pages/route/scenic-list",
         "text": "路线",
-        "iconPath": "images/icons/index.png",
-        "selectedIconPath": "images/icons/index-active.png"
+        "iconPath": "images/icons/route.png",
+        "selectedIconPath": "images/icons/route-active.png"
       },
       {
         "pagePath": "pages/solution/index",
         "text": "旅游搭子",
         "iconPath": "images/icons/solution.png",
         "selectedIconPath": "images/icons/solution-active.png"
+      },
+      {
+        "pagePath": "pages/message/index",
+        "text": "消息",
+        "iconPath": "images/icons/chat.png",
+        "selectedIconPath": "images/icons/chat-active.png"
       },
       {
         "pagePath": "pages/profile/index",

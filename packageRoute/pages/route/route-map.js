@@ -17,18 +17,28 @@ Page({
   },
 
   async onLoad(options) {
-    const data = JSON.parse(decodeURIComponent(options.data));
+    const raw = options && options.data ? options.data : encodeURIComponent('{}');
+    let data = {};
+    try {
+      data = JSON.parse(decodeURIComponent(raw));
+    } catch (e) {
+      data = {};
+    }
     console.log('[route-map] 接收到的数据:', data);
-    console.log('[route-map] scheme对象:', data.scheme);
-    console.log('[route-map] scheme.pathData:', data.scheme?.pathData);
-    console.log('[route-map] scheme.pathData.polyline:', data.scheme?.pathData?.polyline);
-    console.log('[route-map] scheme.pathData.points:', data.scheme?.pathData?.points);
-    console.log('[route-map] scheme.pathData.points 长度:', data.scheme?.pathData?.points?.length || 0);
-    console.log('[route-map] scheme.pathData.polyline 长度:', data.scheme?.pathData?.polyline?.length || 0);
+
+    const safeScheme = data.scheme || {};
+    const safeStops = Array.isArray(safeScheme.stops) ? safeScheme.stops : [];
+    const safeRoutePoints = Array.isArray(data.routePoints) ? data.routePoints : [];
+    const safeSorted = Array.isArray(data.sortedAttractions) ? data.sortedAttractions : [];
 
     this.setData({
-      scheme: data.scheme,
-      scenicId: data.scenicId
+      scheme: {
+        ...safeScheme,
+        stops: safeStops.length ? safeStops : safeRoutePoints
+      },
+      scenicId: data.scenicId || '',
+      sortedAttractions: safeSorted.length ? safeSorted : safeRoutePoints,
+      currentStopIndex: 0
     });
 
     await this.initMap();
@@ -49,24 +59,25 @@ Page({
 
   // 初始化地图
   async initMap() {
-    // 从存储中获取排序后的景点数据和路径数据
-    let sortedAttractions = wx.getStorageSync('sortedAttractions') || [];
+    // 优先使用页面参数，其次使用存储
+    let sortedAttractions = this.data.sortedAttractions || [];
+    if (!sortedAttractions.length) {
+      sortedAttractions = wx.getStorageSync('sortedAttractions') || [];
+    }
     let cachedPathData = wx.getStorageSync('routePathData');
 
-    console.log('[route-map] 从存储获取的路线数据:', sortedAttractions);
-    console.log('[route-map] 从存储获取的路径数据:', cachedPathData);
+    console.log('[route-map] 路线数据:', sortedAttractions);
+    console.log('[route-map] 存储路径数据:', cachedPathData);
     console.log('[route-map] scheme.pathData:', this.data.scheme?.pathData);
 
     // 如果传递的 scheme 中有 pathData，优先使用传递的数据
     if (this.data.scheme && this.data.scheme.pathData) {
-      console.log('[route-map] 使用传递的路径数据（优先）:', this.data.scheme.pathData);
-      console.log('[route-map] 路径点数:', this.data.scheme.pathData.points?.length || 0);
       cachedPathData = this.data.scheme.pathData;
     }
 
     if (sortedAttractions.length === 0) {
       wx.showToast({
-        title: '路线数据为空',
+        title: '路线点为空，无法展示地图',
         icon: 'none'
       });
       return;
@@ -125,9 +136,10 @@ Page({
       console.log('[路线显示] scheme:', this.data.scheme);
       console.log('[路线显示] scheme.pathData:', this.data.scheme?.pathData);
       
-      if (this.data.scheme && this.data.scheme.pathData && this.data.scheme.pathData.points && this.data.scheme.pathData.points.length > 0) {
+      const pathData = (this.data.scheme && this.data.scheme.pathData) || cachedPathData;
+      if (pathData && pathData.points && pathData.points.length > 0) {
         console.log('[路线显示] ✅ 使用完整的路径数据');
-        pathPoints = this.data.scheme.pathData.points;
+        pathPoints = pathData.points;
         console.log('[路线显示] 路径点数:', pathPoints.length);
         polyline = [{
           points: pathPoints,
@@ -150,20 +162,17 @@ Page({
         }
       }
 
-      // 计算中心点
-      const centerLocation = this.calculateCenter(mergedAttractions);
-      // 输出中心点
-      console.log('[route-map] 中心点坐标:', centerLocation);
-      console.log('[route-map] 标记点数量:', markers.length);
-      console.log('[route-map] 路线数据结构:', polyline);
-      console.log('[route-map] 路径点数量:', pathPoints.length);
+      const firstStop = mergedAttractions[0];
+      const firstLocation = this.extractLocation(firstStop);
+      const centerLocation = firstLocation || this.calculateCenter(mergedAttractions);
 
       this.setData({
         markers,
         polyline: polyline || [],
         pathPoints: pathPoints,
         centerLocation,
-        sortedAttractions: mergedAttractions
+        sortedAttractions: mergedAttractions,
+        currentStopIndex: 0
       });
     } catch (error) {
       console.error('初始化地图失败:', error);
