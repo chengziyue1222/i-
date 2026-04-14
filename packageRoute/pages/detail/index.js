@@ -1,4 +1,4 @@
-import { fetchSceneDetail } from '../../../services/scene/index';
+const { fetchSceneDetail } = require('../../../services/scene/index');
 
 Page({
   data: {
@@ -14,8 +14,8 @@ Page({
     wx.showLoading({ title: '加载中...' });
     try {
       const article = await fetchSceneDetail(id, type);
-      this.setData({ article });
-      wx.setNavigationBarTitle({ title: article?.title || article?.sub_title || '详情' });
+      const nextTitle = (article && (article.title || article.sub_title)) || '详情';
+      wx.setNavigationBarTitle({ title: nextTitle });
     } catch (error) {
       wx.showToast({
         title: '加载失败',

@@ -1,4 +1,4 @@
-import { fetchNewsData } from '../../services/news/index';
+const { fetchNewsData } = require('../../services/news/index');
 
 Page({
   /**
@@ -22,7 +22,7 @@ Page({
       this.setData({newsList});
     } catch (error) {
       wx.showToast({
-        title: error?.message || '页面请求失败，请刷新页面',
+        title: (error && error.message) || '页面请求失败，请刷新页面',
         icon: 'error',
         duration: 2000
       })  

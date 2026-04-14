@@ -1,4 +1,4 @@
-import { SCENIC_DEMO_LIST } from '../../config/scenic-demo';
+const { SCENIC_DEMO_LIST } = require('../../config/scenic-demo');
 
 const DEFAULT_COVER = 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png';
 

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "旅行社区",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f7f3ee",
+  "usingComponents": {
+    "search-bar": "../../components/search-bar/index"
+  }
+}

@@ -1,0 +1,74 @@
+<view class="detail-page" wx:if="{{post}}">
+  <scroll-view scroll-y="true" class="detail-scroll">
+    <view class="detail-card">
+      <view class="author-bar">
+        <view class="author-left">
+          <image class="author-avatar" src="{{post.author.avatar}}" mode="aspectFill"></image>
+          <view class="author-meta">
+            <text class="author-name">{{post.author.name}}</text>
+            <text class="author-time">{{post.type}} · {{post.commentCount}} 条评论</text>
+          </view>
+        </view>
+        <view class="author-chip">旅行博主</view>
+      </view>
+
+      <text class="detail-title">{{post.title}}</text>
+
+      <swiper class="detail-swiper" indicator-dots="{{post.images.length > 1}}" autoplay="{{false}}" circular="{{true}}">
+        <swiper-item wx:for="{{post.images}}" wx:key="*this">
+          <image class="detail-image" src="{{item}}" mode="aspectFill"></image>
+        </swiper-item>
+      </swiper>
+
+      <view class="tag-row">
+        <text wx:for="{{post.tags}}" wx:key="*this" class="tag-pill">#{{item}}</text>
+      </view>
+
+      <text class="detail-content">{{post.content}}</text>
+
+      <view class="action-bar">
+        <view class="action-btn {{post.liked ? 'action-btn-liked' : ''}}" bindtap="onLikeTap">
+          <text class="action-icon">❤</text>
+          <text>{{post.liked ? '已点赞' : '点赞'}} {{post.likeCount}}</text>
+        </view>
+        <view class="action-btn action-btn-ghost">
+          <text class="action-icon">☆</text>
+          <text>收藏</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="comment-block">
+      <view class="comment-head">
+        <text class="comment-title">评论区</text>
+        <text class="comment-count">{{comments.length}} 条</text>
+      </view>
+
+      <view wx:if="{{comments.length}}">
+        <view wx:for="{{comments}}" wx:key="id" class="comment-card">
+          <image class="comment-avatar" src="{{item.userAvatar}}" mode="aspectFill"></image>
+          <view class="comment-body">
+            <view class="comment-meta">
+              <text class="comment-name">{{item.userName}}</text>
+              <text class="comment-time">{{item.timeText}}</text>
+            </view>
+            <text class="comment-text">{{item.content}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:else class="comment-empty">
+        <text class="comment-empty-icon">💬</text>
+        <text class="comment-empty-text">还没有评论，抢个沙发吧</text>
+      </view>
+    </view>
+    <view class="bottom-space"></view>
+  </scroll-view>
+
+  <view class="composer">
+    <input class="composer-input" placeholder="说点这篇内容给你的灵感..." value="{{commentValue}}" bindinput="onCommentInput" confirm-type="send" bindconfirm="onSubmitComment" cursor-spacing="22" />
+    <view class="composer-btn {{commentValue ? 'composer-btn-active' : ''}}" bindtap="onSubmitComment">发送</view>
+  </view>
+</view>
+
+<view wx:if="{{loading}}" class="detail-loading">加载中...</view>

@@ -5,6 +5,11 @@ var MOCK_POSTS = mock.MOCK_POSTS;
 var KEYS = { groups:'iTravelGroups', applies:'iTravelApplies', checkins:'checkedScenics', checkinCount:'checkinCount', travelDays:'travelDays' };
 var METRICS_KEY = 'iTravelMetrics';
 
+function getCurrentUserId() {
+  var ui = wx.getStorageSync('userInfo') || {};
+  return String(ui.userId || ui._id || ui.openid || 'me');
+}
+
 function getMetricsData() {
   var data = wx.getStorageSync(METRICS_KEY);
   if (!data || typeof data !== 'object') {
@@ -168,36 +173,52 @@ var MOCK_APPLICATIONS = [
   { id: 'app_001', groupId: 'g001', groupName: '七星岩徒步', groupDest: '七星岩',
     fromUserId: 'u_demo1', fromUserName: '摄影爱好者', fromUserEmoji: '📷',
     message: '我很喜欢摄影，希望能一起去打卡日出！', status: 'pending',
-    createTime: Date.now() - 5 * 60 * 1000 },
+    unread: true, applicantUnread: false, createTime: Date.now() - 5 * 60 * 1000 },
   { id: 'app_002', groupId: 'g002', groupName: '鼎湖山登山', groupDest: '鼎湖山',
     fromUserId: 'u_demo2', fromUserName: '穷游达人', fromUserEmoji: '🎒',
     message: '有徒步经验，轻装上阵，求带！', status: 'pending',
-    createTime: Date.now() - 30 * 60 * 1000 }
+    unread: true, applicantUnread: false, createTime: Date.now() - 30 * 60 * 1000 }
 ];
+
+function normalizeApplication(item) {
+  var currentUserId = getCurrentUserId();
+  var next = Object.assign({}, item);
+  if (typeof next.unread === 'undefined') next.unread = next.status === 'pending';
+  if (typeof next.applicantUnread === 'undefined') next.applicantUnread = false;
+  next.isMine = String(next.fromUserId || '') === currentUserId;
+  next.statusText = next.status === 'accepted'
+    ? '已通过'
+    : (next.status === 'rejected' ? '已拒绝' : '待审核');
+  return next;
+}
 
 function getApplications() {
   var stored = wx.getStorageSync(APP_KEY);
   if (!stored || stored.length === 0) {
     wx.setStorageSync(APP_KEY, MOCK_APPLICATIONS);
-    return MOCK_APPLICATIONS.slice();
+    stored = MOCK_APPLICATIONS.slice();
   }
-  return stored.map(function(item) {
-    if (typeof item.unread === 'undefined') item.unread = item.status === 'pending';
-    return item;
-  });
+  return stored.map(normalizeApplication);
 }
 
 function saveApplications(list) {
-  wx.setStorageSync(APP_KEY, list.slice(0, 200));
+  wx.setStorageSync(APP_KEY, (list || []).slice(0, 200));
+}
+
+function getMyApplications() {
+  var currentUserId = getCurrentUserId();
+  return getApplications().filter(function(item) {
+    return String(item.fromUserId || '') === currentUserId;
+  });
 }
 
 function hasAppliedApplication(groupId, userId) {
   var gid = String(groupId || '');
-  var uid = String(userId || 'me');
+  var uid = String(userId || getCurrentUserId());
   if (!gid) return false;
   var list = getApplications();
   return list.some(function(item) {
-    return String(item.groupId || '') === gid && String(item.fromUserId || 'me') === uid;
+    return String(item.groupId || '') === gid && String(item.fromUserId || '') === uid;
   });
 }
 
@@ -215,34 +236,40 @@ function submitApplication(opts) {
     fromUserId: fromUserId,
     fromUserName: opts.fromUserName || ui.nickName || '我',
     fromUserEmoji: opts.fromUserEmoji || '🙋',
+    targetUserId: String(opts.targetUserId || ''),
+    targetUserName: opts.targetUserName || '队长',
+    targetUserEmoji: opts.targetUserEmoji || '🧭',
     message: opts.message || '',
     status: 'pending',
     unread: true,
+    applicantUnread: false,
     createTime: Date.now()
   };
-  var list = getApplications();
+  var list = getApplications().map(function(item) { return Object.assign({}, item); });
   list.unshift(record);
   saveApplications(list);
-  return record;
+  return normalizeApplication(record);
 }
 
 function updateApplicationStatus(id, status) {
-  var list = getApplications();
+  var list = getApplications().map(function(item) { return Object.assign({}, item); });
   for (var i = 0; i < list.length; i++) {
     if (list[i].id === id) {
       list[i].status = status;
       list[i].unread = false;
+      list[i].applicantUnread = true;
       break;
     }
   }
   saveApplications(list);
 }
 
-function markApplicationRead(id) {
-  var list = getApplications();
+function markApplicationRead(id, role) {
+  var list = getApplications().map(function(item) { return Object.assign({}, item); });
   for (var i = 0; i < list.length; i++) {
     if (String(list[i].id) === String(id)) {
-      list[i].unread = false;
+      if (role === 'applicant') list[i].applicantUnread = false;
+      else list[i].unread = false;
       break;
     }
   }
@@ -330,7 +357,10 @@ function getUnreadSummary() {
 
   var appUnread = 0;
   var apps = getApplications();
-  for (var j = 0; j < apps.length; j++) if (apps[j].unread) appUnread += 1;
+  for (var j = 0; j < apps.length; j++) {
+    if (apps[j].unread) appUnread += 1;
+    if (apps[j].applicantUnread) appUnread += 1;
+  }
 
   var interactUnread = 0;
   var interacts = getInteractions();
@@ -377,6 +407,7 @@ module.exports = {
   getOrCreateConversation: getOrCreateConversation,
   updateConvLastMsg: updateConvLastMsg,
   getApplications: getApplications,
+  getMyApplications: getMyApplications,
   submitApplication: submitApplication,
   hasAppliedApplication: hasAppliedApplication,
   updateApplicationStatus: updateApplicationStatus,
@@ -386,5 +417,6 @@ module.exports = {
   getInteractions: getInteractions,
   markInteractionRead: markInteractionRead,
   getUnreadSummary: getUnreadSummary,
-  addInteraction: addInteraction
+  addInteraction: addInteraction,
+  getCurrentUserId: getCurrentUserId
 };

@@ -22,78 +22,79 @@ exports.main = async (event, context) => {
 
   try {
     const result = await db.runTransaction(async (transaction) => {
-      const reqRes = await transaction.collection('join_request').doc(requestId).get();
+      const reqRes = await transaction.collection('join_request').doc(String(requestId)).get();
       const reqDoc = reqRes.data;
 
       if (!reqDoc) {
         throw new Error('申请记录不存在');
       }
 
-      const { groupId, userId } = reqDoc;
-      if (!groupId || !userId) {
+      const { groupId, fromUserId, targetUserId } = reqDoc;
+      if (!groupId || !fromUserId) {
         throw new Error('申请记录数据不完整');
       }
 
-      const groupRes = await transaction.collection('group').doc(groupId).get();
+      const groupRes = await transaction.collection('group').doc(String(groupId)).get();
       const group = groupRes.data;
 
       if (!group) {
         throw new Error('搭子组不存在');
       }
 
-      // 只允许帖主审核
-      if (group.creatorId !== operatorId) {
+      if (String(group.creatorId || targetUserId || '') !== String(operatorId)) {
         throw new Error('无权限操作该申请');
       }
 
-      // 防止重复审核
       if (reqDoc.status === 'accepted' || reqDoc.status === 'rejected') {
         throw new Error('该申请已处理');
       }
 
       if (action === 'reject') {
-        await transaction.collection('join_request').doc(requestId).update({
+        await transaction.collection('join_request').doc(String(requestId)).update({
           data: {
             status: 'rejected',
+            unread: false,
+            applicantUnread: true,
             updateTime: db.serverDate()
           }
         });
         return { success: true };
       }
 
-      // accept 逻辑
       const members = Array.isArray(group.members) ? group.members : [];
-      const maxPeople = Number(group.maxPeople || 0);
+      const maxPeople = Number(group.max || 0);
       const currentPeople = Number(group.currentPeople || members.length || 0);
 
-      // 防止重复加入
-      if (members.includes(userId)) {
-        await transaction.collection('join_request').doc(requestId).update({
+      if (members.includes(fromUserId)) {
+        await transaction.collection('join_request').doc(String(requestId)).update({
           data: {
             status: 'accepted',
+            unread: false,
+            applicantUnread: true,
             updateTime: db.serverDate()
           }
         });
         return { success: true };
       }
 
-      // 满员拦截
       if (maxPeople > 0 && currentPeople >= maxPeople) {
         throw new Error('当前组队已满员');
       }
 
-      const newMembers = members.concat(userId);
+      const newMembers = members.concat(fromUserId);
       const newCurrentPeople = currentPeople + 1;
       const isFull = maxPeople > 0 && newCurrentPeople >= maxPeople;
 
-      await transaction.collection('join_request').doc(requestId).update({
+      await transaction.collection('join_request').doc(String(requestId)).update({
         data: {
           status: 'accepted',
+          unread: false,
+          applicantUnread: true,
           updateTime: db.serverDate()
         }
       });
 
-      await transaction.collection('group').doc(groupId).update({
+      await transaction.collection('group').doc(String(groupId)).update({
         data: {
           members: newMembers,
           currentPeople: newCurrentPeople,

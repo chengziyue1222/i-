@@ -1,4 +1,4 @@
-import { cloudbaseTemplateConfig } from '../../config/index';
+const { cloudbaseTemplateConfig } = require('../../config/index');
 
 Component({
   properties: {

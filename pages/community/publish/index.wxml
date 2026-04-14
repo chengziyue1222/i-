@@ -1,0 +1,53 @@
+<view class="publish-page">
+  <view class="publish-hero">
+    <text class="publish-kicker">Share your route</text>
+    <text class="publish-title">写下一篇会让别人立刻想出发的旅行内容</text>
+    <text class="publish-desc">把路线、美食和景点体验沉淀成可被点赞、评论、收藏的真实攻略。</text>
+  </view>
+
+  <view class="publish-card">
+    <view class="field-block">
+      <text class="field-label">标题</text>
+      <input class="field-input" data-field="title" value="{{form.title}}" bindinput="onFieldInput" placeholder="例如：广州三天两晚怎么玩最舒服" maxlength="40" />
+    </view>
+
+    <view class="field-block">
+      <text class="field-label">类型</text>
+      <picker mode="selector" range="{{typeOptions}}" value="{{typeIndex}}" bindchange="onTypeChange">
+        <view class="field-picker">{{form.type}}</view>
+      </picker>
+    </view>
+
+    <view class="field-block">
+      <view class="field-label-row">
+        <text class="field-label">图片</text>
+        <text class="field-tip">最多 9 张</text>
+      </view>
+      <view class="image-grid">
+        <view wx:for="{{imageList}}" wx:key="index" class="image-cell">
+          <image class="picked-image" src="{{item.tempFilePath || item}}" mode="aspectFill"></image>
+          <view class="remove-chip" bindtap="onRemoveImage" data-index="{{index}}">×</view>
+        </view>
+        <view wx:if="{{imageList.length < 9}}" class="upload-cell" bindtap="onChooseImages">
+          <text class="upload-plus">＋</text>
+          <text class="upload-text">上传图片</text>
+        </view>
+      </view>
+      <text wx:if="{{uploadProgressText}}" class="field-tip">{{uploadProgressText}}</text>
+    </view>
+
+    <view class="field-block">
+      <text class="field-label">正文</text>
+      <textarea class="field-textarea" data-field="content" value="{{form.content}}" bindinput="onFieldInput" placeholder="写下你的玩法、路线、避坑建议和真实感受..." maxlength="1200"></textarea>
+    </view>
+
+    <view class="field-block">
+      <text class="field-label">标签</text>
+      <input class="field-input" data-field="tagsText" value="{{form.tagsText}}" bindinput="onFieldInput" placeholder="可选，如：广州 美食 citywalk" maxlength="50" />
+    </view>
+  </view>
+
+  <view class="submit-bar">
+    <view class="submit-btn" bindtap="onSubmit">{{submitting ? '发布中...' : '立即发布'}}</view>
+  </view>
+</view>

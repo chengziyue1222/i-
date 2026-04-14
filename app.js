@@ -1,18 +1,23 @@
-import { init } from '@cloudbase/wx-cloud-client-sdk';
-import updateManager from './common/updateManager';
-
-wx.cloud.init({
-  env: 'cloudbase-1g71i8nk689cee71', // 指定云开发环境 ID
-});
-const client = init(wx.cloud);
-const models = client.models;
-// 接下来就可以调用 models 上的数据模型增删改查等方法了
-globalThis.dataModel = models;
+const updateManager = require('./common/updateManager');
 
 App({
-  onLaunch: async function () { },
+  onLaunch() {
+    if (!wx.cloud) {
+      console.error('当前基础库不支持云开发');
+      return;
+    }
+
+    wx.cloud.init({
+      env: 'cloudbase-1g71i8nk689cee71',
+      traceUser: true
+    });
+
+    this.cloudbaseTemplateConfig = {
+      env: 'cloudbase-1g71i8nk689cee71',
+      useMock: false
+    };
+  },
   onShow: function () {
-    // 管理小程序的更新。主要功能包括：检查更新，下载新版本，提示用户更新
     updateManager();
   },
 });

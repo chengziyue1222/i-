@@ -25,7 +25,7 @@
   color: #878D96;
 }
 
-.news_image image {
+.news_image .news-img {
  width: 192rpx;
  height: 130rpx;
 }

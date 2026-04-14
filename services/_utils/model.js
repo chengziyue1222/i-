@@ -1,7 +1,7 @@
-import dayjs from 'dayjs';
+const dayjs = require('dayjs');
 
-export function model() {
-  return globalThis.dataModel;
+function model() {
+  return globalThis.dataModel || null;
 }
 
 /**
@@ -13,7 +13,7 @@ export function model() {
  * @param select 设置返回字段
  * @param orderBy 排序条件 {field: '字段名', order: 'asc'|'desc'}
  */
-export async function getAll({ filter, select, name, pageNumber = 1, pageSize = 200, orderBy }) {
+async function getAll({ filter, select, name, pageNumber = 1, pageSize = 200, orderBy }) {
   try {
     console.log('[数据层] getAll() 开始执行');
     console.log('[数据层] 参数:', { name, filter, orderBy, pageNumber, pageSize });
@@ -108,7 +108,7 @@ export async function getAll({ filter, select, name, pageNumber = 1, pageSize = 
  * @param _id 根据数据标识 _id 进行操作
  * @param select  设置返回字段
  */
-export async function getOne({name,_id,select}){
+async function getOne({name,_id,select}){
   const addSelect = (prop) => (select ? { ...prop, select } : prop);
   const { data } = await model()[name].get(  addSelect({
     filter: {
@@ -127,3 +127,5 @@ export async function getOne({name,_id,select}){
   data.time = dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm:ss');
   return data;
 }
+
+module.exports = { model, getAll, getOne };

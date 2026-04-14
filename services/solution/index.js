@@ -1,10 +1,10 @@
-import { getAll } from '../_utils/model';
-import { cloudbaseTemplateConfig } from '../../config/index';
-import {SolutionData} from '../cloudbaseMock/index'
-import { DATA_MODEL_KEY } from '../../config/model'
+const { getAll } = require('../_utils/model');
+const { cloudbaseTemplateConfig } = require('../../config/index');
+const { SolutionData } = require('../cloudbaseMock/index');
+const { DATA_MODEL_KEY } = require('../../config/model');
 
 /** 获取解决方案数据 */
-export async function fetchSolutionData() {
+async function fetchSolutionData() {
   if (cloudbaseTemplateConfig.useMock) {
     return SolutionData;
   }
@@ -19,3 +19,5 @@ export async function fetchSolutionData() {
     return SolutionData;
   }
 }
+
+module.exports = { fetchSolutionData };

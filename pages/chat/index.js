@@ -1,166 +1,93 @@
-const CHATS_KEY = 'buddy_chat_messages';
-const store = require('../../store/index');
-
-var QUICK_REPLIES = ['好的👍', '在哪集合？', '几点出发？', '我也感兴趣！', '稍后回复你'];
-
-var PARTNER_EMOJIS = ['🧑‍🦰', '👩', '🧔', '👩‍🦱', '🧑'];
-
-function readAllChats() {
-  return wx.getStorageSync(CHATS_KEY) || {};
-}
-
-function saveAllChats(allChats) {
-  wx.setStorageSync(CHATS_KEY, allChats || {});
-}
-
-function pickPartnerEmoji(name) {
-  var sum = 0;
-  for (var i = 0; i < (name || '').length; i++) sum += name.charCodeAt(i);
-  return PARTNER_EMOJIS[sum % PARTNER_EMOJIS.length];
-}
+const chatService = require('../../services/chat/index');
+const { buildGroupedMessages } = require('../../utils/chat');
 
 Page({
   data: {
-    groupId: '',
-    groupName: '',
-    partnerName: '',
-    partnerEmoji: '🧭',
-    currentOpenId: '',
-    messages: [],
+    chatId: '',
+    targetUserId: '',
+    targetName: '',
+    targetEmoji: '💬',
     inputValue: '',
-    isTyping: false,
-    quickReplies: QUICK_REPLIES
+    messageGroups: [],
+    rawMessages: [],
+    scrollAnchor: 'bottom-anchor'
   },
 
-  onLoad: function(options) {
-    var groupId = options.groupId || '';
-    var groupName = decodeURIComponent(options.groupName || '搭子会话');
-    var partnerName = decodeURIComponent(options.partnerName || '队长');
-    var partnerEmoji = pickPartnerEmoji(partnerName);
-    var app = getApp();
-    var currentOpenId = (app && app.globalData && app.globalData.openid)
-      || wx.getStorageSync('mockOpenId') || 'mock_user';
+  async onLoad(options) {
+    this.currentUserId = String((wx.getStorageSync('userInfo') || {}).userId || (wx.getStorageSync('userInfo') || {}).openid || 'guest');
+    this.setData({
+      chatId: decodeURIComponent(options.chatId || ''),
+      targetUserId: decodeURIComponent(options.targetUserId || ''),
+      targetName: decodeURIComponent(options.targetName || '聊天对象'),
+      targetEmoji: decodeURIComponent(options.targetEmoji || '💬')
+    });
 
-    this.setData({ groupId: groupId, groupName: groupName, partnerName: partnerName, partnerEmoji: partnerEmoji, currentOpenId: currentOpenId });
-    wx.setNavigationBarTitle({ title: partnerName + ' · 聊一聊' });
-    this.ensureSeedMessages();
-    this.loadMessages();
+    wx.setNavigationBarTitle({ title: this.data.targetName });
+    if (this.data.chatId) {
+      await chatService.markChatRead(this.data.chatId, this.currentUserId);
+    }
+    await this.loadMessages();
   },
 
-  onBack: function() {
-    wx.navigateBack();
+  onShow() {
+    if (this.data.chatId) chatService.markChatRead(this.data.chatId, this.currentUserId);
+    this.startRealtime();
   },
 
-  ensureSeedMessages: function() {
-    var groupId = this.data.groupId;
-    var partnerName = this.data.partnerName;
-    if (!groupId) return;
+  onHide() { this.stopRealtime(); },
+  onUnload() { this.stopRealtime(); },
 
-    var all = readAllChats();
-    var list = all[groupId] || [];
-    if (list.length > 0) return;
-
-    all[groupId] = [
-      {
-        id: 'm_' + Date.now(),
-        sender: 'other',
-        senderName: partnerName,
-        text: '你好呀，欢迎来聊行程安排～',
-        time: '刚刚'
-      }
-    ];
-    saveAllChats(all);
+  async loadMessages() {
+    if (!this.data.chatId) return;
+    const list = await chatService.fetchMessageList(this.data.chatId);
+    const messageGroups = buildGroupedMessages(list, this.currentUserId);
+    this.setData({ rawMessages: list, messageGroups });
+    wx.nextTick(() => this.scrollToBottom());
   },
 
-  loadMessages: function() {
-    var groupId = this.data.groupId;
-    if (!groupId) return;
-    var all = readAllChats();
-    var messages = all[groupId] || [];
-    this.setData({ messages: messages });
+  startRealtime() {
+    this.stopRealtime();
+    this._pollTimer = setInterval(() => this.loadMessages(), 5000);
   },
 
-  onInput: function(e) {
+  stopRealtime() {
+    if (this._pollTimer) {
+      clearInterval(this._pollTimer);
+      this._pollTimer = null;
+    }
+  },
+
+  scrollToBottom() {
+    this.setData({ scrollAnchor: 'bottom-anchor' });
+  },
+
+  onInput(e) {
     this.setData({ inputValue: e.detail.value });
   },
 
-  onQuickReply: function(e) {
-    var text = e.currentTarget.dataset.text || '';
-    this.setData({ inputValue: text });
-    // 直接发送快捷回复
-    this._doSend(text);
-  },
-
-  onSend: function() {
-    var text = (this.data.inputValue || '').trim();
+  async onSend() {
+    const text = (this.data.inputValue || '').trim();
     if (!text) return;
-    this._doSend(text);
-  },
+    if (!this.data.targetUserId) {
+      wx.showToast({ title: '聊天对象不存在', icon: 'none' });
+      return;
+    }
 
-  _doSend: function(text) {
-    var groupId = this.data.groupId;
-    var currentOpenId = this.data.currentOpenId;
-    var all = readAllChats();
-    var list = all[groupId] || [];
-
-    list.push({
-      id: 'm_' + Date.now(),
-      sender: 'me',
-      senderId: currentOpenId,
-      text: text,
-      time: this.formatNow()
+    await chatService.sendTextMessage({
+      chatId: this.data.chatId,
+      senderId: this.currentUserId,
+      receiverId: this.data.targetUserId,
+      content: text
     });
-
-    all[groupId] = list;
-    saveAllChats(all);
-
-    // 同步更新会话列表 lastMsg
-    var store = require('../../store/index');
-    store.updateConvLastMsg(groupId, text);
 
     this.setData({ inputValue: '' });
-    this.loadMessages();
-
-    // 显示「正在输入」动画
-    var self = this;
-    this.setData({ isTyping: true });
-    setTimeout(function() {
-      self.mockReply();
-    }, 1200);
+    await chatService.markChatRead(this.data.chatId, this.currentUserId);
+    await this.loadMessages();
   },
 
-  mockReply: function() {
-    var groupId = this.data.groupId;
-    var partnerName = this.data.partnerName;
-    var replies = [
-      '收到，我们定在地铁口集合可以吗？',
-      '没问题，我这边时间合适！',
-      '你喜欢拍照还是徒步为主？',
-      '期待和你一起出发🎒',
-      '好的，我看一下行程再回复你～'
-    ];
-    var text = replies[Math.floor(Math.random() * replies.length)];
-
-    var all = readAllChats();
-    var list = all[groupId] || [];
-    list.push({
-      id: 'm_' + Date.now() + '_r',
-      sender: 'other',
-      senderName: partnerName,
-      text: text,
-      time: this.formatNow()
-    });
-    all[groupId] = list;
-    saveAllChats(all);
-
-    this.setData({ isTyping: false });
-    this.loadMessages();
-  },
-
-  formatNow: function() {
-    var d = new Date();
-    var h = String(d.getHours()).padStart(2, '0');
-    var m = String(d.getMinutes()).padStart(2, '0');
-    return h + ':' + m;
+  onQuickReply(e) {
+    const text = e.currentTarget.dataset.text || '';
+    this.setData({ inputValue: text });
+    wx.nextTick(() => this.onSend());
   }
 });

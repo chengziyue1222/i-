@@ -1,4 +1,5 @@
-import { fetchPostDetail } from '../../services/post/index';
+const postApi = require('../../services/post');
+const teamApi = require('../../services/team');
 
 const FALLBACK_CENTER = { latitude: 23.0515, longitude: 112.4650 };
 const DESTINATION_COORDS = {
@@ -97,7 +98,7 @@ Page({
   async loadPostDetail() {
     wx.showLoading({ title: '加载中' });
     try {
-      const post = await fetchPostDetail(this.data.postId);
+      const post = await postApi.fetchPostDetail(this.data.postId);
       this.setData({ post, loaded: true });
       if (!post) {
         wx.showToast({ title: '帖子不存在', icon: 'none' });
@@ -130,9 +131,28 @@ Page({
   },
 
   onApplyJoin() {
-    wx.showToast({
-      title: '已发送申请，等待对方确认',
-      icon: 'success'
+    const postId = this.data.postId || (this.data.post && this.data.post.id);
+
+    if (!postId) {
+      wx.showToast({ title: '帖子不存在', icon: 'none' });
+      return;
+    }
+
+    const ui = wx.getStorageSync('userInfo') || {};
+    const userId = String(ui.userId || ui._id || ui.openid || 'guest');
+
+    wx.showLoading({ title: '提交中...' });
+
+    teamApi.applyTeam({
+      postId,
+      userId,
+      message: '我想加入你的行程'
+    }).then(() => {
+      wx.hideLoading();
+      wx.showToast({ title: '申请已发送', icon: 'success' });
+    }).catch((err) => {
+      wx.hideLoading();
+      wx.showToast({ title: err.message || '申请失败', icon: 'none' });
     });
   }
 });

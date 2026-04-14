@@ -13,6 +13,197 @@ page { background:#f2f3f7; height:100%; }
 .search-bar icon { margin-right:16rpx; }
 .search-bar input { flex:1; font-size:28rpx; color:#495057; }
 
+/* ── 轮播图 ── */
+.banner-section { padding:0 24rpx 20rpx; }
+.banner-swiper { height:300rpx; border-radius:20rpx; overflow:hidden; }
+.banner-image { width:100%; height:100%; }
+.banner-title { position:absolute; bottom:0; left:0; right:0; padding:24rpx 28rpx; background:linear-gradient(transparent 0%, rgba(0,0,0,.6) 100%); color:#fff; font-size:32rpx; font-weight:700; }
+
+/* ── 功能入口 ── */
+.function-section .function-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+.function-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 20rpx;
+  background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
+  border-radius: 20rpx;
+  border: 1rpx solid #e3f2ff;
+}
+.function-item:active {
+  background: linear-gradient(135deg, #e8f4ff 0%, #d8ebff 100%);
+}
+.function-icon {
+  font-size: 48rpx;
+  margin-bottom: 16rpx;
+}
+.function-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+}
+.function-desc {
+  font-size: 22rpx;
+  color: #7f8ea3;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── 天气信息 ── */
+.weather-section .section-header {
+  margin-bottom: 24rpx;
+}
+.weather-update {
+  font-size: 22rpx;
+  color: #7f8ea3;
+}
+.weather-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.weather-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.weather-icon {
+  font-size: 80rpx;
+  line-height: 1;
+}
+.weather-temp {
+  flex: 1;
+  margin-left: 32rpx;
+}
+.temperature {
+  display: block;
+  font-size: 56rpx;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+.weather-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #7f8ea3;
+}
+.weather-city {
+  text-align: right;
+}
+.city-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4rpx;
+}
+.air-quality {
+  display: block;
+  font-size: 24rpx;
+  color: #20c997;
+  background: #ecfaf5;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  display: inline-block;
+}
+.weather-details {
+  display: flex;
+  justify-content: space-between;
+  background: #f8fbff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+.detail-label {
+  font-size: 22rpx;
+  color: #7f8ea3;
+  margin-bottom: 8rpx;
+}
+.detail-value {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ── 推荐路线 ── */
+.recommended-routes-section .routes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.route-item {
+  display: flex;
+  align-items: stretch;
+  background: #f8f9fa;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.route-item:active {
+  background: #edf2ff;
+}
+.route-cover {
+  width: 200rpx;
+  height: 160rpx;
+  flex-shrink: 0;
+}
+.route-info {
+  flex: 1;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+}
+.route-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+  display: block;
+}
+.route-desc {
+  font-size: 24rpx;
+  color: #7f8ea3;
+  margin-bottom: 16rpx;
+  display: block;
+  line-height: 1.4;
+}
+.route-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.meta-tag {
+  padding: 6rpx 16rpx;
+  background: #eef5ff;
+  color: #2b6dd8;
+  font-size: 22rpx;
+  border-radius: 20rpx;
+  font-weight: 600;
+}
+.route-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-left: auto;
+}
+.route-tags .tag {
+  padding: 4rpx 12rpx;
+  background: #f1f3f5;
+  color: #868e96;
+  font-size: 20rpx;
+  border-radius: 12rpx;
+}
+
 /* ── 快捷分类 icon ── */
 .shortcuts-scroll { padding:24rpx 32rpx 20rpx; background:#fff; margin-bottom:16rpx; }
 .shortcuts { display:flex; justify-content:space-between; align-items:center; }
@@ -30,7 +221,11 @@ page { background:#f2f3f7; height:100%; }
 /* ── 通用区块 ── */
 .section { margin:0 24rpx 20rpx; background:#fff; border-radius:20rpx; padding:28rpx; border:1rpx solid #e8edf4; box-shadow:none; }
 .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20rpx; }
+.section-header-stack { align-items:flex-start; }
 .section-title { font-size:30rpx; font-weight:700; color:#1a1a1a; }
+.section-title-row { display:flex; align-items:center; gap:12rpx; }
+.section-subtitle { display:block; margin-top:8rpx; font-size:22rpx; color:#8b95a1; line-height:1.4; }
+.section-badge { padding:4rpx 14rpx; border-radius:999rpx; background:#eef4ff; color:#2b6dd8; font-size:20rpx; font-weight:600; }
 .section-more { font-size:26rpx; color:#0f62fe; }
 
 /* 帖子区和整体风格统一：降低分割感 */
@@ -199,3 +394,58 @@ page { background:#f2f3f7; height:100%; }
 /* ── 最新攻略 ── */
 .news-section .section-header { margin-bottom:16rpx; }
 .news_list { padding:0; }
+.guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.guide-card {
+  display: flex;
+  align-items: stretch;
+  gap: 16rpx;
+  padding: 12rpx;
+  border-radius: 16rpx;
+  background: #f8f9fb;
+}
+.guide-cover {
+  width: 180rpx;
+  height: 132rpx;
+  border-radius: 14rpx;
+  flex-shrink: 0;
+}
+.guide-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.guide-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1f2a37;
+  line-height: 1.45;
+}
+.guide-desc {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #7b8794;
+  line-height: 1.5;
+}
+.guide-meta {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+.guide-author {
+  font-size: 22rpx;
+  color: #556274;
+}
+.guide-stat {
+  font-size: 22rpx;
+  color: #0f62fe;
+}

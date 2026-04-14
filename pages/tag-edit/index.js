@@ -1,7 +1,10 @@
+const { updateUserProfile } = require('../../services/user');
+
 Page({
   data: {
     tags: [],
     editTagInput: '',
+    saving: false,
     presetTags: ['穷游', '特种兵旅游', 'cpdd', '山水', '人文', '美食', '徒步', '登山', '拍照', '自驾', '亲子', '露营', '古镇', '周末游', '说走就走']
   },
 
@@ -55,13 +58,35 @@ Page({
   },
 
   saveAndSet(tags) {
-    const userInfo = wx.getStorageSync('userInfo') || {};
-    userInfo.tags = tags;
-    wx.setStorageSync('userInfo', userInfo);
     this.setData({ tags });
   },
 
-  onConfirm() {
-    wx.navigateBack();
+  async onConfirm() {
+    if (this.data.saving) return;
+
+    const userInfo = wx.getStorageSync('userInfo') || {};
+    if (!userInfo.openid && !userInfo._openid) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+
+    try {
+      this.setData({ saving: true });
+      const res = await updateUserProfile({ tags: this.data.tags });
+      const nextUserInfo = {
+        ...userInfo,
+        ...(res && res.userInfo ? res.userInfo : {}),
+        tags: this.data.tags
+      };
+      wx.setStorageSync('userInfo', nextUserInfo);
+      wx.showToast({ title: '标签已同步', icon: 'success' });
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 300);
+    } catch (error) {
+      wx.showToast({ title: error.message || '标签同步失败', icon: 'none' });
+    } finally {
+      this.setData({ saving: false });
+    }
   }
 });

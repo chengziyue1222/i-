@@ -1,7 +1,7 @@
 // 统一景区图片配置（核心景区使用本地压缩图）
-export const DEFAULT_SCENIC_IMAGE = '/images/scenic/qixingyan.jpg';
+const DEFAULT_SCENIC_IMAGE = '/images/scenic/qixingyan.jpg';
 
-export const SCENIC_IMAGE_MAP = {
+const SCENIC_IMAGE_MAP = {
   '七星岩风景区': '/images/scenic/qixingyan.jpg',
   '七星岩': '/images/scenic/qixingyan.jpg',
   '鼎湖山景区': '/images/scenic/dinghushan.jpg',
@@ -16,6 +16,12 @@ export const SCENIC_IMAGE_MAP = {
   '鸡笼顶': 'https://picsum.photos/seed/jilongding/400/500'
 };
 
-export function resolveScenicImageUrlByName(name = '') {
-  return SCENIC_IMAGE_MAP[(name || '').trim()] || DEFAULT_SCENIC_IMAGE;
+function resolveScenicImageUrlByName(name) {
+  return SCENIC_IMAGE_MAP[String(name || '').trim()] || DEFAULT_SCENIC_IMAGE;
 }
+
+module.exports = {
+  DEFAULT_SCENIC_IMAGE,
+  SCENIC_IMAGE_MAP,
+  resolveScenicImageUrlByName
+};

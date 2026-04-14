@@ -1,5 +1,5 @@
 // pages/route/route-map.js
-import { TENCENT_MAP_API_KEY } from '../../../config/map';
+const { TENCENT_MAP_API_KEY } = require('../../../config/map');
 
 Page({
   data: {
@@ -24,7 +24,6 @@ Page({
     } catch (e) {
       data = {};
     }
-    console.log('[route-map] 接收到的数据:', data);
 
     const safeScheme = data.scheme || {};
     const safeStops = Array.isArray(safeScheme.stops) ? safeScheme.stops : [];
@@ -66,10 +65,6 @@ Page({
     }
     let cachedPathData = wx.getStorageSync('routePathData');
 
-    console.log('[route-map] 路线数据:', sortedAttractions);
-    console.log('[route-map] 存储路径数据:', cachedPathData);
-    console.log('[route-map] scheme.pathData:', this.data.scheme?.pathData);
-
     // 如果传递的 scheme 中有 pathData，优先使用传递的数据
     if (this.data.scheme && this.data.scheme.pathData) {
       cachedPathData = this.data.scheme.pathData;
@@ -90,17 +85,12 @@ Page({
     });
 
     try {
-      // 不过滤任何点,直接使用所有路线数据
-      console.log('路线点数量:', sortedAttractions.length);
-      console.log('路线点列表:', sortedAttractions);
-
       // 检查并过滤掉无效的数据（没有location的）
       const validAttractions = sortedAttractions.filter(attr => {
         const location = this.extractLocation(attr);
         return attr && location;
       });
-      console.log('有效路线点数量:', validAttractions.length);
-      
+
       if (validAttractions.length === 0) {
         wx.hideLoading();
         wx.showToast({
@@ -120,7 +110,6 @@ Page({
       if (startPoint && endPoint &&
           startPoint.name === endPoint.name &&
           startPoint.type === 'start' && endPoint.type === 'end') {
-        console.log('起点和终点重合，合并为一个标记');
         // 移除终点
         mergedAttractions = validAttractions.filter(attr => attr.type !== 'end');
       }
@@ -131,16 +120,10 @@ Page({
       // 生成步行导航路线
       let polyline;
       let pathPoints = [];
-      
-      // 检查是否有完整的路径数据
-      console.log('[路线显示] scheme:', this.data.scheme);
-      console.log('[路线显示] scheme.pathData:', this.data.scheme?.pathData);
-      
+
       const pathData = (this.data.scheme && this.data.scheme.pathData) || cachedPathData;
       if (pathData && pathData.points && pathData.points.length > 0) {
-        console.log('[路线显示] ✅ 使用完整的路径数据');
         pathPoints = pathData.points;
-        console.log('[路线显示] 路径点数:', pathPoints.length);
         polyline = [{
           points: pathPoints,
           color: '#0F62FE',
@@ -149,7 +132,6 @@ Page({
           arrowLine: true
         }];
       } else {
-        console.log('[路线显示] ❌ 使用直线连接景点（无路径数据）');
         try {
           polyline = this.generatePolyline(mergedAttractions);
           // 从polyline中提取路径点
@@ -157,7 +139,6 @@ Page({
             pathPoints = polyline[0].points;
           }
         } catch (error) {
-          console.error('[路线显示] 生成直线失败:', error);
           polyline = [];
         }
       }
@@ -175,7 +156,6 @@ Page({
         currentStopIndex: 0
       });
     } catch (error) {
-      console.error('初始化地图失败:', error);
       wx.showToast({
         title: '加载失败',
         icon: 'none'
@@ -188,8 +168,6 @@ Page({
 
   // 生成标记点
   generateMarkers(attractions) {
-    console.log('[生成标记] attractions:', attractions);
-
     return attractions.filter(attr => {
       const location = this.extractLocation(attr);
       return attr && location;
@@ -207,8 +185,8 @@ Page({
         longitude: location.longitude,
         title: attr.name,
         iconPath: attr.type === 'start' ? '/images/icons/index-active.png' :
-                  attr.type === 'end' ? '/images/icons/address.png' :
-                  '/images/icons/index.png',
+          attr.type === 'end' ? '/images/icons/address.png' :
+            '/images/icons/index.png',
         width: 32,
         height: 32,
         callout: {
@@ -230,17 +208,13 @@ Page({
   // 生成路线（使用Haversine直线）
   generatePolyline(attractions) {
     if (!attractions || attractions.length === 0) {
-      console.warn('generatePolyline: 没有景点数据');
       return [];
     }
 
-    console.log('[生成路线] attractions:', attractions);
-    
     // 过滤掉没有location的景点
     const validAttractions = attractions.filter(attr => attr && attr.location);
-    
+
     if (validAttractions.length === 0) {
-      console.warn('generatePolyline: 没有有效的景点数据（缺少location）');
       return [];
     }
 
@@ -288,37 +262,19 @@ Page({
       attractions = this.data.sortedAttractions;
     }
 
-    // 如果本地数据中有该景点，先使用本地数据
-    // if (attractions && attractions.length > 0) {
-    //   // 查找匹配的景点（支持模糊匹配）
-    //   const targetAttraction = attractions.find(attr =>
-    //     attr.name && attr.name.includes(attractionName)
-    //   );
-
-    //   if (targetAttraction && targetAttraction.location) {
-    //     console.log(`从本地数据获取景点位置: ${attractionName}`, targetAttraction.location);
-    //     return targetAttraction.location;
-    //   }
-    // }
-
     // 本地数据中没有，通过腾讯地图API查询
     try {
-      console.log(`通过腾讯地图API查询景点位置: ${attractionName}`);
-
       // 使用腾讯地图地理编码API
       const response = await this.searchLocationByAPI(attractionName);
 
       if (response) {
-        console.log(`API查询成功: ${attractionName}`, response);
         return response;
       }
 
       // API未返回有效结果，使用默认位置
-      console.log(`API未返回结果，尝试使用默认位置: ${attractionName}`);
       const defaultLocation = await this.getDefaultLocation(attractionName);
       return defaultLocation;
     } catch (error) {
-      console.error(`查询景点位置失败: ${attractionName}`, error);
       // 异常情况下也尝试使用默认位置
       const defaultLocation = await this.getDefaultLocation(attractionName);
       return defaultLocation;
@@ -332,13 +288,10 @@ Page({
       const API_KEY = TENCENT_MAP_API_KEY;
 
       // 构建请求URL
-      const url = `https://apis.map.qq.com/ws/geocoder/v1/`;
+      const url = 'https://apis.map.qq.com/ws/geocoder/v1/';
 
       // 添加城市限定，优先查找肇庆的景点
-      // 先尝试"肇庆+景点名称"
       const searchKeyword = `肇庆${keyword}`;
-
-      console.log('调用腾讯地图API:', url, { address: searchKeyword, key: API_KEY });
 
       wx.request({
         url: url,
@@ -348,23 +301,18 @@ Page({
         },
         method: 'GET',
         success: (res) => {
-          console.log('腾讯地图API响应:', res.data);
-
           if (res.statusCode === 200 && res.data.status === 0 && res.data.result) {
             const location = {
               latitude: res.data.result.location.lat,
               longitude: res.data.result.location.lng
             };
-            console.log('成功获取坐标:', location);
             resolve(location);
           } else {
-            console.warn('腾讯地图API返回无结果或失败:', res.data);
             // API调用失败，尝试使用默认位置
             this.getDefaultLocation(keyword).then(resolve).catch(() => resolve(null));
           }
         },
-        fail: (error) => {
-          console.error('腾讯地图API调用失败:', error);
+        fail: () => {
           // 如果API失败，尝试使用默认位置
           this.getDefaultLocation(keyword).then(resolve).catch(() => resolve(null));
         }
@@ -391,7 +339,7 @@ Page({
       '羚山峡': { latitude: 23.120000, longitude: 112.510000 },
       '德庆孔庙': { latitude: 23.145000, longitude: 111.785000 },
       '龙母祖庙': { latitude: 23.285000, longitude: 111.670000 },
-      '龙岩洞': { latitude: 23.075000, longitude: 112.475000 }, // 肇庆龙岩洞
+      '龙岩洞': { latitude: 23.075000, longitude: 112.475000 },
 
       // 公园景点
       '肇庆公园': { latitude: 23.058000, longitude: 112.466000 },
@@ -400,19 +348,17 @@ Page({
 
     for (const key in defaultLocations) {
       if (keyword.includes(key)) {
-        console.log(`使用默认位置: ${keyword} -> 匹配: ${key}`, defaultLocations[key]);
         return defaultLocations[key];
       }
     }
 
     // 如果没有匹配到，返回肇庆中心位置作为兜底
-    console.log(`未找到景点 "${keyword}" 的默认位置，使用肇庆中心位置`);
     return { latitude: 23.105994, longitude: 112.470000 };
   },
 
   // 地图区域变化
-  onMapRegionChange(e) {
-    console.log('地图区域变化', e);
+  onMapRegionChange() {
+    return null;
   },
 
   // 放大
@@ -481,8 +427,6 @@ Page({
       });
       return;
     }
-
-    console.log('[开始导航] 导航路线站点数:', attractions.length);
 
     const params = encodeURIComponent(JSON.stringify({
       scheme: this.data.scheme,

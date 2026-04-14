@@ -1,53 +1,51 @@
-import { fetchIndexData } from '../../services/index/index';
+const { fetchIndexData } = require('../../services/index/index');
 
 Page({
-  /**
-   * 页面的初始数据
-   */
   data: {
-    aboutUs:{}
+    aboutUs: {}
   },
-  /**
-   * 生命周期函数--监听页面加载
-   */
+
   async onLoad() {
     await this.getAboutUs();
   },
-  async getAboutUs(){
+
+  async getAboutUs() {
     try {
       wx.showLoading({
-        title: '加载中',
-      })   
-      const res = await fetchIndexData({pageSize:1});
-      this.setData({aboutUs: res?.[0]})
+        title: '加载中'
+      });
+      const res = await fetchIndexData();
+      const aboutUs = (res && res[0]) ? res[0] : {};
+      this.setData({ aboutUs: aboutUs });
     } catch (error) {
       wx.showToast({
-        title: error?.message || '页面请求失败，请刷新页面',
-        icon: 'error',
+        title: (error && error.message) || '页面请求失败，请刷新页面',
+        icon: 'none',
         duration: 2000
-      })   
-    } finally{
-      wx.hideLoading()
+      });
+    } finally {
+      wx.hideLoading();
     }
   },
-  onPhone(){
+
+  onPhone() {
     wx.makePhoneCall({
-      phoneNumber: '1340000' //仅为示例，并非真实的电话号码
-    })
+      phoneNumber: '1340000'
+    });
   },
 
-  onGoMap(){
+  onGoMap() {
     wx.getLocation({
-      type: 'gcj02', // 返回可以用于wx.openLocation的经纬度
+      type: 'gcj02',
       success(res) {
-        const latitude = res.latitude
-        const longitude = res.longitude
+        const latitude = res.latitude;
+        const longitude = res.longitude;
         wx.openLocation({
           latitude,
           longitude,
           scale: 18
-        })
+        });
       }
-    }) 
+    });
   }
-})
+});

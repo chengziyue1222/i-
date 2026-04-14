@@ -1,10 +1,85 @@
-import { fetchIndexData } from '../../services/index/index';
-import { fetchScenicSpotData } from '../../services/scene/index';
-import { fetchNewsData } from '../../services/news/index';
-import { fetchPostList } from '../../services/post/index';
-import { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } from '../../config/scenic-images';
-
+const { fetchIndexData } = require('../../services/index/index');
+const { fetchScenicSpotData } = require('../../services/scene/index');
+const teamApi = require('../../services/team');
+const postApi = require('../../services/post');
+const chatApi = require('../../services/chat');
+const { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } = require('../../config/scenic-images');
+const { logError } = require('../../utils/error');
 const store = require('../../store/index');
+
+function normalizeText(value) {
+  return String(value || '').trim();
+}
+
+function formatGroupTime(startTime) {
+  if (!startTime || startTime === '待定') return '时间待定';
+  return startTime;
+}
+
+function computeGroupScore(group) {
+  const tags = Array.isArray(group.tags) ? group.tags : [];
+  const remainCount = Number(group.remainCount || 0);
+  const currentPeople = Number(group.currentPeople || group.current || 0);
+  let score = 0;
+
+  if (group.status === 'recruiting') score += 50;
+  if (remainCount > 0 && remainCount <= 3) score += 22;
+  if (currentPeople > 0) score += Math.min(currentPeople * 4, 20);
+  if (group.startTime && group.startTime !== '待定') score += 12;
+  if (tags.length > 0) score += Math.min(tags.length * 4, 12);
+  if (normalizeText(group.intro)) score += 8;
+
+  return score;
+}
+
+function pickSmartGroups(groups) {
+  return (groups || [])
+    .filter((item) => item && item.status === 'recruiting' && Number(item.remainCount || 0) > 0)
+    .map((item) => ({ ...item, recommendScore: computeGroupScore(item) }))
+    .sort((a, b) => {
+      if (b.recommendScore !== a.recommendScore) return b.recommendScore - a.recommendScore;
+      return Number(b.createTime || 0) - Number(a.createTime || 0);
+    })
+    .slice(0, 3)
+    .map((item) => ({
+      ...item,
+      displayTime: formatGroupTime(item.startTime),
+      summary: normalizeText(item.intro) || '一起出发，寻找同频旅伴。'
+    }));
+}
+
+function buildPostSummary(post) {
+  const desc = normalizeText(post.desc);
+  const content = normalizeText(post.content);
+  const source = desc || content;
+  if (!source) return '真实旅行体验分享，点击查看完整内容。';
+  return source.slice(0, 34);
+}
+
+function computePostScore(post) {
+  const likeCount = Number(post.likeCount || 0);
+  const commentCount = Number(post.commentCount || 0);
+  const createdAt = Number(post.createdAt || post.createTime || 0);
+  return likeCount * 3 + commentCount * 5 + Math.floor(createdAt / 1000000000);
+}
+
+function pickFeaturedPosts(posts) {
+  return (posts || [])
+    .filter((item) => item && item.visibility !== 'private')
+    .filter((item) => normalizeText(item.cover))
+    .filter((item) => normalizeText(item.title))
+    .filter((item) => normalizeText(item.desc) || normalizeText(item.content))
+    .map((item) => ({
+      ...item,
+      summary: buildPostSummary(item),
+      recommendScore: computePostScore(item)
+    }))
+    .sort((a, b) => {
+      if (b.recommendScore !== a.recommendScore) return b.recommendScore - a.recommendScore;
+      return Number(b.createdAt || b.createTime || 0) - Number(a.createdAt || a.createTime || 0);
+    })
+    .slice(0, 4);
+}
 
 Page({
   data: {
@@ -13,39 +88,99 @@ Page({
     productAbilityList: [],
     applicationScene: [],
     newsList: [],
+    guidePostList: [],
     partnersList: [],
     hotScenicList: [],
     postList: [],
     postAppliedMap: {},
     activeShortcut: 'walk',
     routeFilter: 'time',
-    searchKeyword: ''
+    searchKeyword: '',
+    weather: {
+      city: '肇庆',
+      temperature: '25°',
+      weather: '晴',
+      icon: '☀️',
+      humidity: '65%',
+      wind: '东南风2级',
+      airQuality: '优',
+      updateTime: '刚刚更新'
+    },
+    recommendedRoutes: [
+      {
+        id: 'route_1',
+        title: '肇庆经典一日游',
+        description: '七星岩+鼎湖山精华路线',
+        duration: '1天',
+        difficulty: '轻松',
+        cover: '/images/scenic/qixingyan.jpg',
+        tags: ['经典', '自然', '摄影']
+      },
+      {
+        id: 'route_2', 
+        title: '肇庆美食探寻',
+        description: '地道美食+文化体验',
+        duration: '半天',
+        difficulty: '休闲',
+        cover: '/images/scenic/duanzhou.jpg',
+        tags: ['美食', '文化', 'citywalk']
+      },
+      {
+        id: 'route_3',
+        title: '肇庆夜景漫步',
+        description: '星湖夜景+城区漫步',
+        duration: '3小时',
+        difficulty: '轻松',
+        cover: '/images/scenic/xinghu.jpg',
+        tags: ['夜景', '散步', '浪漫']
+      }
+    ]
   },
   async onLoad() {
+    this._hasLoadedOnce = false;
     await this.getRequestList();
   },
-  // 首页数据请求
+  async onShow() {
+    if (!this._hasLoadedOnce) return;
+    await this.getRequestList();
+  },
   async getRequestList(){
+    this._hasLoadedOnce = true;
+    wx.showTabBar();
+    wx.showLoading({
+      title: '加载中',
+    });
+
     try {
-      wx.showTabBar();
-      wx.showLoading({
-        title: '加载中',
-      })
-      
-      console.log('[首页] ===== 开始加载数据 =====');
-      console.log('[首页] 当前模式:', getApp().cloudbaseTemplateConfig?.useMock ? 'Mock数据' : '云数据库');
-      
-      // 加载首页其他数据
-      const res = await fetchIndexData({pageSize:1});
-      console.log('[首页] 首页数据加载完成:', res);
-      
-      // 加载景区数据（热门景区）
-      console.log('[首页] 开始加载景区数据...');
-      const res1 = await fetchScenicSpotData();
-      console.log('[首页] 景区数据加载完成:', res1);
-      
-      // 在 setData 之前统一注入 imageUrl
-      const scenicList = (res1 || []).map((item) => {
+      const [homeResult, scenicResult, teamResult, postResult] = await Promise.allSettled([
+        fetchIndexData({ pageSize: 1 }),
+        fetchScenicSpotData(),
+        teamApi.getTeamList(),
+        postApi.fetchPostList({ type: '推荐' })
+      ]);
+
+      const homeList = homeResult.status === 'fulfilled' ? (homeResult.value || []) : [];
+      const scenicRawList = scenicResult.status === 'fulfilled' ? (scenicResult.value || []) : [];
+      const teamGroups = teamResult.status === 'fulfilled' ? ((teamResult.value && teamResult.value.groups) || []) : [];
+      const communityPosts = postResult.status === 'fulfilled' ? (postResult.value || []) : [];
+
+      if (homeResult.status === 'rejected') {
+        logError('首页-首页配置加载失败', homeResult.reason);
+      }
+
+      if (scenicResult.status === 'rejected') {
+        logError('首页-景区数据加载失败', scenicResult.reason);
+      }
+
+      if (teamResult.status === 'rejected') {
+        logError('首页-组队数据加载失败', teamResult.reason);
+      }
+
+      if (postResult.status === 'rejected') {
+        logError('首页-社区帖子加载失败', postResult.reason);
+      }
+
+      const scenicList = scenicRawList.map((item) => {
         const scenicName = (item.scenicName || item.name || '').trim();
         return {
           ...item,
@@ -53,69 +188,44 @@ Page({
         };
       });
 
-      if (!scenicList || scenicList.length === 0) {
-        console.error('[首页] ❌ 景区数据返回为空！');
-      } else {
-        console.log('[首页] ✅ 成功获取景区数据，共', scenicList.length, '条');
-      }
-      
-      const res2 = await fetchNewsData({pageSize:3});
-      console.log('[首页] 新闻数据加载完成:', res2);
+      const { index_show, function_show, cooperation } = homeList[0] || {};
 
-      const res3 = await fetchPostList({ pageSize: 20 });
-      const postList = this.decoratePostsWithApplyStatus(res3 || []);
-      console.log('[首页] 搭子帖子加载完成:', postList.length);
-
-      const {index_show,function_show,cooperation} = res?.[0] || {};
-      console.log('[首页] 解析首页数据:', {index_show, function_show, cooperation});
-
-      // 处理热门景区列表（按热度排序，取前5个）
       let hotScenicList = [];
-      console.log('[首页] 原始景区数据 scenicList:', scenicList);
-      
-      // 云数据库已按热度降序排序，直接取前5个
-      if (scenicList && scenicList.length > 0) {
+      if (scenicList.length > 0) {
         hotScenicList = scenicList.slice(0, 5);
-        console.log('[首页] ✅ 热门景区列表:', hotScenicList.length, '个');
-        console.log('[首页] 热门景区详情:', hotScenicList.map(item => ({
-          name: item.scenicName,
-          heat: item.heat,
-          id: item.scenicId
-        })));
-      } else {
-        console.warn('[首页] ⚠️ 没有获取到景区数据，hotScenicList 为空');
-        // 不添加测试数据，保持为空
       }
+
+      const smartGroups = pickSmartGroups(teamGroups);
+      const featuredPosts = pickFeaturedPosts(communityPosts);
 
       this.setData({
         showUploadTip: true,
         bannerList: index_show || [],
         productAbilityList: function_show || [],
         partnersList: cooperation || [],
-        applicationScene: scenicList || [],
-        newsList: res2 || [],
-        hotScenicList: hotScenicList,
-        postList: postList
-      }, () => {
-        console.log('[首页] ✅ setData完成');
-        console.log('[首页] 最终 hotScenicList:', this.data.hotScenicList);
-        console.log('[首页] applicationScene:', this.data.applicationScene);
-        
-        // 如果热门景区为空，给出明确提示
-        if (this.data.hotScenicList.length === 0) {
-          console.warn('[首页] ⚠️ 警告: hotScenicList 为空数组，请检查云数据库 scene 集合是否有数据');
-        }
+        applicationScene: scenicList,
+        newsList: featuredPosts,
+        guidePostList: featuredPosts,
+        hotScenicList,
+        postList: smartGroups
       });
-    } catch (error) {
-      console.error('[首页] ❌ 数据加载失败:', error);
-      wx.showToast({
-        title: error?.message || '页面请求失败，请刷新页面',
-        icon: 'error',
-        duration: 2000
-      })   
+
+      const failedModules = [];
+      if (homeResult.status === 'rejected') failedModules.push('首页配置');
+      if (scenicResult.status === 'rejected') failedModules.push('景区');
+      if (teamResult.status === 'rejected') failedModules.push('组队');
+      if (postResult.status === 'rejected') failedModules.push('社区帖子');
+
+      if (failedModules.length > 0) {
+        wx.showToast({
+          title: failedModules.join('、') + '加载失败',
+          icon: 'none',
+          duration: 1800
+        });
+      }
     } finally {
-      wx.hideLoading();  
-    }   
+      wx.hideLoading();
+    }
   },
   onSearchInput(e) {
     this.setData({ searchKeyword: e.detail.value });
@@ -147,104 +257,95 @@ Page({
 
   getCurrentUserId() {
     const ui = wx.getStorageSync('userInfo') || {};
-    return String(ui.userId || ui._id || ui.openid || 'me');
+    return String(ui.openid || ui._openid || ui.userId || ui._id || '');
   },
 
-  decoratePostsWithApplyStatus(posts) {
-    const uid = this.getCurrentUserId();
-    return (posts || []).map((item) => {
-      const postId = item.postId || item._id;
-      const applied = postId ? store.hasAppliedApplication(String(postId), uid) : false;
-      return { ...item, _applied: applied };
-    });
-  },
   onPostTap(e) {
-    const postId = e.currentTarget.dataset.postId;
-    if (postId) {
-      wx.navigateTo({ url: `/pages/post-detail/index?postId=${postId}` });
+    const groupId = e.currentTarget.dataset.groupId;
+    if (groupId) {
+      wx.navigateTo({ url: '/pages/buddy-detail/index?id=' + encodeURIComponent(groupId) });
     }
   },
 
-  onPostChatTap(e) {
-    const post = e.currentTarget.dataset.post || {};
-    const postId = post.postId || post._id || ('post_' + Date.now());
-    const partnerName = (post.publisher && post.publisher.nickname) || '帖子作者';
-    const groupName = post.destination || post.title || '搭子会话';
+  async onPostChatTap(e) {
+    const group = e.currentTarget.dataset.post || {};
+    const groupId = group.groupId || group.id || ('group_' + Date.now());
+    const partnerName = group.nickname || '组队发起人';
+    const currentUserId = this.getCurrentUserId();
 
-    store.track('post_chat_tap', {
-      postId: String(postId),
-      destination: groupName
+    if (!currentUserId || currentUserId === 'guest') {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+
+    const targetUserId = String(group.creatorId || '');
+    if (!targetUserId) {
+      wx.showToast({ title: '发起人信息缺失', icon: 'none' });
+      return;
+    }
+
+    await chatApi.sendMessage({
+      senderId: currentUserId,
+      receiverId: targetUserId,
+      content: '你好，我想了解一下你的组队安排～'
+    }).catch((error) => {
+      const message = logError('首页-发起组队私聊失败', error, {
+        groupId,
+        targetUserId,
+        currentUserId
+      });
+      wx.showToast({ title: message, icon: 'none' });
+      throw error;
     });
 
-    store.getOrCreateConversation({
-      groupId: String(postId),
-      groupName: groupName,
-      partnerName: partnerName
+    const chatList = await chatApi.getChatList(currentUserId).catch((error) => {
+      const message = logError('首页-获取会话列表失败', error, {
+        currentUserId,
+        targetUserId
+      });
+      wx.showToast({ title: message, icon: 'none' });
+      throw error;
     });
+    const chat = (chatList || []).find((item) => item.targetUser && String(item.targetUser.userId) === String(targetUserId));
+    if (!chat) return;
 
     wx.navigateTo({
-      url: '/pages/chat/index?groupId=' + encodeURIComponent(String(postId))
-        + '&groupName=' + encodeURIComponent(groupName)
-        + '&partnerName=' + encodeURIComponent(partnerName)
+      url: '/pages/chat/index?chatId=' + encodeURIComponent(chat.chatId)
+        + '&targetUserId=' + encodeURIComponent(chat.targetUser.userId)
+        + '&targetName=' + encodeURIComponent(chat.targetUser.nickName || partnerName)
+        + '&targetEmoji=' + encodeURIComponent(chat.targetUser.emoji || '💬')
     });
   },
 
   onPostCommentTap(e) {
-    const post = e.currentTarget.dataset.post || {};
-    const postId = post.postId || post._id;
-    if (!postId) return;
+    const group = e.currentTarget.dataset.post || {};
+    const groupId = group.groupId || group.id;
+    if (!groupId) return;
 
-    store.track('post_comment_tap', {
-      postId: String(postId),
-      destination: post.destination || ''
+    store.track('team_detail_tap', {
+      groupId: String(groupId),
+      destination: group.destination || ''
     });
 
     wx.navigateTo({
-      url: '/pages/post-comment/index?postId=' + encodeURIComponent(String(postId))
-        + '&postTitle=' + encodeURIComponent(post.title || post.destination || '搭子帖子')
-        + '&postAuthor=' + encodeURIComponent((post.publisher && post.publisher.nickname) || '')
+      url: '/pages/buddy-detail/index?id=' + encodeURIComponent(String(groupId))
     });
   },
 
-  onPostApplyTap(e) {
-    const post = e.currentTarget.dataset.post || {};
-    const postId = post.postId || post._id;
+  async onPostApplyTap(e) {
+    const group = e.currentTarget.dataset.post || {};
+    const groupId = group.groupId || group.id;
+    if (!groupId) return;
+
+    wx.navigateTo({
+      url: '/pages/buddy-apply/index?id=' + encodeURIComponent(String(groupId))
+    });
+  },
+
+  onGuideTap(e) {
+    const postId = e.currentTarget.dataset.postId;
     if (!postId) return;
-
-    const uid = this.getCurrentUserId();
-    if (store.hasAppliedApplication(String(postId), uid)) {
-      wx.showToast({ title: '你已申请过该帖子', icon: 'none' });
-      return;
-    }
-
-    const nick = (wx.getStorageSync('userInfo') || {}).nickName || '我';
-    const result = store.submitApplication({
-      groupId: String(postId),
-      groupName: post.destination || post.title || '搭子行程',
-      destination: post.destination || '',
-      fromUserId: uid,
-      fromUserName: nick,
-      fromUserEmoji: '🙋',
-      message: '我想加入这个行程，一起出发！'
-    });
-
-    if (result && result.duplicated) {
-      wx.showToast({ title: '你已申请过该帖子', icon: 'none' });
-      return;
-    }
-
-    store.track('post_apply_submit', {
-      postId: String(postId),
-      destination: post.destination || ''
-    });
-
-    const nextList = (this.data.postList || []).map((item) => {
-      const id = item.postId || item._id;
-      if (String(id) === String(postId)) return { ...item, _applied: true };
-      return item;
-    });
-    this.setData({ postList: nextList });
-    wx.showToast({ title: '申请已提交', icon: 'success' });
+    wx.navigateTo({ url: '/pages/community/detail/index?id=' + encodeURIComponent(postId) });
   },
   onGoScenicList() {
     wx.switchTab({ url: '/pages/route/scenic-list' });
@@ -290,5 +391,67 @@ Page({
         duration: 2000
       }) 
     }
+  },
+
+  // 轮播图点击事件
+  onBannerTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const title = e.currentTarget.dataset.title;
+    console.log('[首页] 轮播图点击:', { id, title });
+    
+    // 根据不同的banner类型跳转到不同页面
+    if (id && title) {
+      wx.navigateTo({
+        url: `/pages/detail/index?type=banner&id=${id}&title=${encodeURIComponent(title)}`
+      });
+    }
+  },
+
+  // 功能入口点击事件
+  onFunctionTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const title = e.currentTarget.dataset.title;
+    console.log('[首页] 功能入口点击:', { id, title });
+    
+    if (id === 'fn_1') {
+      wx.navigateTo({
+        url: '/packageRoute/pages/route/route-plan'
+      });
+    } else if (id === 'fn_2') {
+      wx.navigateTo({
+        url: '/pages/buddy-match/index'
+      });
+    } else if (id === 'fn_3') {
+      wx.switchTab({
+        url: '/pages/route/scenic-list'
+      });
+    } else if (id === 'fn_4') {
+      wx.navigateTo({
+        url: '/pages/community/index'
+      });
+    } else {
+      wx.navigateTo({
+        url: `/pages/detail/index?type=function&id=${id}&title=${encodeURIComponent(title || '功能')}`
+      });
+    }
+  },
+
+  // 推荐路线点击事件
+  onRouteTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const title = e.currentTarget.dataset.title;
+    console.log('[首页] 推荐路线点击:', { id, title });
+    
+    // 跳转到路线详情页
+    wx.navigateTo({
+      url: `/packageRoute/pages/route/route-detail?id=${id}&title=${encodeURIComponent(title || '路线')}`
+    });
+  },
+
+  // 跳转到路线规划页面
+  onGoRoutePlan() {
+    wx.navigateTo({
+      url: '/packageRoute/pages/route/route-plan'
+    });
   }
 });

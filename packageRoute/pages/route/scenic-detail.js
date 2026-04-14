@@ -1,6 +1,6 @@
 // pages/route/scenic-detail.js
-import { fetchScenicSpotDetail, fetchAttractionData } from '../../../services/scene/index';
-import { TENCENT_MAP_API_KEY } from '../../../config/map';
+const { fetchScenicSpotDetail, fetchAttractionData } = require('../../../services/scene/index');
+const { TENCENT_MAP_API_KEY } = require('../../../config/map');
 
 Page({
   data: {

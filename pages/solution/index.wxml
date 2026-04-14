@@ -1,135 +1,137 @@
 <view class="page">
-  <!-- 搜索栏 -->
-  <search-bar placeholder="搜索目的地 / 搭子" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" bindclear="onSearchClear"></search-bar>
+  <scroll-view
+    scroll-y
+    class="page-scroll"
+    refresher-enabled="{{true}}"
+    refresher-triggered="{{refresherTriggered}}"
+    bindrefresherrefresh="onRefresherRefresh"
+  >
+    <search-bar placeholder="搜索目的地 / 搭子" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" bindclear="onSearchClear"></search-bar>
 
-  <!-- Tab -->
-  <tab-switch tabs="{{tabs}}" active="{{tab}}" bindswitch="onTabSwitch"></tab-switch>
+    <view class="hero-stack">
+      <view class="buddy-headline">
+        <view class="buddy-copy">
+          <text class="buddy-kicker">BUDDY LOBBY</text>
+          <text class="buddy-title">旅伴大厅</text>
+          <text class="buddy-subtitle">按目的地、时间与兴趣快速筛选，先找到合适的人，再决定一起怎么出发。</text>
+        </view>
 
-  <!-- ── 找搭子 ── -->
-  <block wx:if="{{tab==='buddy'}}">
-    <!-- AI Banner -->
+        <view class="community-entry" bindtap="onGoCommunity">
+          <view class="community-entry-top">
+            <text class="community-entry-tag">TRAVEL COMMUNITY</text>
+            <text class="community-entry-arrow">→</text>
+          </view>
+          <text class="community-entry-title">去社区</text>
+          <text class="community-entry-desc">看攻略、发内容、找灵感</text>
+          <view class="community-entry-badge">内容社区</view>
+        </view>
+      </view>
+
+      <view class="stats-strip">
+        <view class="stats-item">
+          <text class="stats-value">{{filtered.length}}</text>
+          <text class="stats-label">当前匹配</text>
+        </view>
+        <view class="stats-divider"></view>
+        <view class="stats-item">
+          <text class="stats-value">AI</text>
+          <text class="stats-label">智能筛选</text>
+        </view>
+        <view class="stats-divider"></view>
+        <view class="stats-item">
+          <text class="stats-value">实时</text>
+          <text class="stats-label">组队招募</text>
+        </view>
+      </view>
+    </view>
+
     <view class="ai-banner" bindtap="onToggleAi">
       <view class="ai-left">
         <view class="ai-badge">✨ AI 智能匹配</view>
         <text class="ai-title">告诉我你的旅行偏好</text>
         <text class="ai-title ai-title-strong">帮你快速找到同频搭子</text>
         <text class="ai-hint">结合目的地、时间和兴趣，一键给出更合拍的人选</text>
-
         <view class="ai-metas">
           <text class="ai-meta">偏好匹配</text>
           <text class="ai-meta">时间同步</text>
           <text class="ai-meta">路线同向</text>
         </view>
       </view>
-
       <view class="ai-right">
         <view class="ai-orb">🤖</view>
         <view class="ai-entry-btn" catchtap="onToggleAi">立即匹配</view>
       </view>
     </view>
 
-    <!-- AI 展开面板 -->
     <view class="ai-panel" wx:if="{{showAiPanel}}">
       <text class="ai-panel-title">快速匹配搭子</text>
       <input class="ai-input" placeholder="输入目的地，如：七星岩" value="{{aiDest}}" bindinput="onAiDestInput" cursor-spacing="40"/>
       <view class="ai-go" bindtap="onStartAiMatch">开始匹配 🚀</view>
     </view>
 
-    <!-- 筛选胶囊 -->
-    <scroll-view scroll-x class="chip-scroll" show-scrollbar="{{false}}">
-      <view class="chip-row">
-        <view wx:for="{{chips}}" wx:key="id"
-          class="chip {{activeChip===item.id?'chip-on':''}}"
-          bindtap="onChip" data-id="{{item.id}}">{{item.label}}</view>
-      </view>
-    </scroll-view>
-
-    <!-- 双列瀑布流 -->
-    <scroll-view
-      scroll-y
-      class="list-scroll"
-      refresher-enabled="{{true}}"
-      refresher-triggered="{{refresherTriggered}}"
-      bindrefresherrefresh="onRefresherRefresh"
-    >
-      <view class="waterfall">
-        <view class="waterfall-col">
-          <card-buddy
-            wx:for="{{leftGroups}}"
-            wx:key="id"
-            group="{{item}}"
-            bindtap="onCardTap"
-            bindchat="onChatTap"
-            bindjoin="onJoinTap"
-          ></card-buddy>
+    <view class="section-shell">
+      <view class="section-head">
+        <view>
+          <text class="section-title">条件筛选</text>
+          <text class="section-desc">先选旅行风格，再浏览正在招募的队伍</text>
         </view>
+      </view>
 
+      <scroll-view scroll-x class="chip-scroll" show-scrollbar="{{false}}">
+        <view class="chip-row">
+          <view wx:for="{{chips}}" wx:key="id" class="chip {{activeChip===item.id?'chip-on':''}}" bindtap="onChip" data-id="{{item.id}}">{{item.label}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="section-shell list-shell">
+      <view class="section-head section-head-space">
+        <view>
+          <text class="section-title">队伍广场</text>
+          <text class="section-desc">卡片流双列排布，点击可查看详情、联系或申请加入</text>
+        </view>
+        <view class="section-pill">{{activeChip==='all' ? '全部队伍' : '已筛选'}}</view>
+      </view>
+
+      <view class="waterfall" wx:if="{{filtered.length>0}}">
         <view class="waterfall-col">
-          <card-buddy
-            wx:for="{{rightGroups}}"
-            wx:key="id"
-            group="{{item}}"
-            bindtap="onCardTap"
-            bindchat="onChatTap"
-            bindjoin="onJoinTap"
-          ></card-buddy>
+          <card-buddy wx:for="{{leftGroups}}" wx:key="id" group="{{item}}" bindtap="onCardTap" bindchat="onChatTap" bindjoin="onJoinTap"></card-buddy>
+        </view>
+        <view class="waterfall-col">
+          <card-buddy wx:for="{{rightGroups}}" wx:key="id" group="{{item}}" bindtap="onCardTap" bindchat="onChatTap" bindjoin="onJoinTap"></card-buddy>
         </view>
       </view>
 
       <view class="empty" wx:if="{{filtered.length===0}}">
-        <text>🧳</text><text class="empty-t">暂无符合的搭子</text>
+        <text class="empty-icon">🧳</text>
+        <text class="empty-t">暂无符合的搭子</text>
+        <text class="empty-sub">可以切换筛选条件，或者点击右下角自己发起组队</text>
       </view>
-      <view class="list-end" wx:if="{{filtered.length>0}}">— 已经到底啦 —</view>
-    </scroll-view>
-  </block>
 
-  <!-- ── 社区 ── -->
-  <scroll-view scroll-y class="community-scroll" wx:if="{{tab==='community'}}">
-    <view class="community-list">
-      <view wx:for="{{posts}}" wx:key="id" class="post-card">
-        <view class="post-cover" style="background:{{item.cover.color}}">
-          <text class="post-emoji">{{item.cover.emoji}}</text>
-        </view>
-        <view class="post-body">
-          <text class="post-title">{{item.title}}</text>
-          <view class="post-meta">
-            <view class="post-author">
-              <view class="post-av">{{item.author[0]}}</view>
-              <text class="post-name">{{item.author}}</text>
-            </view>
-          </view>
-          <view class="post-actions">
-            <view class="post-action-btn post-like-btn" catchtap="onLikePost" data-post="{{item}}">❤️ {{item.likes}}</view>
-            <view class="post-action-btn post-cmt-btn" catchtap="onCommentPost" data-post="{{item}}">💬 评论</view>
-            <view class="post-action-btn post-dm-btn" catchtap="onDmAuthor" data-post="{{item}}">✉️ 私聊</view>
-          </view>
-        </view>
-      </view>
+      <view class="list-end" wx:if="{{filtered.length>0}}">— 已经到底啦 —</view>
     </view>
-    <view class="list-end">— 已经到底啦 —</view>
+
+    <view class="page-bottom-space"></view>
   </scroll-view>
 
-  <!-- 发布组队表单 -->
   <view wx:if="{{showPublishForm}}" class="publish-mask" catchtap="onClosePublishForm">
     <view class="publish-sheet" catchtap="noop">
       <view class="publish-head">
-        <text class="publish-title">发起组队</text>
+        <view>
+          <text class="publish-title">发起组队</text>
+          <text class="publish-subtitle">补充目的地、时间和标签，让别人更快找到你</text>
+        </view>
         <text class="publish-close" bindtap="onClosePublishForm">关闭</text>
       </view>
 
       <view class="publish-form">
         <input class="publish-input" data-field="destination" value="{{publishForm.destination}}" bindinput="onPublishFieldInput" placeholder="目的地（必填，如：七星岩）" />
-
         <view class="publish-datetime-row">
           <picker mode="date" value="{{publishForm.publishDate}}" bindchange="onPublishFieldInput" data-field="publishDate">
-            <view class="publish-picker {{publishForm.publishDate ? 'has-value' : ''}}">
-              {{publishForm.publishDate || '选择出发日期'}}
-            </view>
+            <view class="publish-picker {{publishForm.publishDate ? 'has-value' : ''}}">{{publishForm.publishDate || '选择出发日期'}}</view>
           </picker>
           <picker mode="time" value="{{publishForm.publishTime}}" bindchange="onPublishFieldInput" data-field="publishTime">
-            <view class="publish-picker {{publishForm.publishTime ? 'has-value' : ''}}">
-              {{publishForm.publishTime || '选择出发时间'}}
-            </view>
+            <view class="publish-picker {{publishForm.publishTime ? 'has-value' : ''}}">{{publishForm.publishTime || '选择出发时间'}}</view>
           </picker>
         </view>
         <input class="publish-input" data-field="max" type="number" value="{{publishForm.max}}" bindinput="onPublishFieldInput" placeholder="队伍人数（如：4，默认4人）" />
@@ -144,6 +146,8 @@
     </view>
   </view>
 
-  <!-- FAB -->
-  <view class="fab" bindtap="onPublish"><text class="fab-icon">+</text></view>
+  <view class="fab" bindtap="onPublish">
+    <text class="fab-icon">+</text>
+    <text class="fab-label">组队</text>
+  </view>
 </view>

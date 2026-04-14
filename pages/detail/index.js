@@ -1,5 +1,5 @@
-import { fetchSceneDetail } from '../../services/scene/index';
-import { getScenicDemoById } from '../../config/scenic-demo';
+const { fetchSceneDetail } = require('../../services/scene/index');
+const { getScenicDemoById } = require('../../config/scenic-demo');
 
 const DEFAULT_COVER = 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png';
 

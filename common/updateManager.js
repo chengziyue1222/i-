@@ -1,4 +1,4 @@
-export default () => {
+module.exports = function () {
   if (!wx.canIUse('getUpdateManager')) {
     return;
   }

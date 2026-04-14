@@ -1,4 +1,4 @@
-import { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } from '../../config/scenic-images';
+const { DEFAULT_SCENIC_IMAGE, resolveScenicImageUrlByName } = require('../../config/scenic-images');
 
 const store = require('../../store/index');
 

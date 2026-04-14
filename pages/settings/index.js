@@ -1,6 +1,7 @@
 Page({
   data: {
-    version: '1.0.0'
+    version: '1.0.0',
+    cloudEnv: 'cloudbase-1g71i8nk689cee71'
   },
 
   onClearCache() {
@@ -8,13 +9,12 @@ Page({
       title: '清除缓存',
       content: '确定要清除本地缓存吗？部分数据将需要重新加载。',
       success: (res) => {
-        if (res.confirm) {
-          try {
-            wx.clearStorageSync();
-            wx.showToast({ title: '清除成功', icon: 'success' });
-          } catch (e) {
-            wx.showToast({ title: '清除失败', icon: 'none' });
-          }
+        if (!res.confirm) return;
+        try {
+          wx.clearStorageSync();
+          wx.showToast({ title: '清除成功', icon: 'success' });
+        } catch (e) {
+          wx.showToast({ title: '清除失败', icon: 'none' });
         }
       }
     });

@@ -1,4 +1,16 @@
 <view class="settings-page">
+  <view class="section section-dev">
+    <view class="section-title-row">
+      <text class="section-title">云开发环境</text>
+      <text class="section-caption">当前项目已切换为微信云开发架构</text>
+    </view>
+
+    <view class="api-status-card">
+      <text class="api-status-label">当前环境 ID</text>
+      <text class="api-status-value">{{cloudEnv}}</text>
+    </view>
+  </view>
+
   <view class="section">
     <view class="setting-item" bindtap="onAbout">
       <text class="item-title">关于我们</text>
@@ -9,6 +21,7 @@
       <text class="item-arrow">›</text>
     </view>
   </view>
+
   <view class="version-info">
     <text>i旅图 v{{version}}</text>
   </view>

@@ -1,4 +1,4 @@
-var store = require('../../store/index');
+const postApi = require('../../services/post');
 
 Page({
   data: {
@@ -23,44 +23,41 @@ Page({
     this.loadComments();
   },
 
-  loadComments: function () {
-    var list = store.getComments(this.data.postId);
-    this.setData({ comments: list });
+  async loadComments() {
+    try {
+      var list = await postApi.getComments(this.data.postId);
+      this.setData({ comments: list || [] });
+    } catch (error) {
+      wx.showToast({ title: error.message || '评论加载失败', icon: 'none' });
+    }
   },
 
   onInput: function (e) {
     this.setData({ inputValue: e.detail.value });
   },
 
-  onSend: function () {
+  async onSend() {
     var text = (this.data.inputValue || '').trim();
+    var ui = wx.getStorageSync('userInfo') || {};
     if (!text) { wx.showToast({ title: '请输入评论内容', icon: 'none' }); return; }
+    if (!String(ui.openid || ui._openid || '')) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
     if (this.data.submitting) return;
     this.setData({ submitting: true });
 
-    var ui = wx.getStorageSync('userInfo') || {};
-    var myName = ui.nickName || '我';
-
-    store.addComment(this.data.postId, {
-      userId: 'me',
-      userName: myName,
-      userEmoji: '🙋',
-      content: text
-    });
-
-    // 触发互动通知（给帖主）
-    if (this.data.postAuthor && this.data.postAuthor !== myName) {
-      store.addInteraction({
-        type: 'comment',
-        userEmoji: '💬',
-        userName: myName,
-        desc: myName + ' 评论了你：「' + text + '」',
-        postId: this.data.postId
+    try {
+      await postApi.createComment({
+        postId: this.data.postId,
+        content: text
       });
+      this.setData({ inputValue: '', submitting: false });
+      this.loadComments();
+      wx.showToast({ title: '评论成功', icon: 'success' });
+    } catch (error) {
+      this.setData({ submitting: false });
+      wx.showToast({ title: error.message || '评论失败', icon: 'none' });
     }
-
-    this.setData({ inputValue: '', submitting: false });
-    this.loadComments();
-    wx.showToast({ title: '评论成功', icon: 'success' });
   }
 });

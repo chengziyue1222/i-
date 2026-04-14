@@ -4,7 +4,6 @@
   "backgroundColor": "#eef3fb",
   "usingComponents": {
     "card-buddy": "../../components/card-buddy/index",
-    "search-bar": "../../components/search-bar/index",
-    "tab-switch": "../../components/tab-switch/index"
+    "search-bar": "../../components/search-bar/index"
   }
 }

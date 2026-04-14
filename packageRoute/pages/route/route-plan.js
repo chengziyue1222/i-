@@ -1,5 +1,5 @@
 // pages/route/route-plan.js
-import { TENCENT_MAP_API_KEY } from '../../../config/map';
+const { TENCENT_MAP_API_KEY } = require('../../../config/map');
 
 // 腾讯地图API请求限流器（每秒最多5次）
 class TencentMapRateLimiter {
@@ -101,13 +101,34 @@ Page({
   },
 
   onLoad(options) {
-    // 初始化限流器（每秒最多2次）
     this.rateLimiter = new TencentMapRateLimiter(2);
 
-    const data = JSON.parse(decodeURIComponent(options.data));
+    let data = null;
+    if (options.data) {
+      try {
+        data = JSON.parse(decodeURIComponent(options.data));
+      } catch (error) {
+        console.warn('路线规划页面解析入参失败:', error);
+      }
+    }
+
+    if (!data || !Array.isArray(data.routePoints)) {
+      this.setData({
+        scenicId: options.scenicId || '',
+        routePoints: [],
+        attractions: [],
+        routeSchemes: []
+      });
+      if (!options.data) {
+        wx.showToast({ title: '请先选择景点后再规划路线', icon: 'none' });
+      } else {
+        wx.showToast({ title: '路线数据解析失败', icon: 'none' });
+      }
+      return;
+    }
+
     console.log('路线规划页面接收到的数据:', data);
 
-    // 提取景点（排除起点和终点）
     const attractions = data.routePoints.filter(point => point.type === 'attraction');
 
     this.setData({

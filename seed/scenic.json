@@ -1,0 +1,38 @@
+[
+  {
+    "scenicId": "scenic_001",
+    "scenicName": "七星岩风景区",
+    "description": "肇庆代表性山水景区，以喀斯特地貌和星湖景观闻名。",
+    "heat": 98.5,
+    "suggestedDuration": 4,
+    "imageUrl": "/images/scenic/qixingyan.jpg",
+    "cover": "/images/scenic/qixingyan.jpg",
+    "tags": ["山水", "摄影", "徒步"],
+    "location": "广东省肇庆市端州区",
+    "openingHours": "08:00-18:00"
+  },
+  {
+    "scenicId": "scenic_002",
+    "scenicName": "鼎湖山",
+    "description": "适合轻徒步和吸氧放松，生态环境优越。",
+    "heat": 95.2,
+    "suggestedDuration": 5,
+    "imageUrl": "/images/scenic/xinghu.jpg",
+    "cover": "/images/scenic/xinghu.jpg",
+    "tags": ["自然", "徒步", "亲子"],
+    "location": "广东省肇庆市鼎湖区",
+    "openingHours": "08:30-17:30"
+  },
+  {
+    "scenicId": "scenic_003",
+    "scenicName": "端州古城",
+    "description": "适合 citywalk 与人文打卡，历史文化氛围浓厚。",
+    "heat": 88.6,
+    "suggestedDuration": 3,
+    "imageUrl": "/images/scenic/duanzhou.jpg",
+    "cover": "/images/scenic/duanzhou.jpg",
+    "tags": ["人文", "古城", "citywalk"],
+    "location": "广东省肇庆市端州区",
+    "openingHours": "全天开放"
+  }
+]

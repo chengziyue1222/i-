@@ -1,0 +1,71 @@
+<view class="community-page">
+  <view class="hero-panel">
+    <view class="hero-copy">
+      <text class="hero-kicker">TRAVEL NOTEBOOK</text>
+      <text class="hero-title">发现会让人立刻想出发的旅行内容</text>
+      <text class="hero-desc">从景点、美食到路线，把真实旅行经验沉淀成可收藏、可互动的灵感社区。</text>
+    </view>
+    <view class="hero-orb">✦</view>
+  </view>
+
+  <search-bar placeholder="搜索景点 / 美食 / 路线" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" bindclear="onSearchClear"></search-bar>
+
+  <scroll-view scroll-x="true" show-scrollbar="false" class="tab-scroll">
+    <view class="tab-row">
+      <view wx:for="{{tabs}}" wx:key="id" class="tab-pill {{activeTab===item.id ? 'tab-pill-active' : ''}}" data-id="{{item.id}}" bindtap="onTabTap">{{item.label}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-card" wx:for="{{[1,2,3,4]}}" wx:key="*this"></view>
+  </view>
+
+  <scroll-view scroll-y="true" class="feed-scroll" wx:else>
+    <view class="waterfall" wx:if="{{posts.length}}">
+      <view class="waterfall-col">
+        <view wx:for="{{leftPosts}}" wx:key="id" class="post-card" bindtap="onPostTap" data-id="{{item.id}}">
+          <image class="post-cover" src="{{item.cover}}" mode="aspectFill" lazy-load="true"></image>
+          <view class="post-body">
+            <text class="post-title">{{item.title}}</text>
+            <text class="post-desc">{{item.desc}}</text>
+            <view class="post-footer">
+              <view class="post-author">
+                <image class="author-avatar" src="{{item.author.avatar}}" mode="aspectFill" lazy-load="true"></image>
+                <text class="author-name">{{item.author.name}}</text>
+              </view>
+              <view class="post-like {{item.liked ? 'post-like-active' : ''}}">❤ {{item.likeCount}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="waterfall-col">
+        <view wx:for="{{rightPosts}}" wx:key="id" class="post-card" bindtap="onPostTap" data-id="{{item.id}}">
+          <image class="post-cover" src="{{item.cover}}" mode="aspectFill" lazy-load="true"></image>
+          <view class="post-body">
+            <text class="post-title">{{item.title}}</text>
+            <text class="post-desc">{{item.desc}}</text>
+            <view class="post-footer">
+              <view class="post-author">
+                <image class="author-avatar" src="{{item.author.avatar}}" mode="aspectFill" lazy-load="true"></image>
+                <text class="author-name">{{item.author.name}}</text>
+              </view>
+              <view class="post-like {{item.liked ? 'post-like-active' : ''}}">❤ {{item.likeCount}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">🗺</text>
+      <text class="empty-title">还没有找到相关内容</text>
+      <text class="empty-desc">换个关键词试试，或者发布你的第一篇旅行笔记。</text>
+    </view>
+    <view class="feed-bottom-space"></view>
+  </scroll-view>
+
+  <view class="publish-fab" bindtap="onPublishTap">
+    <text class="publish-fab-icon">＋</text>
+  </view>
+</view>

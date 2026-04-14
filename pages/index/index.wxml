@@ -1,4 +1,3 @@
-<cloud-template-guide />
 <scroll-view class="home-scroll" scroll-y="{{true}}" enable-back-to-top="{{true}}">
   <!-- 顶部品牌区 -->
   <view class="home-header">
@@ -10,6 +9,18 @@
       <icon type="search" size="16" color="#999"></icon>
       <input placeholder="搜索景点/路线" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" />
     </view>
+  </view>
+
+  <!-- 轮播图 -->
+  <view wx:if="{{bannerList.length > 0}}" class="banner-section">
+    <swiper class="banner-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="3000" duration="500">
+      <block wx:for="{{bannerList}}" wx:key="id">
+        <swiper-item>
+          <image class="banner-image" src="{{item.image}}" mode="aspectFill" bindtap="onBannerTap" data-id="{{item.id}}" data-title="{{item.title}}"></image>
+          <view class="banner-title" wx:if="{{item.title}}">{{item.title}}</view>
+        </swiper-item>
+      </block>
+    </swiper>
   </view>
 
   <!-- 快捷入口胶囊 -->
@@ -38,6 +49,72 @@
     </view>
   </view>
 
+  <!-- 天气信息 -->
+  <view class="section weather-section">
+    <view class="section-header">
+      <text class="section-title">今日天气</text>
+      <text class="weather-update">{{weather.updateTime}}</text>
+    </view>
+    <view class="weather-content">
+      <view class="weather-main">
+        <text class="weather-icon">{{weather.icon}}</text>
+        <view class="weather-temp">
+          <text class="temperature">{{weather.temperature}}</text>
+          <text class="weather-desc">{{weather.weather}}</text>
+        </view>
+        <view class="weather-city">
+          <text class="city-name">{{weather.city}}</text>
+          <text class="air-quality">空气质量 {{weather.airQuality}}</text>
+        </view>
+      </view>
+      <view class="weather-details">
+        <view class="detail-item">
+          <text class="detail-label">湿度</text>
+          <text class="detail-value">{{weather.humidity}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">风力</text>
+          <text class="detail-value">{{weather.wind}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">体感</text>
+          <text class="detail-value">{{weather.temperature}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐路线 -->
+  <view wx:if="{{recommendedRoutes.length > 0}}" class="section recommended-routes-section">
+    <view class="section-header">
+      <text class="section-title">推荐路线</text>
+      <text class="section-more" bindtap="onGoRoutePlan">更多</text>
+    </view>
+    <view class="routes-list">
+      <view 
+        wx:for="{{recommendedRoutes}}" 
+        wx:key="id" 
+        class="route-item" 
+        bindtap="onRouteTap"
+        data-id="{{item.id}}"
+        data-title="{{item.title}}"
+      >
+        <image class="route-cover" src="{{item.cover || '/images/scenic/qixingyan.jpg'}}" mode="aspectFill"></image>
+        <view class="route-info">
+          <text class="route-title">{{item.title}}</text>
+          <text class="route-desc">{{item.description}}</text>
+          <view class="route-meta">
+            <text class="meta-tag">{{item.duration}}</text>
+            <text class="meta-tag">{{item.difficulty}}</text>
+            <view class="route-tags">
+              <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="tag">{{tag}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 热门景点推荐 -->
   <view wx:if="{{hotScenicList.length > 0}}" class="section hot-attraction-section">
     <view class="section-header">
@@ -45,7 +122,7 @@
       <text class="section-more" bindtap="onGoScenicList">更多</text>
     </view>
     <view class="featured-card" bindtap="goScenicDetail" data-id="{{hotScenicList[0].scenicId}}" data-name="{{hotScenicList[0].scenicName}}">
-      <image class="featured-bg" src="{{hotScenicList[0].imageUrl || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
+      <image class="featured-bg" src="{{hotScenicList[0].imageUrl || '/images/scenic/qixingyan.jpg'}}" mode="aspectFill"></image>
       <view class="featured-overlay">
         <text class="featured-name">{{hotScenicList[0].scenicName}}</text>
         <text class="featured-desc">{{hotScenicList[0].description || '肇庆知名景区'}}</text>
@@ -77,7 +154,7 @@
         data-id="{{item.scenicId}}"
         data-name="{{item.scenicName}}"
       >
-        <image class="route-card-img" src="{{item.imageUrl || 'https://main.qcloudimg.com/raw/f859ae9d38d34a5ddaa89ae108109cd4.png'}}" mode="aspectFill"></image>
+        <image class="route-card-img" src="{{item.imageUrl || '/images/scenic/qixingyan.jpg'}}" mode="aspectFill"></image>
         <view class="route-card-info">
           <text class="route-card-name">{{item.scenicName}}</text>
           <text class="route-card-meta">建议 {{item.suggestedDuration || 4}} 小时 · 热度 {{item.heat || 0}}°</text>
@@ -86,22 +163,25 @@
     </view>
   </view>
 
-  <!-- 搭子帖子广场 -->
+  <!-- 搭子大厅 -->
   <view class="section post-square-section">
-    <view class="section-header">
-      <text class="section-title">搭子帖子广场</text>
+    <view class="section-header section-header-stack">
+      <view>
+        <text class="section-title">搭子大厅</text>
+        <text class="section-subtitle">智能推荐当前最值得加入的组队</text>
+      </view>
     </view>
     <view class="post-cards">
       <view
         wx:for="{{postList}}"
-        wx:key="postId"
+        wx:key="groupId"
         class="post-card"
         bindtap="onPostTap"
-        data-post-id="{{item.postId}}"
+        data-group-id="{{item.groupId || item.id}}"
       >
         <view class="post-card-header">
-          <image class="post-avatar" src="{{item.publisher.avatar}}" mode="aspectFill"></image>
-          <text class="post-nickname">{{item.publisher.nickname}}</text>
+          <image class="post-avatar" src="{{item.imageUrl || '/images/scenic/qixingyan.jpg'}}" mode="aspectFill"></image>
+          <text class="post-nickname">{{item.nickname || '旅行爱好者'}}</text>
         </view>
         <view class="post-card-body">
           <view class="post-destination">
@@ -109,33 +189,55 @@
             <text class="value">{{item.destination}}</text>
           </view>
           <view class="post-meta">
-            <text class="meta-item">出发 {{item.departureTime}}</text>
-            <text class="meta-item">还缺 {{item.peopleNeeded}} 人</text>
+            <text class="meta-item">出发 {{item.displayTime || item.startTime || '待定'}}</text>
+            <text class="meta-item">还缺 {{item.remainCount}} 人</text>
           </view>
           <view class="post-tags" wx:if="{{item.tags && item.tags.length > 0}}">
             <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="post-tag">{{tag}}</text>
           </view>
           <view class="post-actions">
             <view class="post-action-btn action-chat" catchtap="onPostChatTap" data-post="{{item}}">联系TA</view>
-            <view class="post-action-btn action-comment" catchtap="onPostCommentTap" data-post="{{item}}">评论</view>
-            <view class="post-action-btn {{item._applied ? 'action-applied' : 'action-apply'}}" catchtap="onPostApplyTap" data-post="{{item}}">{{item._applied ? '已申请' : '申请'}}</view>
+            <view class="post-action-btn action-comment" catchtap="onPostCommentTap" data-post="{{item}}">详情</view>
+            <view class="post-action-btn action-apply" catchtap="onPostApplyTap" data-post="{{item}}">申请</view>
           </view>
         </view>
       </view>
     </view>
     <view wx:if="{{postList.length === 0}}" class="empty-posts">
-      <text>暂无搭子帖子，快来发布第一个吧</text>
+      <text>暂无可推荐的组队，快去搭子大厅看看吧</text>
     </view>
   </view>
 
-  <!-- 最新攻略（保留） -->
-  <view wx:if="{{newsList.length > 0}}" class="section news-section">
-    <view class="section-header">
-      <text class="section-title">最新攻略</text>
+  <!-- 推荐攻略 -->
+  <view wx:if="{{guidePostList.length > 0}}" class="section news-section">
+    <view class="section-header section-header-stack">
+      <view>
+        <view class="section-title-row">
+          <text class="section-title">推荐攻略</text>
+          <text class="section-badge">优质推荐</text>
+        </view>
+        <text class="section-subtitle">精选社区里更值得看的公开攻略内容</text>
+      </view>
       <view class="section-more" bindtap="onGoNews">更多</view>
     </view>
-    <view class="news_list">
-      <news-list wx:for="{{newsList}}" wx:key="index" title="{{item.title}}" time="{{item.time}}" image="{{item.picture}}" id="{{item._id}}" number="{{index}}"></news-list>
+    <view class="guide-list">
+      <view
+        wx:for="{{guidePostList}}"
+        wx:key="id"
+        class="guide-card"
+        bindtap="onGuideTap"
+        data-post-id="{{item.id}}"
+      >
+        <image class="guide-cover" src="{{item.cover}}" mode="aspectFill"></image>
+        <view class="guide-body">
+          <text class="guide-title">{{item.title}}</text>
+          <text class="guide-desc">{{item.summary}}</text>
+          <view class="guide-meta">
+            <text class="guide-author">{{item.authorName || item.author.name || '旅行者'}}</text>
+            <text class="guide-stat">❤ {{item.likeCount}} · 💬 {{item.commentCount}}</text>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 
